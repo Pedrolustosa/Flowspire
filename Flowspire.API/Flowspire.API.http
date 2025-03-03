@@ -1,0 +1,6 @@
+@Flowspire.API_HostAddress = http://localhost:5240
+
+GET {{Flowspire.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
