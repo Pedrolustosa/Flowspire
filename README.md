@@ -27,7 +27,7 @@ The project follows **Clean Architecture** principles with a clear separation of
 Flowspire/
 ├── Flowspire.API             # Presentation layer (Controllers, Hubs)
 ├── Flowspire.Application     # Application layer (Services, DTOs)
-├── Flowspire.Domain         # Domain layer (Entities, Interfaces)
+├── Flowspire.Domain         # Domain layer (Entities, Interfaces, Hubs)
 ├── Flowspire.Infra         # Infrastructure layer (Repositories, DB Context)
 └── Flowspire.Infra.IoC     # Dependency Injection configuration
 ```
