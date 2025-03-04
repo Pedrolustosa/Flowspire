@@ -39,4 +39,13 @@ public class TransactionController : ControllerBase
         var transactions = await _transactionService.GetTransactionsByUserIdAsync(userId);
         return Ok(transactions);
     }
+
+    [HttpGet("report")]
+    [Authorize(Roles = "Customer, FinancialAdvisor, Administrator")]
+    public async Task<IActionResult> GetFinancialReport([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var report = await _transactionService.GetFinancialReportAsync(userId, startDate, endDate);
+        return Ok(report);
+    }
 }

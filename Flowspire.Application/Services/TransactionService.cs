@@ -5,9 +5,10 @@ using Flowspire.Domain.Interfaces;
 
 namespace Flowspire.Application.Services;
 
-public class TransactionService(ITransactionRepository transactionRepository) : ITransactionService
+public class TransactionService(ITransactionRepository transactionRepository, IBudgetService budgetService) : ITransactionService
 {
     private readonly ITransactionRepository _transactionRepository = transactionRepository;
+    private readonly IBudgetService _budgetService = budgetService;
 
     public async Task<TransactionDTO> AddTransactionAsync(TransactionDTO transactionDto)
     {
@@ -15,17 +16,20 @@ public class TransactionService(ITransactionRepository transactionRepository) : 
             transactionDto.Description,
             transactionDto.Amount,
             transactionDto.Date,
-            transactionDto.Category,
+            transactionDto.CategoryId,
             transactionDto.UserId);
 
         var addedTransaction = await _transactionRepository.AddAsync(transaction);
+
+        await _budgetService.CheckBudgetAndNotifyAsync(transactionDto.UserId, transactionDto.CategoryId, transactionDto.Amount);
+
         return new TransactionDTO
         {
             Id = addedTransaction.Id,
             Description = addedTransaction.Description,
             Amount = addedTransaction.Amount,
             Date = addedTransaction.Date,
-            Category = addedTransaction.Category,
+            CategoryId = addedTransaction.CategoryId,
             UserId = addedTransaction.UserId
         };
     }
@@ -39,8 +43,34 @@ public class TransactionService(ITransactionRepository transactionRepository) : 
             Description = t.Description,
             Amount = t.Amount,
             Date = t.Date,
-            Category = t.Category,
+            CategoryId = t.CategoryId,
+            Category = t.Category != null ? new CategoryDTO
+            {
+                Id = t.Category.Id,
+                Name = t.Category.Name,
+                UserId = t.Category.UserId
+            } : null,
             UserId = t.UserId
         }).ToList();
+    }
+
+    public async Task<FinancialReportDTO> GetFinancialReportAsync(string userId, DateTime startDate, DateTime endDate)
+    {
+        var transactions = await _transactionRepository.GetByUserIdAsync(userId);
+        var filteredTransactions = transactions
+            .Where(t => t.Date >= startDate && t.Date <= endDate)
+            .ToList();
+
+        var report = new FinancialReportDTO
+        {
+            TotalIncome = filteredTransactions.Where(t => t.Amount > 0).Sum(t => t.Amount),
+            TotalExpenses = filteredTransactions.Where(t => t.Amount < 0).Sum(t => Math.Abs(t.Amount)),
+            ExpensesByCategory = filteredTransactions
+                .Where(t => t.Amount < 0)
+                .GroupBy(t => t.Category.Name)
+                .ToDictionary(g => g.Key, g => Math.Abs(g.Sum(t => t.Amount)))
+        };
+
+        return report;
     }
 }

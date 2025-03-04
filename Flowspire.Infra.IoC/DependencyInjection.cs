@@ -8,20 +8,22 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using Flowspire.Domain.Interfaces;
+using FluentValidation.AspNetCore; // Mantido para compatibilidade
+using Flowspire.Application.Validators;
 using Flowspire.Domain.Entities;
-using Microsoft.Extensions.Configuration; // Para IdentityRole
+using Flowspire.Domain.Interfaces;
+using Flowspire.Infra.Services;
+using FluentValidation;
+using Microsoft.Extensions.Configuration;
 
 namespace Flowspire.Infra.IoC;
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString, IConfiguration configuration)
     {
-        // Configuração do DbContext
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlite(connectionString));
 
-        // Configuração do Identity com Roles
         services.AddIdentity<User, IdentityRole>(options =>
         {
             options.Password.RequireDigit = true;
@@ -29,14 +31,23 @@ public static class DependencyInjection
         })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddSignInManager()
-        .AddRoles<IdentityRole>(); // Adiciona suporte a Roles
+        .AddRoles<IdentityRole>();
 
-        // Injeção de dependências
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITransactionService, TransactionService>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IBudgetRepository, BudgetRepository>();
+        services.AddScoped<IBudgetService, BudgetService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IMessageService, MessageService>();
+        services.AddScoped<IAdvisorCustomerRepository, AdvisorCustomerRepository>();
+        services.AddScoped<IAdvisorCustomerService, AdvisorCustomerService>();
+        services.AddSignalR();
 
-        // Configuração de autenticação JWT
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -44,6 +55,10 @@ public static class DependencyInjection
         })
         .AddJwtBearer(options =>
         {
+            var jwtKey = configuration["Jwt:Key"];
+            if (string.IsNullOrEmpty(jwtKey))
+                throw new InvalidOperationException("A chave JWT não está configurada no appsettings.json.");
+
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -52,12 +67,15 @@ public static class DependencyInjection
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = configuration["Jwt:Issuer"],
                 ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
             };
         });
 
-        // Adicionar configuração do Swagger
         services.AddSwaggerConfiguration();
+
+        services.AddFluentValidationAutoValidation();
+        services.AddFluentValidationClientsideAdapters();
+        services.AddValidatorsFromAssemblyContaining<TransactionDTOValidator>();
 
         return services;
     }

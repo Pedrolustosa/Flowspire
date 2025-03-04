@@ -19,6 +19,7 @@ public class TransactionRepository(ApplicationDbContext context) : ITransactionR
     public async Task<List<Transaction>> GetByUserIdAsync(string userId)
     {
         return await _context.Transactions
+            .Include(t => t.Category)
             .Where(t => t.UserId == userId)
             .ToListAsync();
     }

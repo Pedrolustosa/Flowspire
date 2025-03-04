@@ -1,13 +1,11 @@
-using System.Text;
+using Flowspire.Domain.Hubs;
 using Flowspire.Infra.IoC;
-using Microsoft.OpenApi.Models;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=flowspire.db";
 builder.Services.AddInfrastructure(connectionString, builder.Configuration);
@@ -20,7 +18,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Flowspire API v1");
-        c.RoutePrefix = string.Empty;
     });
 }
 
@@ -28,5 +25,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
+app.MapHub<NotificationHub>("/notificationHub");
 app.Run();
