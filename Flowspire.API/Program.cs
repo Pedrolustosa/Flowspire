@@ -1,25 +1,29 @@
+using Flowspire.Domain.Hubs;
+using Flowspire.Infra.IoC;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=flowspire.db";
+builder.Services.AddInfrastructure(connectionString, builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Flowspire API v1");
+    });
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
+app.MapHub<NotificationHub>("/notificationHub");
 app.Run();
