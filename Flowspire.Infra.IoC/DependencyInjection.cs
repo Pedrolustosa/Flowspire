@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using FluentValidation.AspNetCore; // Mantido para compatibilidade
+using FluentValidation.AspNetCore;
 using Flowspire.Application.Validators;
 using Flowspire.Domain.Entities;
 using Flowspire.Domain.Interfaces;
@@ -17,6 +17,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 
 namespace Flowspire.Infra.IoC;
+
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString, IConfiguration configuration)
