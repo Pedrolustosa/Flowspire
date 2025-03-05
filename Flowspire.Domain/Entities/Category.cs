@@ -10,6 +10,13 @@ public class Category
 
     private Category() { }
 
+    public Category(int id, string name, string userId)
+    {
+        Id = id;
+        Name = name;
+        UserId = userId;
+    }
+
     public static Category Create(string name, string userId)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nome da categoria é obrigatório.");

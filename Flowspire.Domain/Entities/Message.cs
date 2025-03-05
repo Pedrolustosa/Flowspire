@@ -12,6 +12,16 @@ public class Message
 
     private Message() { }
 
+    public Message(int id, string senderId, string receiverId, string content, DateTime sentAt, bool isRead)
+    {
+        Id = id;
+        SenderId = senderId;
+        ReceiverId = receiverId;
+        Content = content;
+        SentAt = sentAt;
+        IsRead = isRead;
+    }
+
     public static Message Create(string senderId, string receiverId, string content)
     {
         if (string.IsNullOrWhiteSpace(senderId)) throw new ArgumentException("SenderId é obrigatório.");

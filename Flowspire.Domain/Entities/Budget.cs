@@ -12,6 +12,16 @@ public class Budget
 
     private Budget() { }
 
+    public Budget(int id, int categoryId, decimal amount, DateTime startDate, DateTime endDate, string userId)
+    {
+        Id = id;
+        CategoryId = categoryId;
+        Amount = amount;
+        StartDate = startDate;
+        EndDate = endDate;
+        UserId = userId;
+    }
+
     public static Budget Create(int categoryId, decimal amount, DateTime startDate, DateTime endDate, string userId)
     {
         if (categoryId <= 0) throw new ArgumentException("Categoria inválida.");
