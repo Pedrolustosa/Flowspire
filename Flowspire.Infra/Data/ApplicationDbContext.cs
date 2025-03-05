@@ -108,5 +108,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                   .HasForeignKey(ac => ac.CustomerId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
+
+        DatabaseSeeder.Seed(builder);
     }
 }

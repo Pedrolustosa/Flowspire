@@ -12,6 +12,16 @@ public class Transaction
 
     private Transaction() { }
 
+    public Transaction(int id, string description, decimal amount, DateTime date, int categoryId, string userId)
+    {
+        Id = id;
+        Description = description;
+        Amount = amount;
+        Date = date;
+        CategoryId = categoryId;
+        UserId = userId;
+    }
+
     public static Transaction Create(string description, decimal amount, DateTime date, int categoryId, string userId)
     {
         if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Descrição é obrigatória.");

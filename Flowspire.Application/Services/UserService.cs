@@ -78,7 +78,9 @@ public class UserService(UserManager<User> userManager,
     {
         try
         {
-            var user = await _userManager.FindByEmailAsync(email)??throw new Exception("Usuário não encontrado.");
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                throw new Exception("Usuário não encontrado.");
             var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
             if (!result.Succeeded)
                 throw new Exception("Login falhou.");
@@ -191,10 +193,11 @@ public class UserService(UserManager<User> userManager,
         var roles = _userManager.GetRolesAsync(user).Result;
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id),
-            new(JwtRegisteredClaimNames.Email, user.Email),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

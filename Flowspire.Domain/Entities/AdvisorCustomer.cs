@@ -9,6 +9,13 @@ public class AdvisorCustomer
 
     private AdvisorCustomer() { }
 
+    public AdvisorCustomer(string advisorId, string customerId, DateTime assignedAt)
+    {
+        AdvisorId = advisorId;
+        CustomerId = customerId;
+        AssignedAt = assignedAt;
+    }
+
     public static AdvisorCustomer Create(string advisorId, string customerId)
     {
         if (string.IsNullOrWhiteSpace(advisorId)) throw new ArgumentException("AdvisorId é obrigatório.");

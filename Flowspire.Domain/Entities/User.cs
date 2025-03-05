@@ -9,6 +9,16 @@ public class User : IdentityUser
 
     private User() { }
 
+    public User(string id, string email, string fullName, string passwordHash)
+    {
+        Id = id;
+        UserName = email;
+        Email = email;
+        FullName = fullName;
+        PasswordHash = passwordHash;
+        EmailConfirmed = true;
+    }
+
     public static User Create(string email, string fullName, string password)
     {
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email é obrigatório.");
