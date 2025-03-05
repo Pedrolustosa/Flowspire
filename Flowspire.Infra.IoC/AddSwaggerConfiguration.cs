@@ -2,6 +2,7 @@
 using Microsoft.OpenApi.Models;
 
 namespace Flowspire.Infra.IoC;
+
 public static class SwaggerConfiguration
 {
     public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)

@@ -1,13 +1,13 @@
-﻿using Flowspire.API.Models;
-using Flowspire.Application.DTOs;
-using Flowspire.Application.Interfaces;
-using Flowspire.Domain.Entities;
-using Flowspire.Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Flowspire.Application.Interfaces;
+using Flowspire.Application.DTOs;
+using Flowspire.Domain.Enums;
 using System.Security.Claims;
+using Flowspire.API.Models;
 
 namespace Flowspire.API.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 public class UserController(IUserService userService) : ControllerBase
@@ -18,53 +18,99 @@ public class UserController(IUserService userService) : ControllerBase
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var requestingUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var userDto = await _userService.RegisterUserAsync(request.Email, request.FullName, request.Password, request.Role, requestingUserId);
-        return Ok(new { Message = "Usuário registrado com sucesso", User = userDto });
+        try
+        {
+            var requestingUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userDto = await _userService.RegisterUserAsync(request.Email, request.FullName, request.Password, request.Role, requestingUserId);
+            return Ok(new { Message = "Usuário registrado com sucesso", User = userDto });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
     }
 
     [HttpPost("register-customer")]
     public async Task<IActionResult> RegisterCustomer([FromBody] RegisterCustomerRequest request)
     {
-        var userDto = await _userService.RegisterUserAsync(request.Email, request.FullName, request.Password, UserRole.Customer);
-        return Ok(new { Message = "Usuário registrado com sucesso", User = userDto });
+        try
+        {
+            var userDto = await _userService.RegisterUserAsync(request.Email, request.FullName, request.Password, UserRole.Customer);
+            return Ok(new { Message = "Usuário registrado com sucesso", User = userDto });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var (accessToken, refreshToken) = await _userService.LoginUserAsync(request.Email, request.Password);
-        return Ok(new { Message = "Login bem-sucedido", AccessToken = accessToken, RefreshToken = refreshToken });
+        try
+        {
+            var (accessToken, refreshToken) = await _userService.LoginUserAsync(request.Email, request.Password);
+            return Ok(new { Message = "Login bem-sucedido", AccessToken = accessToken, RefreshToken = refreshToken });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
     }
 
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
     {
-        var (accessToken, refreshToken) = await _userService.RefreshTokenAsync(request.RefreshToken);
-        return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+        try
+        {
+            var (accessToken, refreshToken) = await _userService.RefreshTokenAsync(request.RefreshToken);
+            return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
     }
 
     [Authorize]
     [HttpPut("update")]
     public async Task<IActionResult> Update([FromBody] UpdateRequest request)
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized();
+        try
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
 
-        var updatedUserDto = await _userService.UpdateUserAsync(userId, request.FullName);
-        return Ok(new { Message = "Usuário atualizado com sucesso", User = updatedUserDto });
+            var updatedUserDto = await _userService.UpdateUserAsync(userId, request.FullName);
+            return Ok(new { Message = "Usuário atualizado com sucesso", User = updatedUserDto });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
     }
 
     [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> GetCurrentUser()
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized();
+        try
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
 
-        var userDto = await _userService.GetCurrentUserAsync(userId);
-        return Ok(userDto);
+            var userDto = await _userService.GetCurrentUserAsync(userId);
+            return Ok(userDto);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
     }
 }

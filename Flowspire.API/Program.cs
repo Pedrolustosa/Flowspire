@@ -1,3 +1,4 @@
+using Flowspire.API.Middleware;
 using Flowspire.Domain.Hubs;
 using Flowspire.Infra.IoC;
 
@@ -21,6 +22,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseExceptionMiddleware();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
