@@ -1,4 +1,4 @@
-# Flowspire)
+# Flowspire
 ![Status](https://img.shields.io/badge/Status-In%20Development-yellow?style=flat-square)
 
 **Flowspire** is a modern personal finance management API designed to help users track income and expenses, create budgets, and interact with financial advisors in real-time. Built with **Clean Architecture** and **Domain-Driven Design (DDD)** principles, the application provides a secure, scalable foundation for both users and financial advisors.
