@@ -1,4 +1,5 @@
-﻿namespace Flowspire.Domain.Entities;
+﻿using Flowspire.Domain.Entities;
+
 public class Transaction
 {
     public int Id { get; private set; }
@@ -11,16 +12,6 @@ public class Transaction
     public User User { get; private set; }
 
     private Transaction() { }
-
-    public Transaction(int id, string description, decimal amount, DateTime date, int categoryId, string userId)
-    {
-        Id = id;
-        Description = description;
-        Amount = amount;
-        Date = date;
-        CategoryId = categoryId;
-        UserId = userId;
-    }
 
     public static Transaction Create(string description, decimal amount, DateTime date, int categoryId, string userId)
     {

@@ -10,4 +10,7 @@ public interface IUserService
     Task<UserDTO> UpdateUserAsync(string userId, string fullName);
     Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(string refreshToken);
     Task<UserDTO> GetCurrentUserAsync(string userId);
+    Task AssignRoleAsync(string userId, UserRole role);
+    Task RemoveRoleAsync(string userId, UserRole role);
+    Task<List<UserDTO>> GetUsersByRoleAsync(UserRole role);
 }

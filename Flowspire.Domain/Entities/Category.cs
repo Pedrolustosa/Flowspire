@@ -1,4 +1,4 @@
-﻿namespace Flowspire.Domain.Entities;
+﻿using Flowspire.Domain.Entities;
 
 public class Category
 {
@@ -9,13 +9,6 @@ public class Category
     public ICollection<Transaction> Transactions { get; private set; } = new List<Transaction>();
 
     private Category() { }
-
-    public Category(int id, string name, string userId)
-    {
-        Id = id;
-        Name = name;
-        UserId = userId;
-    }
 
     public static Category Create(string name, string userId)
     {
@@ -33,5 +26,12 @@ public class Category
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nome da categoria é obrigatório.");
         Name = name.Trim();
+    }
+
+    public void AddTransaction(Transaction transaction)
+    {
+        if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+        if (transaction.CategoryId != Id) throw new ArgumentException("Transação pertence a outra categoria.");
+        Transactions.Add(transaction);
     }
 }

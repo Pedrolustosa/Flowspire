@@ -106,10 +106,13 @@ public class UserService(UserManager<User> userManager,
         try
         {
             var token = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
-            if (token == null || token.IsRevoked || token.Expires < DateTime.UtcNow)
+            if (token == null || token.IsRevoked || token.IsExpired())
                 throw new Exception("Refresh token inválido ou expirado.");
 
-            var user = await _userManager.FindByIdAsync(token.UserId)??throw new Exception("Usuário não encontrado.");
+            var user = await _userManager.FindByIdAsync(token.UserId);
+            if (user == null)
+                throw new Exception("Usuário não encontrado.");
+
             var newAccessToken = GenerateJwtToken(user);
             token.Revoke();
             await _refreshTokenRepository.UpdateAsync(token);
@@ -185,6 +188,86 @@ public class UserService(UserManager<User> userManager,
         catch (Exception ex)
         {
             throw new Exception("Erro inesperado ao recuperar usuário.", ex);
+        }
+    }
+
+    public async Task AssignRoleAsync(string userId, UserRole role)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException("Usuário não encontrado.");
+
+            string roleName = role.ToString();
+            if (!await _roleManager.RoleExistsAsync(roleName))
+                await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+            if (!result.Succeeded)
+                throw new Exception("Erro ao atribuir o role ao usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new Exception("Erro ao salvar a atribuição de role no banco de dados.", ex);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Erro inesperado ao atribuir role.", ex);
+        }
+    }
+
+    public async Task RemoveRoleAsync(string userId, UserRole role)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException("Usuário não encontrado.");
+
+            string roleName = role.ToString();
+            if (!await _userManager.IsInRoleAsync(user, roleName))
+                throw new Exception("O usuário não possui este role.");
+
+            var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+            if (!result.Succeeded)
+                throw new Exception("Erro ao remover o role do usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new Exception("Erro ao salvar a remoção de role no banco de dados.", ex);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Erro inesperado ao remover role.", ex);
+        }
+    }
+
+    public async Task<List<UserDTO>> GetUsersByRoleAsync(UserRole role)
+    {
+        try
+        {
+            string roleName = role.ToString();
+            var users = await _userManager.GetUsersInRoleAsync(roleName);
+            return users.Select(user => new UserDTO
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+                Role = role
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Erro inesperado ao recuperar usuários por role.", ex);
         }
     }
 

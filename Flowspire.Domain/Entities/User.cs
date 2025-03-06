@@ -1,23 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Flowspire.Domain.Enums;
 
-namespace Flowspire.Domain.Entities;
 public class User : IdentityUser
 {
     public string FullName { get; private set; }
     public ICollection<Transaction> Transactions { get; private set; } = new List<Transaction>();
 
     private User() { }
-
-    public User(string id, string email, string fullName, string passwordHash)
-    {
-        Id = id;
-        UserName = email;
-        Email = email;
-        FullName = fullName;
-        PasswordHash = passwordHash;
-        EmailConfirmed = true;
-    }
 
     public static User Create(string email, string fullName, string password)
     {
