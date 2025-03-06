@@ -1,4 +1,5 @@
-﻿namespace Flowspire.Domain.Entities;
+﻿using Flowspire.Domain.Entities;
+
 public class Message
 {
     public int Id { get; private set; }
@@ -11,16 +12,6 @@ public class Message
     public bool IsRead { get; private set; }
 
     private Message() { }
-
-    public Message(int id, string senderId, string receiverId, string content, DateTime sentAt, bool isRead)
-    {
-        Id = id;
-        SenderId = senderId;
-        ReceiverId = receiverId;
-        Content = content;
-        SentAt = sentAt;
-        IsRead = isRead;
-    }
 
     public static Message Create(string senderId, string receiverId, string content)
     {
@@ -41,5 +32,12 @@ public class Message
     public void MarkAsRead()
     {
         IsRead = true;
+    }
+
+    public void EditContent(string newContent)
+    {
+        if (IsRead) throw new InvalidOperationException("Não é possível editar uma mensagem já lida.");
+        if (string.IsNullOrWhiteSpace(newContent)) throw new ArgumentException("Conteúdo da mensagem é obrigatório.");
+        Content = newContent.Trim();
     }
 }

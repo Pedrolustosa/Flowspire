@@ -113,4 +113,57 @@ public class UserController(IUserService userService) : ControllerBase
             return BadRequest(new { Error = ex.Message });
         }
     }
+
+    [HttpPost("assign")]
+    public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest request)
+    {
+        try
+        {
+            await _userService.AssignRoleAsync(request.UserId, request.Role);
+            return Ok(new { Message = $"Role {request.Role} atribuído ao usuário {request.UserId} com sucesso." });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { Error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
+    }
+
+    [HttpPost("remove")]
+    public async Task<IActionResult> RemoveRole([FromBody] RemoveRoleRequest request)
+    {
+        try
+        {
+            await _userService.RemoveRoleAsync(request.UserId, request.Role);
+            return Ok(new { Message = $"Role {request.Role} removido do usuário {request.UserId} com sucesso." });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { Error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
+    }
+
+    [HttpGet("users/{roleName}")]
+    public async Task<IActionResult> GetUsersByRole(string roleName)
+    {
+        try
+        {
+            if (!Enum.TryParse<UserRole>(roleName, true, out var role))
+                return BadRequest(new { Error = "Role inválido." });
+
+            var users = await _userService.GetUsersByRoleAsync(role);
+            return Ok(users);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
+    }
 }

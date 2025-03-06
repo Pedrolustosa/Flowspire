@@ -1,4 +1,5 @@
-﻿namespace Flowspire.Domain.Entities;
+﻿using Flowspire.Domain.Entities;
+
 public class Budget
 {
     public int Id { get; private set; }
@@ -11,16 +12,6 @@ public class Budget
     public User User { get; private set; }
 
     private Budget() { }
-
-    public Budget(int id, int categoryId, decimal amount, DateTime startDate, DateTime endDate, string userId)
-    {
-        Id = id;
-        CategoryId = categoryId;
-        Amount = amount;
-        StartDate = startDate;
-        EndDate = endDate;
-        UserId = userId;
-    }
 
     public static Budget Create(int categoryId, decimal amount, DateTime startDate, DateTime endDate, string userId)
     {

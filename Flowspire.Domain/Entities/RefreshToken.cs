@@ -1,5 +1,4 @@
 ﻿namespace Flowspire.Domain.Entities;
-
 public class RefreshToken
 {
     public int Id { get; private set; }
@@ -32,4 +31,6 @@ public class RefreshToken
             throw new InvalidOperationException("Token já foi revogado.");
         IsRevoked = true;
     }
+
+    public bool IsExpired() => DateTime.UtcNow > Expires;
 }

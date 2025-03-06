@@ -1,4 +1,5 @@
-﻿namespace Flowspire.Domain.Entities;
+﻿using Flowspire.Domain.Entities;
+
 public class AdvisorCustomer
 {
     public string AdvisorId { get; private set; }
@@ -8,13 +9,6 @@ public class AdvisorCustomer
     public DateTime AssignedAt { get; private set; }
 
     private AdvisorCustomer() { }
-
-    public AdvisorCustomer(string advisorId, string customerId, DateTime assignedAt)
-    {
-        AdvisorId = advisorId;
-        CustomerId = customerId;
-        AssignedAt = assignedAt;
-    }
 
     public static AdvisorCustomer Create(string advisorId, string customerId)
     {
