@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -29,9 +30,11 @@ export class SidebarComponent {
     }
   ];
 
-  constructor(
-    private router: Router,
-  ) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
+
+  constructor() {}
 
   handleSidebarToggle(): void {
     this.isExpanded = !this.isExpanded;
@@ -43,6 +46,6 @@ export class SidebarComponent {
   }
 
   logout(): void {
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }
