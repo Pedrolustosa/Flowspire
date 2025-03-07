@@ -1,0 +1,29 @@
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-4 text-primary">Registro</h2>
+        <form (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="fullName" class="form-label">Nome</label>
+            <input type="text" id="fullName" class="form-control" [(ngModel)]="registerRequest.fullName" name="fullName" required>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" [(ngModel)]="registerRequest.email" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Senha</label>
+            <input type="password" id="password" class="form-control" [(ngModel)]="registerRequest.password" name="password" required>
+          </div>
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirmar Senha</label>
+            <input type="password" id="confirmPassword" class="form-control" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Registrar</button>
+        </form>
+        <p class="text-center mt-3">
+          Já tem uma conta? <a routerLink="['/login']" class="text-primary">Faça login</a>
+        </p>
+      </div>
+    </div>
+  </div>

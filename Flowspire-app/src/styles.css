@@ -1,0 +1,17 @@
+/* You can add global styles to this file, and also import other style files */
+/* Estilização personalizada do toastr */
+.toast-top-right {
+    top: 70px;
+  }
+  
+  .toast-success {
+    background-color: #34D399;
+  }
+  
+  .toast-error {
+    background-color: #EF4444;
+  }
+  
+  .toast-info {
+    background-color: #1E3A8A;
+  }

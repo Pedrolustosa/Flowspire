@@ -1,0 +1,34 @@
+<nav class="sidebar" [class.collapsed]="!isExpanded">
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <span class="app-name" *ngIf="isExpanded">Flowspire</span>
+    </div>
+    <button class="toggle-btn" (click)="handleSidebarToggle()">
+      <i class="fas" [class.fa-chevron-left]="isExpanded" [class.fa-chevron-right]="!isExpanded"></i>
+    </button>
+  </div>
+
+  <div class="nav-section">
+    <ul class="nav-links">
+      <li *ngFor="let item of navItems" 
+          [class.active]="isCurrentRoute(item.route)" 
+          [routerLinkActive]="'active'"
+          [routerLink]="[item.route]" 
+          [title]="!isExpanded ? item.label : ''">
+        <div class="nav-item">
+          <i [class]="item.icon"></i>
+          <div class="nav-content" *ngIf="isExpanded">
+            <span class="nav-label">{{ item.label }}</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span *ngIf="isExpanded">Sair</span>
+    </button>
+  </div>
+</nav>

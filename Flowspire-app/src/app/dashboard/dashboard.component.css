@@ -1,0 +1,254 @@
+.container-fluid {
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Styling */
+.dashboard-header {
+  margin-bottom: 1.5rem;
+}
+
+.display-6 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2C3E50;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.text-muted {
+  color: #64748B !important;
+  font-size: 1rem;
+}
+
+/* Grid Layout */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -0.75rem;
+}
+
+.col-md-4 {
+  flex: 0 0 33.333333%;
+  max-width: 33.333333%;
+  padding: 0.75rem;
+}
+
+.col-12 {
+  flex: 0 0 100%;
+  max-width: 100%;
+  padding: 0.75rem;
+}
+
+/* Card Styling */
+.card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card-body {
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Indicadores Financeiros */
+.indicator-card {
+  position: relative;
+  min-height: 160px;
+}
+
+.indicator-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: currentColor;
+  opacity: 0.1;
+}
+
+.indicator-card.receitas::before {
+  background: #2ECC71;
+}
+
+.indicator-card.despesas::before {
+  background: #E74C3C;
+}
+
+.indicator-card.saldo::before {
+  background: #3498DB;
+}
+
+.indicator-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.indicator-card:hover .indicator-icon {
+  transform: scale(1.1) rotate(-10deg);
+}
+
+.text-success .indicator-icon {
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.text-danger .indicator-icon {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.text-primary .indicator-icon {
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.indicator-title {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #64748B;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.indicator-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.trend-info {
+  margin-top: auto;
+  padding-top: 1rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748B;
+}
+
+.trend-info i {
+  font-size: 0.75rem;
+}
+
+/* Valores */
+.text-success {
+  color: #2ECC71 !important;
+}
+
+.text-danger {
+  color: #E74C3C !important;
+}
+
+.text-primary {
+  color: #3498DB !important;
+}
+
+/* Gráfico */
+.chart-card {
+  margin-top: 1.5rem;
+}
+
+.chart-header {
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  color: #2C3E50;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748B;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-color.receitas {
+  background: #2ECC71;
+}
+
+.legend-color.despesas {
+  background: #E74C3C;
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  margin-top: 1rem;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .container-fluid {
+    padding: 1.5rem;
+  }
+
+  .col-md-4 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 1rem;
+  }
+
+  .display-6 {
+    font-size: 1.5rem;
+  }
+
+  .col-md-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .indicator-card {
+    min-height: auto;
+  }
+
+  .chart-container {
+    height: 300px;
+  }
+
+  .chart-legend {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+}
