@@ -11,17 +11,24 @@ builder.Services.AddSignalR();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=flowspire.db";
 builder.Services.AddInfrastructure(connectionString, builder.Configuration);
 
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+builder.Services.AddCors(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Flowspire API v1");
+        policy.AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials()
+              .WithOrigins(
+                  "http://localhost:4200",
+                  "https://localhost:4200"
+              );
     });
-}
+});
 
+var app = builder.Build();
+app.UseCors("AllowSpecificOrigins");
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseExceptionMiddleware();
 app.UseHttpsRedirection();
 app.UseAuthentication();

@@ -1,0 +1,19 @@
+.card {
+    background-color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+  }
+  
+  .btn-primary {
+    background-color: #1E3A8A;
+    border-color: #1E3A8A;
+  }
+  
+  .btn-primary:hover {
+    background-color: #166534;
+    border-color: #166534;
+  }
+  
+  .text-primary {
+    color: #1E3A8A !important;
+  }

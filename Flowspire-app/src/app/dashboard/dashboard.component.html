@@ -1,0 +1,49 @@
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h2 class="display-6 fw-bold text-primary">Olá, {{ userName }}!</h2>
+        <h2 class="display-6 fw-bold text-primary">Dashboard Financeiro</h2>
+        <p class="text-muted">Visão geral das suas finanças</p>
+      </div>
+    </div>
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+          <div class="card-body text-center">
+            <i class="fas fa-arrow-up text-success fs-3 mb-2"></i>
+            <h5 class="card-title">Receitas</h5>
+            <p class="card-text fw-bold text-success">R$ 5.200,00</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+          <div class="card-body text-center">
+            <i class="fas fa-arrow-down text-danger fs-3 mb-2"></i>
+            <h5 class="card-title">Despesas</h5>
+            <p class="card-text fw-bold text-danger">R$ 1.800,00</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+          <div class="card-body text-center">
+            <i class="fas fa-chart-line text-primary fs-3 mb-2"></i>
+            <h5 class="card-title">Saldo</h5>
+            <p class="card-text fw-bold text-primary">R$ 3.400,00</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="monthlyChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
