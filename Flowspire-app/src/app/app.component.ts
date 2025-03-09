@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, RouterOutlet } from '@angular/router';
-import { NgxSpinnerModule } from 'ngx-spinner';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { ToastrModule } from 'ngx-toastr';
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -22,12 +23,22 @@ import { ToastrModule } from 'ngx-toastr';
 export class AppComponent {
   isSidebarExpanded = true;
 
-  constructor(
-    private router: Router,
-  ) {}
+  private router = inject(Router);
+  private loadingService = inject(LoadingService);
+  private spinner = inject(NgxSpinnerService);
 
-  onSidebarToggle(): void {
-    this.isSidebarExpanded = !this.isSidebarExpanded;
+  constructor() {
+    this.loadingService.isLoading$.subscribe(isLoading => {
+      if (isLoading) {
+        this.spinner.show();
+      } else {
+        this.spinner.hide();
+      }
+    });
+  }
+
+  onSidebarToggle(event: boolean): void {
+    this.isSidebarExpanded = event;
   }
 
   shouldShowSidebar(): boolean {

@@ -1,21 +1,23 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
+import { provideClientHydration } from '@angular/platform-browser';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideToastr } from 'ngx-toastr';
 import { provideHttpClient } from '@angular/common/http';
 import { NgxSpinnerModule } from 'ngx-spinner';
-import { ToastrModule } from 'ngx-toastr';
-import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(),
+    provideClientHydration(),
     provideAnimations(),
-    ToastrModule.forRoot({
+    provideHttpClient(),
+    provideToastr({
+      timeOut: 3000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
-      timeOut: 5000,
-      progressBar: true,
-    }).providers!,
-  ],
+    }),
+    NgxSpinnerModule,
+  ]
 };

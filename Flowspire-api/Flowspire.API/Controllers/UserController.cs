@@ -78,7 +78,7 @@ public class UserController(IUserService userService) : ControllerBase
 
     [Authorize]
     [HttpPut("update")]
-    public async Task<IActionResult> Update([FromBody] UpdateRequest request)
+    public async Task<IActionResult> Update([FromBody] UpdateRequestWrapper requestWrapper)
     {
         try
         {
@@ -86,7 +86,7 @@ public class UserController(IUserService userService) : ControllerBase
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var updatedUserDto = await _userService.UpdateUserAsync(userId, request.FullName);
+            var updatedUserDto = await _userService.UpdateUserAsync(userId, requestWrapper.requestWrapper.FullName, requestWrapper.requestWrapper.Roles);
             return Ok(new { Message = "Usuário atualizado com sucesso", User = updatedUserDto });
         }
         catch (Exception ex)

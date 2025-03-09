@@ -57,7 +57,7 @@ public class UserService(UserManager<User> userManager,
                 Id = user.Id,
                 Email = user.Email,
                 FullName = user.FullName,
-                Role = role
+                Roles = new List<UserRole> { role }
             };
         }
         catch (DbUpdateException ex)
@@ -73,7 +73,6 @@ public class UserService(UserManager<User> userManager,
             throw new Exception("Erro inesperado ao registrar usuário.", ex);
         }
     }
-
     public async Task<(string AccessToken, string RefreshToken)> LoginUserAsync(string email, string password)
     {
         try
@@ -132,7 +131,7 @@ public class UserService(UserManager<User> userManager,
         }
     }
 
-    public async Task<UserDTO> UpdateUserAsync(string userId, string fullName)
+    public async Task<UserDTO> UpdateUserAsync(string userId, string fullName, List<UserRole> roles = null)
     {
         try
         {
@@ -142,19 +141,37 @@ public class UserService(UserManager<User> userManager,
             if (string.IsNullOrWhiteSpace(fullName))
                 throw new ArgumentException("O nome completo não pode ser vazio.");
 
-            var user = await _userManager.FindByIdAsync(userId)??throw new Exception("Usuário não encontrado.");
+            var user = await _userManager.FindByIdAsync(userId) ?? throw new Exception("Usuário não encontrado.");
             user.UpdateFullName(fullName);
+
+            // Atualizar roles, se fornecidas
+            if (roles != null && roles.Any())
+            {
+                var currentRoles = await _userManager.GetRolesAsync(user);
+                var rolesToRemove = currentRoles.Except(roles.Select(r => r.ToString())).ToList();
+                var rolesToAdd = roles.Select(r => r.ToString()).Except(currentRoles).ToList();
+
+                if (rolesToRemove.Any())
+                    await _userManager.RemoveFromRolesAsync(user, rolesToRemove.ToArray());
+                if (rolesToAdd.Any())
+                    await _userManager.AddToRolesAsync(user, rolesToAdd.ToArray());
+            }
+
             var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)
                 throw new Exception("Erro ao atualizar usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+
+            // Obter todas as roles do usuário
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var roleEnums = userRoles.Select(r => Enum.Parse<UserRole>(r)).ToList();
 
             return new UserDTO
             {
                 Id = user.Id,
                 Email = user.Email,
                 FullName = user.FullName,
-                Role = Enum.Parse<UserRole>(_userManager.GetRolesAsync(user).Result.First())
+                Roles = roleEnums // Retornar todas as roles como lista
             };
         }
         catch (DbUpdateException ex)
@@ -175,22 +192,23 @@ public class UserService(UserManager<User> userManager,
     {
         try
         {
-            var user = await _userManager.FindByIdAsync(userId)??throw new Exception("Usuário não encontrado.");
+            var user = await _userManager.FindByIdAsync(userId) ?? throw new Exception("Usuário não encontrado.");
             var roles = await _userManager.GetRolesAsync(user);
+            var roleEnums = roles.Select(r => Enum.Parse<UserRole>(r)).ToList();
+
             return new UserDTO
             {
                 Id = user.Id,
                 Email = user.Email,
                 FullName = user.FullName,
-                Role = Enum.Parse<UserRole>(roles.First())
+                Roles = roleEnums
             };
         }
         catch (Exception ex)
         {
-            throw new Exception("Erro inesperado ao recuperar usuário.", ex);
+            throw new Exception("Erro ao obter usuário atual.", ex);
         }
     }
-
     public async Task AssignRoleAsync(string userId, UserRole role)
     {
         try
@@ -262,7 +280,7 @@ public class UserService(UserManager<User> userManager,
                 Id = user.Id,
                 Email = user.Email,
                 FullName = user.FullName,
-                Role = role
+                Roles = new List<UserRole> { role }
             }).ToList();
         }
         catch (Exception ex)
