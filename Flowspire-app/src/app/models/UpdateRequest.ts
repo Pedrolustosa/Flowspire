@@ -1,3 +1,8 @@
+export interface UpdateRequestWrapper {
+  requestWrapper: UpdateRequest;
+}
+
 export interface UpdateRequest {
-    fullName: string;
-  }
+  fullName: string;
+  roles: number[];
+}

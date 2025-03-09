@@ -2,7 +2,6 @@ import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../environments/environment';
@@ -10,7 +9,8 @@ import { User } from '../models/User';
 import { LoginRequest } from '../models/LoginRequest';
 import { RegisterCustomerRequest } from '../models/RegisterCustomerRequest';
 import { RefreshTokenRequest } from '../models/RefreshTokenRequest';
-import { UpdateRequest } from '../models/UpdateRequest';
+import { UpdateRequest, UpdateRequestWrapper } from '../models/UpdateRequest';
+import { LoadingService } from './loading.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,9 +18,9 @@ import { UpdateRequest } from '../models/UpdateRequest';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private spinner = inject(NgxSpinnerService);
   private toastr = inject(ToastrService);
   private platformId = inject(PLATFORM_ID);
+  private loadingService = inject(LoadingService);
   private apiUrl = environment.apiUrl;
 
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(
@@ -37,7 +37,7 @@ export class AuthService {
   currentUser$ = this.currentUserSubject.asObservable();
 
   login(request: LoginRequest): Observable<any> {
-    this.spinner.show();
+    this.loadingService.setLoading(true);
     return this.http.post<any>(`${this.apiUrl}/user/login`, request).pipe(
       tap({
         next: (response) => {
@@ -50,20 +50,21 @@ export class AuthService {
             this.isAuthenticatedSubject.next(true);
             this.toastr.success('Login bem-sucedido!', 'Sucesso');
             this.getCurrentUser().subscribe();
-          } else {
-            this.toastr.error('Token de acesso não encontrado na resposta.', 'Erro');
           }
         },
         error: (err) => {
           this.toastr.error(err.error?.Error || 'Credenciais inválidas', 'Erro');
+          this.loadingService.setLoading(false);
         },
-        complete: () => this.spinner.hide()
+        complete: () => {
+          this.loadingService.setLoading(false);
+        }
       })
     );
   }
 
   register(request: RegisterCustomerRequest): Observable<any> {
-    this.spinner.show();
+    this.loadingService.setLoading(true);
     return this.http.post<any>(`${this.apiUrl}/user/register-customer`, request).pipe(
       tap({
         next: (response) => {
@@ -72,8 +73,11 @@ export class AuthService {
         },
         error: (err) => {
           this.toastr.error(err.error?.Error || 'Erro no registro', 'Erro');
+          this.loadingService.setLoading(false);
         },
-        complete: () => this.spinner.hide()
+        complete: () => {
+          this.loadingService.setLoading(false);
+        }
       })
     );
   }
@@ -86,7 +90,7 @@ export class AuthService {
     }
 
     const request: RefreshTokenRequest = { refreshToken };
-    this.spinner.show();
+    this.loadingService.setLoading(true);
     return this.http.post<any>(`${this.apiUrl}/user/refresh-token`, request).pipe(
       tap({
         next: (response) => {
@@ -103,18 +107,22 @@ export class AuthService {
         error: (err) => {
           this.toastr.error('Erro ao atualizar o token. Faça login novamente.', 'Erro');
           this.logout();
+          this.loadingService.setLoading(false);
         },
-        complete: () => this.spinner.hide()
+        complete: () => {
+          this.loadingService.setLoading(false);
+        }
       })
     );
   }
 
   updateUser(request: UpdateRequest): Observable<User> {
-    this.spinner.show();
+    this.loadingService.setLoading(true);
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`
     });
-    return this.http.put<User>(`${this.apiUrl}/user/update`, request, { headers }).pipe(
+    const body: UpdateRequestWrapper = { requestWrapper: request };
+    return this.http.put<User>(`${this.apiUrl}/user/update`, body, { headers }).pipe(
       tap({
         next: (response) => {
           this.currentUserSubject.next(response);
@@ -122,14 +130,17 @@ export class AuthService {
         },
         error: (err) => {
           this.toastr.error(err.error?.Error || 'Erro ao atualizar o perfil.', 'Erro');
+          this.loadingService.setLoading(false);
         },
-        complete: () => this.spinner.hide()
+        complete: () => {
+          this.loadingService.setLoading(false);
+        }
       })
     );
   }
 
   getCurrentUser(): Observable<User> {
-    this.spinner.show();
+    this.loadingService.setLoading(true);
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`
     });
@@ -140,8 +151,11 @@ export class AuthService {
         },
         error: (err) => {
           this.toastr.error(err.error?.Error || 'Erro ao buscar dados do usuário.', 'Erro');
+          this.loadingService.setLoading(false);
         },
-        complete: () => this.spinner.hide()
+        complete: () => {
+          this.loadingService.setLoading(false);
+        }
       })
     );
   }

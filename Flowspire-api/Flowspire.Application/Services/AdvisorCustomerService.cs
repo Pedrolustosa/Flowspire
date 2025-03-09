@@ -17,11 +17,11 @@ public class AdvisorCustomerService(IAdvisorCustomerRepository advisorCustomerRe
         try
         {
             var advisor = await _userService.GetCurrentUserAsync(advisorId);
-            if (advisor.Role != Flowspire.Domain.Enums.UserRole.FinancialAdvisor)
+            if (!advisor.Roles.Contains(Flowspire.Domain.Enums.UserRole.FinancialAdvisor))
                 throw new Exception("O usuário especificado não é um FinancialAdvisor.");
 
             var customer = await _userService.GetCurrentUserAsync(customerId);
-            if (customer.Role != Flowspire.Domain.Enums.UserRole.Customer)
+            if (!customer.Roles.Contains(Flowspire.Domain.Enums.UserRole.Customer))
                 throw new Exception("O usuário especificado não é um Customer.");
 
             var advisorCustomer = AdvisorCustomer.Create(advisorId, customerId);
@@ -42,7 +42,6 @@ public class AdvisorCustomerService(IAdvisorCustomerRepository advisorCustomerRe
             throw new Exception("Erro inesperado ao associar advisor e customer.", ex);
         }
     }
-
     public async Task<List<AdvisorCustomerDTO>> GetCustomersByAdvisorIdAsync(string advisorId)
     {
         try

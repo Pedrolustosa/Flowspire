@@ -1,17 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  --primary-color: #34D399;
+  --secondary-color: #10B981;
+  --background-color: #F3F4F6;
+  --text-color: #1F2937;
+  --sidebar-width: 250px;
+  --sidebar-collapsed-width: 70px;
+  --header-height: 60px;
+}
+
 /* Estilização personalizada do toastr */
-.toast-top-right {
-    top: 70px;
-  }
-  
-  .toast-success {
+.toast-success {
     background-color: #34D399;
-  }
-  
-  .toast-error {
+}
+
+.toast-error {
     background-color: #EF4444;
-  }
-  
-  .toast-info {
+}
+
+.toast-info {
     background-color: #1E3A8A;
-  }
+}

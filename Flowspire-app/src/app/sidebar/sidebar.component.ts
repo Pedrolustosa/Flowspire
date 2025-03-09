@@ -27,6 +27,11 @@ export class SidebarComponent {
       icon: 'fas fa-wallet',
       route: '/transactions',
       label: 'Transações'
+    },
+    {
+      icon: 'fas fa-user',
+      route: '/profile',
+      label: 'Perfil'
     }
   ];
 

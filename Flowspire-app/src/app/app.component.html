@@ -1,14 +1,15 @@
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#34D399" type="ball-scale-multiple">
+  <p style="color: white">Carregando...</p>
+</ngx-spinner>
+
 <div class="app-wrapper">
   <div class="container-fluid p-0">
     <div class="row g-0">
       <!-- Sidebar -->
       <div *ngIf="shouldShowSidebar()" class="col-auto sidebar-wrapper">
-        <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#34D399" type="ball-scale-multiple">
-          <p style="color: white">Carregando...</p>
-        </ngx-spinner>
         <app-sidebar 
           [isExpanded]="isSidebarExpanded"
-          (toggleSidebar)="onSidebarToggle()">
+          (toggleSidebar)="onSidebarToggle($event)">
         </app-sidebar>
       </div>
 
