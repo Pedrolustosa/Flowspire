@@ -5,7 +5,6 @@
 <div class="app-wrapper">
   <div class="container-fluid p-0">
     <div class="row g-0">
-      <!-- Sidebar -->
       <div *ngIf="shouldShowSidebar()" class="col-auto sidebar-wrapper">
         <app-sidebar 
           [isExpanded]="isSidebarExpanded"
@@ -13,7 +12,6 @@
         </app-sidebar>
       </div>
 
-      <!-- Main Content -->
       <div class="col" [ngClass]="{'ms-auto': !shouldShowSidebar()}">
         <router-outlet></router-outlet>
       </div>

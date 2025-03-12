@@ -1,0 +1,132 @@
+<div class="container-fluid py-4">
+  <div class="position-relative mb-4 p-4 bg-primary bg-gradient rounded-3 text-white">
+    <div class="position-relative z-2">
+      <h2 class="display-6 fw-bold mb-2">
+        <i class="fa-solid fa-folder-open me-2"></i>Gerenciamento de Categorias
+      </h2>
+      <p class="lead mb-0 opacity-75">Organize seu sistema com categorias personalizadas</p>
+    </div>
+    <div class="position-absolute top-0 end-0 p-4">
+      <i class="fa-solid fa-grip opacity-25" style="font-size: 4rem;"></i>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom border-light py-3">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid" [class.fa-circle-plus]="!isEditing" [class.fa-pen-to-square]="isEditing"></i>
+            {{ isEditing ? 'Editar Categoria' : 'Nova Categoria' }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="addOrUpdateCategory()" #categoryForm="ngForm" class="needs-validation" novalidate>
+            <div class="mb-4">
+              <label for="name" class="form-label">Nome da Categoria</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fa-solid fa-tag"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control border-start-0 ps-0"
+                  id="name"
+                  name="name"
+                  [(ngModel)]="newCategory.name"
+                  required
+                  minlength="3"
+                  #nameInput="ngModel"
+                  placeholder="Digite o nome da categoria"
+                  [class.is-invalid]="nameInput.invalid && (nameInput.dirty || nameInput.touched)"
+                />
+                <div class="invalid-feedback" *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+                  <div *ngIf="nameInput.errors?.['required']">Nome da categoria é obrigatório</div>
+                  <div *ngIf="nameInput.errors?.['minlength']">Nome deve ter pelo menos 3 caracteres</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="!categoryForm.form.valid"
+              >
+                <i class="fa-solid" [class.fa-plus]="!isEditing" [class.fa-check]="isEditing"></i>
+                {{ isEditing ? 'Atualizar' : 'Adicionar' }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="resetForm()"
+              >
+                <i class="fa-solid fa-xmark"></i> Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-list"></i> Categorias Existentes
+          </h5>
+          <span class="badge bg-primary rounded-pill">
+            {{ categories.length }} {{ categories.length === 1 ? 'Categoria' : 'Categorias' }}
+          </span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="border-0 px-4">Nome</th>
+                  <th class="border-0 px-4 text-end">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let category of categories; let i = index" 
+                    class="category-row"
+                    [class.table-active]="isEditing && category.id === newCategory.id">
+                  <td class="px-4">
+                    <div class="d-flex align-items-center">
+                      <span class="category-icon rounded-circle bg-light p-2 me-3">
+                        <i class="fa-solid fa-folder text-primary"></i>
+                      </span>
+                      {{ category.name }}
+                    </div>
+                  </td>
+                  <td class="px-4 text-end">
+                    <button
+                      (click)="editCategory(category)"
+                      class="btn btn-sm btn-outline-warning me-2"
+                      [class.active]="isEditing && category.id === newCategory.id"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                      <span class="d-none d-sm-inline ms-1">Editar</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="categories.length === 0">
+                  <td colspan="2" class="text-center py-5">
+                    <div class="text-muted">
+                      <span class="display-4 d-block mb-3 text-info opacity-75">
+                        <i class="fa-solid fa-folder-plus"></i>
+                      </span>
+                      <p>Nenhuma categoria encontrada</p>
+                      <small>Comece adicionando uma nova categoria!</small>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

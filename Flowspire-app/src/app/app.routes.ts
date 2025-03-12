@@ -18,12 +18,17 @@ export const routes: Routes = [
   },
   {
     path: 'transactions',
-    loadComponent: () => import('./transactions/transactions.component').then(m => m.TransactionsComponent),
+    loadComponent: () => import('./transactions/transactions.component').then(m => m.TransactionComponent),
     canActivate: [authGuard]
   },
   {
     path: 'profile',
     loadComponent: () => import('./profile/profile.component').then(m => m.ProfileComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'category',
+    loadComponent: () => import('./category/category.component').then(m => m.CategoryComponent),
     canActivate: [authGuard]
   }
 ];
