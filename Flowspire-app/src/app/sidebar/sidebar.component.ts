@@ -29,6 +29,11 @@ export class SidebarComponent {
       label: 'Transações'
     },
     {
+      icon: 'fas fa-tags',
+      route: '/category',
+      label: 'Categorias'
+    },
+    {
       icon: 'fas fa-user',
       route: '/profile',
       label: 'Perfil'

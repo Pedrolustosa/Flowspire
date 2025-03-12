@@ -1,3 +1,4 @@
+// src/app/services/auth.service.ts
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
@@ -36,6 +37,21 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
+  constructor() {
+    // Verificar se o usuário já está autenticado ao inicializar o serviço
+    if (this.isAuthenticatedSubject.value) {
+      this.getCurrentUser().subscribe({
+        next: (user) => {
+          console.log('User loaded on initialization:', user);
+        },
+        error: (err) => {
+          console.error('Failed to fetch current user on initialization:', err);
+          this.logout(); // Deslogar se falhar
+        }
+      });
+    }
+  }
+
   login(request: LoginRequest): Observable<any> {
     this.loadingService.setLoading(true);
     return this.http.post<any>(`${this.apiUrl}/user/login`, request).pipe(
@@ -49,7 +65,15 @@ export class AuthService {
             this.accessTokenSubject.next(response.accessToken);
             this.isAuthenticatedSubject.next(true);
             this.toastr.success('Login bem-sucedido!', 'Sucesso');
-            this.getCurrentUser().subscribe();
+            this.getCurrentUser().subscribe({
+              next: (user) => {
+                console.log('Current user after login:', user);
+              },
+              error: (err) => {
+                console.error('Failed to fetch current user after login:', err);
+                this.logout(); // Deslogar se falhar
+              }
+            });
           }
         },
         error: (err) => {
@@ -82,30 +106,30 @@ export class AuthService {
     );
   }
 
-  refreshToken(): Observable<any> {
-    const refreshToken = isPlatformBrowser(this.platformId) ? localStorage.getItem('refreshToken') : null;
-    if (!refreshToken) {
-      this.logout();
-      return new Observable(observer => observer.error('No refresh token available'));
-    }
-
-    const request: RefreshTokenRequest = { refreshToken };
+  refreshToken(token: string): Observable<any> {
+    const request = { refreshToken: token };
     this.loadingService.setLoading(true);
     return this.http.post<any>(`${this.apiUrl}/user/refresh-token`, request).pipe(
       tap({
         next: (response) => {
-          if (response.AccessToken) {
+          if (response.accessToken) {
             if (isPlatformBrowser(this.platformId)) {
-              localStorage.setItem('accessToken', response.AccessToken);
-              localStorage.setItem('refreshToken', response.RefreshToken);
+              localStorage.setItem('accessToken', response.accessToken);
+              localStorage.setItem('refreshToken', response.refreshToken);
             }
-            this.accessTokenSubject.next(response.AccessToken);
+            this.accessTokenSubject.next(response.accessToken);
             this.isAuthenticatedSubject.next(true);
             this.toastr.info('Token atualizado com sucesso.', 'Informação');
+            this.getCurrentUser().subscribe({
+              error: (err) => {
+                console.error('Failed to fetch current user after refresh:', err);
+                this.logout();
+              }
+            });
           }
         },
         error: (err) => {
-          this.toastr.error('Erro ao atualizar o token. Faça login novamente.', 'Erro');
+          console.error('Token refresh failed:', err);
           this.logout();
           this.loadingService.setLoading(false);
         },
@@ -173,7 +197,17 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('accessToken');
+    }
     return this.accessTokenSubject.value;
+  }
+
+  getRefreshToken(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('refreshToken');
+    }
+    return null;
   }
 
   isLoggedIn(): boolean {

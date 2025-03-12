@@ -1,85 +1,272 @@
-<div class="p-3">
-  <div class="dashboard-header">
-    <h2 class="display-6">Transações</h2>
-    <p class="text-muted">Histórico de movimentações financeiras</p>
-  </div>
-
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card indicator-card entradas shadow-sm border-0">
-        <div class="card-body">
-          <div class="indicator-icon text-success">
-            <i class="fas fa-arrow-up"></i>
-          </div>
-          <h6 class="indicator-title">Entradas</h6>
-          <p class="indicator-value text-success">R$ 2.200,00</p>
-          <div class="trend-info">
-            <i class="fas fa-arrow-up text-success"></i>
-            <span>2 transações este mês</span>
-          </div>
-        </div>
-      </div>
+<div class="container-fluid py-4">
+  <div class="position-relative mb-4 p-4 bg-primary bg-gradient rounded-3 text-white">
+    <div class="position-relative z-2">
+      <h2 class="display-6 fw-bold mb-2">
+        <i class="fa-solid fa-money-bill-trend-up me-2"></i>Gerenciamento de Transações
+      </h2>
+      <p class="lead mb-0 opacity-75">Controle suas receitas e despesas de forma eficiente</p>
     </div>
-
-    <div class="col-md-4">
-      <div class="card indicator-card saidas shadow-sm border-0">
-        <div class="card-body">
-          <div class="indicator-icon text-danger">
-            <i class="fas fa-arrow-down"></i>
-          </div>
-          <h6 class="indicator-title">Saídas</h6>
-          <p class="indicator-value text-danger">R$ 60,00</p>
-          <div class="trend-info">
-            <i class="fas fa-arrow-down text-danger"></i>
-            <span>1 transação este mês</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card indicator-card total shadow-sm border-0">
-        <div class="card-body">
-          <div class="indicator-icon text-primary">
-            <i class="fas fa-calculator"></i>
-          </div>
-          <h6 class="indicator-title">Total</h6>
-          <p class="indicator-value text-primary">R$ 2.140,00</p>
-          <div class="trend-info">
-            <i class="fas fa-check-circle text-success"></i>
-            <span>3 transações no total</span>
-          </div>
-        </div>
-      </div>
+    <div class="position-absolute top-0 end-0 p-4">
+      <i class="fa-solid fa-chart-line opacity-25" style="font-size: 4rem;"></i>
     </div>
   </div>
 
-  <div class="row mt-4">
-    <div class="col-12">
-      <div class="card shadow-sm border-0">
+  <div class="row g-4">
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white border-bottom border-light py-3">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-circle-plus me-2"></i>Nova Transação
+          </h5>
+        </div>
         <div class="card-body">
+          <form (ngSubmit)="addTransaction()" #transactionForm="ngForm" class="needs-validation" novalidate>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descrição</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fa-solid fa-font"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control border-start-0 ps-0"
+                  id="description"
+                  [(ngModel)]="newTransaction.description"
+                  name="description"
+                  required
+                  minlength="3"
+                  #descriptionInput="ngModel"
+                  placeholder="Digite a descrição"
+                  [class.is-invalid]="descriptionInput.invalid && (descriptionInput.dirty || descriptionInput.touched)"
+                />
+                <div class="invalid-feedback" *ngIf="descriptionInput.invalid && (descriptionInput.dirty || descriptionInput.touched)">
+                  <div *ngIf="descriptionInput.errors?.['required']">Descrição é obrigatória</div>
+                  <div *ngIf="descriptionInput.errors?.['minlength']">Descrição deve ter pelo menos 3 caracteres</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="amount" class="form-label">Valor</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fa-solid fa-dollar-sign"></i>
+                </span>
+                <input
+                  type="number"
+                  class="form-control border-start-0 ps-0"
+                  id="amount"
+                  [(ngModel)]="newTransaction.amount"
+                  name="amount"
+                  required
+                  step="0.01"
+                  #amountInput="ngModel"
+                  placeholder="0,00"
+                  [class.is-invalid]="amountInput.invalid && (amountInput.dirty || amountInput.touched)"
+                />
+                <div class="invalid-feedback" *ngIf="amountInput.invalid && (amountInput.dirty || amountInput.touched)">
+                  Valor é obrigatório
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="category" class="form-label">Categoria</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fa-solid fa-tag"></i>
+                </span>
+                <select
+                  class="form-select border-start-0 ps-0"
+                  id="category"
+                  [(ngModel)]="newTransaction.categoryId"
+                  name="categoryId"
+                  required
+                  #categoryInput="ngModel"
+                  [class.is-invalid]="categoryInput.invalid && (categoryInput.dirty || categoryInput.touched)"
+                >
+                  <option value="">Selecione uma categoria</option>
+                  <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="categoryInput.invalid && (categoryInput.dirty || categoryInput.touched)">
+                  Categoria é obrigatória
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="date" class="form-label">Data</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fa-solid fa-calendar"></i>
+                </span>
+                <input
+                  type="date"
+                  class="form-control border-start-0 ps-0"
+                  id="date"
+                  [(ngModel)]="newTransaction.date"
+                  name="date"
+                  required
+                  #dateInput="ngModel"
+                  [class.is-invalid]="dateInput.invalid && (dateInput.dirty || dateInput.touched)"
+                />
+                <div class="invalid-feedback" *ngIf="dateInput.invalid && (dateInput.dirty || dateInput.touched)">
+                  Data é obrigatória
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="!transactionForm.form.valid"
+              >
+                <i class="fa-solid fa-plus me-2"></i>Adicionar Transação
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+      <div class="row g-4 mb-4">
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100 bg-success bg-opacity-10">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                  <i class="fa-solid fa-circle-arrow-up text-success"></i>
+                </div>
+                <h6 class="card-title mb-0">Total de Receitas</h6>
+              </div>
+              <h3 class="mb-0 text-success">{{ financialReport.totalIncome | currency:'BRL' }}</h3>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100 bg-danger bg-opacity-10">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                  <i class="fa-solid fa-circle-arrow-down text-danger"></i>
+                </div>
+                <h6 class="card-title mb-0">Total de Despesas</h6>
+              </div>
+              <h3 class="mb-0 text-danger">{{ financialReport.totalExpenses | currency:'BRL' }}</h3>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100 bg-info bg-opacity-10">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                  <i class="fa-solid fa-scale-balanced text-info"></i>
+                </div>
+                <h6 class="card-title mb-0">Saldo Líquido</h6>
+              </div>
+              <h3 class="mb-0" [class.text-success]="financialReport.netBalance" [class.text-danger]="financialReport.netBalance">
+                {{ financialReport.netBalance | currency:'BRL' }}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4" id="date-filter-card">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label class="form-label">Data Inicial</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">
+                  <i class="fa-solid fa-calendar-days"></i>
+                </span>
+                <input
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="startDate"
+                  (ngModelChange)="onDateChange()"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">Data Final</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">
+                  <i class="fa-solid fa-calendar-days"></i>
+                </span>
+                <input
+                  type="date"
+                  class="form-control"
+                  [(ngModel)]="endDate"
+                  (ngModelChange)="onDateChange()"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+              <button class="btn btn-primary w-100" (click)="generateReport()" [disabled]="isGenerateButtonDisabled">
+                <i class="fa-solid fa-file-lines me-2"></i>Gerar Relatório
+              </button>
+              <button class="btn btn-outline-secondary w-100" (click)="resetDates()">
+                <i class="fa-solid fa-rotate-left me-2"></i>Resetar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="pdfGenerated" class="alert alert-success mt-3" role="alert">
+        Relatório gerado com sucesso! Verifique o download.
+      </div>
+
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-list me-2"></i>Transações Recentes
+          </h5>
+          <span class="badge bg-primary rounded-pill">{{ transactions.length }} transações</span>
+        </div>
+        <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead>
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
                 <tr>
-                  <th>Data</th>
-                  <th>Descrição</th>
-                  <th>Categoria</th>
-                  <th>Valor</th>
+                  <th>DATA</th>
+                  <th>DESCRIÇÃO</th>
+                  <th>CATEGORIA</th>
+                  <th>VALOR</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>01/03/2025</td>
-                  <td>Supermercado</td>
-                  <td>Alimentação</td>
-                  <td class="text-danger">- R$ 60,00</td>
+                <tr *ngFor="let transaction of transactions">
+                  <td>{{ transaction.date | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ transaction.description }}</td>
+                  <td>
+                    <span class="badge rounded-pill bg-light text-dark">
+                      {{ transaction.category?.name }}
+                    </span>
+                  </td>
+                  <td [class.text-success]="transaction.amount >= 0" [class.text-danger]="transaction.amount < 0">
+                    {{ transaction.amount | currency:'BRL' }}
+                  </td>
                 </tr>
-                <tr>
-                  <td>02/03/2025</td>
-                  <td>Salário</td>
-                  <td>Renda</td>
-                  <td class="text-success">+ R$ 2.200,00</td>
+                <tr *ngIf="transactions.length === 0">
+                  <td colspan="4" class="text-center py-5">
+                    <div class="text-muted">
+                      <span class="display-4 d-block mb-3 text-info opacity-75">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                      </span>
+                      <p class="mb-2">Nenhuma transação encontrada</p>
+                      <small class="text-secondary">Que tal começar a registrar suas finanças?</small>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>

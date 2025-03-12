@@ -1,18 +1,14 @@
-/* Main layout styles */
 .app-wrapper {
   min-height: 100vh;
   background-color: #f8f9fa;
 }
 
-/* Sidebar styles */
 .sidebar-wrapper {
   background-color: #ffffff;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
 }
 
-
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -31,7 +27,6 @@
   background: #555;
 }
 
-/* Utility classes */
 .shadow-sm-hover {
   transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
@@ -41,7 +36,6 @@
   transform: translateY(-2px);
 }
 
-/* Button styles */
 .btn {
   padding: 0.5rem 1rem;
   font-weight: 500;
@@ -86,7 +80,6 @@
   transform: translateY(-1px);
 }
 
-/* Card styles */
 .card {
   border: none;
   border-radius: 0.5rem;
@@ -102,7 +95,6 @@
   padding: 1.5rem;
 }
 
-/* Table styles */
 .table {
   margin-bottom: 0;
 }
@@ -127,7 +119,6 @@
   background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* Input styles */
 .form-control {
   border: 1px solid #ced4da;
   border-radius: 0.375rem;
@@ -140,9 +131,7 @@
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
-  
   .card-body {
     padding: 1rem;
   }
