@@ -1,4 +1,5 @@
 ﻿namespace Flowspire.Application.DTOs;
+
 public class MessageDTO
 {
     public int Id { get; set; }
@@ -7,4 +8,5 @@ public class MessageDTO
     public string Content { get; set; }
     public DateTime SentAt { get; set; }
     public bool IsRead { get; set; }
+    public DateTime? ReadAt { get; set; }
 }
