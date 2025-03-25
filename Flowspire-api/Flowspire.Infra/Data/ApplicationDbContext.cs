@@ -4,6 +4,7 @@ using Flowspire.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Flowspire.Infra.Data;
+
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User, IdentityRole, string>(options)
 {
     public DbSet<Transaction> Transactions { get; set; }
@@ -86,6 +87,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(m => m.Content).IsRequired().HasMaxLength(500);
             entity.Property(m => m.SentAt).IsRequired();
             entity.Property(m => m.IsRead).IsRequired();
+            entity.Property(m => m.ReadAt).IsRequired(false);
             entity.HasOne(m => m.Sender)
                   .WithMany()
                   .HasForeignKey(m => m.SenderId)

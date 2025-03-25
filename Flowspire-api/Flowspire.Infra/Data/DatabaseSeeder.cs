@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Flowspire.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Flowspire.Infra.Data;
@@ -258,13 +259,13 @@ public static class DatabaseSeeder
     {
         var now = DateTime.UtcNow;
         builder.Entity<Message>().HasData(
-            new { Id = 1, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Olá, preciso de ajuda com meu orçamento!", SentAt = now.AddDays(-10), IsRead = false },
-            new { Id = 2, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440004", Content = "Claro, vamos analisar suas despesas.", SentAt = now.AddDays(-9), IsRead = true },
-            new { Id = 3, SenderId = "550e8400-e29b-41d4-a716-446655440005", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Qual é o melhor investimento agora?", SentAt = now.AddDays(-5), IsRead = false },
-            new { Id = 4, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440005", Content = "Recomendo fundos de índice.", SentAt = now.AddDays(-4), IsRead = true },
-            new { Id = 5, SenderId = "550e8400-e29b-41d4-a716-446655440006", ReceiverId = "550e8400-e29b-41d4-a716-446655440003", Content = "Como reduzir meus gastos?", SentAt = now.AddDays(-3), IsRead = false },
-            new { Id = 6, SenderId = "550e8400-e29b-41d4-a716-446655440003", ReceiverId = "550e8400-e29b-41d4-a716-446655440006", Content = "Vamos revisar suas categorias.", SentAt = now.AddDays(-2), IsRead = false },
-            new { Id = 7, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Obrigado pela ajuda!", SentAt = now.AddDays(-1), IsRead = false }
+            new { Id = 1, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Olá, preciso de ajuda com meu orçamento!", SentAt = now.AddDays(-10), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 2, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440004", Content = "Claro, vamos analisar suas despesas.", SentAt = now.AddDays(-9), IsRead = true, ReadAt = now.AddDays(-8) },
+            new { Id = 3, SenderId = "550e8400-e29b-41d4-a716-446655440005", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Qual é o melhor investimento agora?", SentAt = now.AddDays(-5), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 4, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440005", Content = "Recomendo fundos de índice.", SentAt = now.AddDays(-4), IsRead = true, ReadAt = now.AddDays(-3) },
+            new { Id = 5, SenderId = "550e8400-e29b-41d4-a716-446655440006", ReceiverId = "550e8400-e29b-41d4-a716-446655440003", Content = "Como reduzir meus gastos?", SentAt = now.AddDays(-3), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 6, SenderId = "550e8400-e29b-41d4-a716-446655440003", ReceiverId = "550e8400-e29b-41d4-a716-446655440006", Content = "Vamos revisar suas categorias.", SentAt = now.AddDays(-2), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 7, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Obrigado pela ajuda!", SentAt = now.AddDays(-1), IsRead = false, ReadAt = (DateTime?)null }
         );
     }
 
