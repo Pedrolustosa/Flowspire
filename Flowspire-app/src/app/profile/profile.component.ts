@@ -87,4 +87,14 @@ export class ProfileComponent implements OnInit {
       this.updateRequest.roles.push(roleId);
     }
   }
+
+  // Método para resetar o formulário
+  resetForm(): void {
+    if (this.user) {
+      this.updateRequest.fullName = this.user.fullName;
+      this.updateRequest.roles = Array.isArray(this.user.roles)
+        ? [...this.user.roles]
+        : [];
+    }
+  }
 }

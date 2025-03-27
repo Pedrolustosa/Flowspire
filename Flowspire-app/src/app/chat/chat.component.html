@@ -1,78 +1,164 @@
-<div class="container-fluid chat-container h-100">
-  <ng-container *ngIf="currentUserId; else notLoggedIn">
-    <!-- Campo para inserir o ID do outro usuário -->
-    <div class="row bg-light p-3 border-bottom" *ngIf="!isChatActive">
-      <div class="col">
-        <form (ngSubmit)="searchUser()" class="input-group">
-          <input
-            type="text"
-            [(ngModel)]="otherUserIdInput"
-            name="otherUserIdInput"
-            class="form-control"
-            placeholder="Digite o ID do usuário para iniciar o chat"
-            required
-          />
-          <button type="submit" class="btn btn-primary">Buscar</button>
-        </form>
-      </div>
+<div class="container-fluid py-4">
+  <div class="position-relative mb-4 p-4 bg-primary bg-gradient rounded-3 text-white">
+    <div class="position-relative z-2">
+      <h2 class="display-6 fw-bold mb-2">
+        <i class="fa-solid fa-comments me-2"></i>Chat
+      </h2>
+      <p class="lead mb-0 opacity-75">Converse em tempo real com outros usuários</p>
     </div>
+    <div class="position-absolute top-0 end-0 p-4">
+      <i class="fa-solid fa-message opacity-25" style="font-size: 4rem;"></i>
+    </div>
+  </div>
 
-    <!-- Área do chat (exibida após buscar o usuário) -->
-    <ng-container *ngIf="isChatActive">
-      <div class="row bg-primary text-white p-3">
-        <div class="col">
-          <h4 class="mb-0">Conversa com {{ otherUserId }}</h4>
-        </div>
-      </div>
-
-      <div class="row flex-grow-1 overflow-auto messages-container">
-        <div class="col p-3">
-          <div *ngFor="let message of messages" class="mb-3">
-            <div
-              [ngClass]="{
-                'd-flex justify-content-end': message.senderId === currentUserId,
-                'd-flex justify-content-start': message.senderId !== currentUserId
-              }"
-            >
-              <div
-                [ngClass]="{
-                  'bg-primary text-white p-3 rounded': message.senderId === currentUserId,
-                  'bg-light p-3 rounded': message.senderId !== currentUserId
-                }"
-                style="max-width: 70%;"
-              >
-                <p class="mb-1">{{ message.content }}</p>
-                <small>{{ message.sentAt | date: 'HH:mm - dd/MM/yyyy' }}</small>
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <ng-container *ngIf="currentUserId; else notLoggedIn">
+            <div class="p-3 border-bottom bg-light" *ngIf="!isChatActive">
+              <form (ngSubmit)="searchUser()" class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fa-solid fa-search"></i>
+                </span>
+                <input
+                  type="text"
+                  [(ngModel)]="otherUserIdInput"
+                  name="otherUserIdInput"
+                  class="form-control border-start-0 ps-0"
+                  placeholder="Digite o ID do usuário para iniciar o chat"
+                  required
+                />
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-paper-plane me-2"></i>Buscar
+                </button>
+              </form>
+              
+              <div *ngIf="showError" class="alert alert-danger mt-3 d-flex align-items-center" role="alert">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                <div>{{ errorMessage }}</div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="row p-3 border-top">
-        <div class="col">
-          <form (ngSubmit)="sendMessage()" class="input-group">
-            <input
-              type="text"
-              [(ngModel)]="newMessage"
-              name="newMessage"
-              class="form-control"
-              placeholder="Digite sua mensagem..."
-              required
-            />
-            <button type="submit" class="btn btn-primary">Enviar</button>
-          </form>
-        </div>
-      </div>
-    </ng-container>
-  </ng-container>
+            <ng-container *ngIf="isChatActive">
+              <div class="bg-primary text-white p-3 d-flex justify-content-between align-items-center border-bottom">
+                <div class="d-flex align-items-center">
+                  <div class="rounded-circle bg-white text-primary p-2 me-2" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                  <div>
+                    <h5 class="mb-0">{{ otherUserId }}</h5>
+                    <small class="opacity-75">Online agora</small>
+                  </div>
+                </div>
+                <div>
+                  <button class="btn btn-sm btn-outline-light me-2" title="Atualizar conversa">
+                    <i class="fa-solid fa-rotate"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-light" (click)="isChatActive = false" title="Voltar">
+                    <i class="fa-solid fa-arrow-left"></i>
+                  </button>
+                </div>
+              </div>
 
-  <!-- Template para usuário não logado -->
-  <ng-template #notLoggedIn>
-    <div class="row h-100 justify-content-center align-items-center">
-      <div class="col text-center">
-        <p class="text-muted">Por favor, faça login para usar o chat.</p>
+              <div class="messages-container p-3 bg-light" style="height: 400px; overflow-y: auto; scroll-behavior: smooth;">
+                <div class="chat-date-separator text-center mb-3">
+                  <span class="badge bg-secondary">{{ messages.length > 0 ? (messages[0].sentAt | date: 'dd/MM/yyyy') : 'Hoje' }}</span>
+                </div>
+                
+                <div *ngFor="let message of messages; let i = index; let isFirst = first; let isLast = last">
+                  <div *ngIf="i > 0 && (message.sentAt | date:'dd/MM/yyyy') !== (messages[i-1].sentAt | date:'dd/MM/yyyy')" class="chat-date-separator text-center my-3">
+                    <span class="badge bg-secondary">{{ message.sentAt | date: 'dd/MM/yyyy' }}</span>
+                  </div>
+                  
+                  <div class="message-wrapper mb-3" [ngClass]="{'own-message': message.senderId === currentUserId, 'other-message': message.senderId !== currentUserId}">
+                    <div class="user-indicator" *ngIf="message.senderId === currentUserId">
+                      Você
+                    </div>
+                    <div class="user-indicator" *ngIf="message.senderId !== currentUserId">
+                      {{ otherUserId }}
+                    </div>
+                    
+                    <div class="message-container d-flex">
+                      <div *ngIf="message.senderId !== currentUserId" class="avatar-container me-2">
+                        <div class="avatar">
+                          <div class="rounded-circle other-avatar p-1" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-user" style="font-size: 0.8rem;"></i>
+                          </div>
+                          <div class="status-indicator"></div>
+                        </div>
+                      </div>
+                      
+                      <div class="message-content">
+                        <div class="message-bubble p-3">
+                          <p class="mb-1" style="word-wrap: break-word;">{{ message.content }}</p>
+                          <div class="d-flex justify-content-between align-items-center mt-1">
+                            <small class="opacity-75">{{ message.sentAt | date: 'HH:mm' }}</small>
+                            <i *ngIf="message.senderId === currentUserId" class="fa-solid fa-check text-primary opacity-75 ms-2" style="font-size: 0.7rem;" title="Enviado"></i>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div *ngIf="message.senderId === currentUserId" class="avatar-container ms-2">
+                        <div class="avatar">
+                          <div class="rounded-circle own-avatar p-1" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-user" style="font-size: 0.8rem;"></i>
+                          </div>
+                          <div class="status-indicator"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="typing-indicator d-none mt-3 ms-4">
+                  <small class="text-muted me-2">Digitando</small>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+
+              <div class="p-3 border-top bg-white">
+                <form (ngSubmit)="sendMessage()" class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="fa-solid fa-keyboard"></i>
+                  </span>
+                  <input
+                    type="text"
+                    [(ngModel)]="newMessage"
+                    name="newMessage"
+                    class="form-control border-start-0 ps-0"
+                    placeholder="Digite sua mensagem..."
+                    required
+                    autofocus
+                  />
+                  <button type="button" class="btn btn-light" title="Anexar arquivo">
+                    <i class="fa-solid fa-paperclip"></i>
+                  </button>
+                  <button type="button" class="btn btn-light" title="Inserir emoji">
+                    <i class="fa-solid fa-face-smile"></i>
+                  </button>
+                  <button type="submit" class="btn btn-primary" [disabled]="!newMessage.trim()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                  </button>
+                </form>
+              </div>
+            </ng-container>
+          </ng-container>
+
+          <ng-template #notLoggedIn>
+            <div class="text-center py-5">
+              <i class="fa-solid fa-lock text-muted mb-3" style="font-size: 3rem;"></i>
+              <h4>Faça login para acessar o chat</h4>
+              <p class="text-muted">Você precisa estar logado para conversar com outros usuários.</p>
+              <button class="btn btn-primary">
+                <i class="fa-solid fa-sign-in-alt me-2"></i>Fazer Login
+              </button>
+            </div>
+          </ng-template>
+        </div>
       </div>
     </div>
-  </ng-template>
+  </div>
 </div>

@@ -19,17 +19,16 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   messages: MessageDTO[] = [];
   newMessage: string = '';
-  otherUserIdInput: string = ''; // Campo para entrada do ID
-  otherUserId: string = ''; // ID confirmado após busca
+  otherUserIdInput: string = '';
+  otherUserId: string = '';
   currentUserId: string | null = null;
-  isChatActive: boolean = false; // Controla se o chat está ativo
+  isChatActive: boolean = false;
+  errorMessage: string = '';
+  showError: boolean = false;
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user) => {
       this.currentUserId = user?.id || null;
-      if (!this.currentUserId) {
-        console.error('Usuário não autenticado');
-      }
     });
   }
 
@@ -39,8 +38,21 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   searchUser(): void {
     if (!this.otherUserIdInput.trim() || !this.currentUserId) return;
-
-    this.otherUserId = this.otherUserIdInput.trim();
+    
+    const targetUserId = this.otherUserIdInput.trim();
+    
+    // Validação para impedir chat consigo mesmo
+    if (targetUserId === this.currentUserId) {
+      this.showError = true;
+      this.errorMessage = 'Não é possível iniciar um chat com você mesmo.';
+      setTimeout(() => {
+        this.showError = false;
+      }, 3000);
+      return;
+    }
+    
+    this.showError = false;
+    this.otherUserId = targetUserId;
     this.isChatActive = true;
     this.loadMessages();
     this.setupSignalR();
@@ -54,7 +66,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.messages = messages;
         this.scrollToBottom();
       },
-      error: (err) => console.error('Erro ao carregar mensagens:', err),
+      error: () => {},
     });
   }
 
@@ -86,7 +98,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.newMessage = '';
         this.scrollToBottom();
       },
-      error: (err) => console.error('Erro ao enviar mensagem:', err),
+      error: () => {},
     });
   }
 
