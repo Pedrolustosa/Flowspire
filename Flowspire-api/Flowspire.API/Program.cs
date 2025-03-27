@@ -1,12 +1,11 @@
 using Flowspire.API.Middleware;
-using Flowspire.Domain.Hubs;
 using Flowspire.Infra.IoC;
+using Flowspire.Domain.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSignalR();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=flowspire.db";
 builder.Services.AddInfrastructure(connectionString, builder.Configuration);

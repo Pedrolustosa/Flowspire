@@ -7,9 +7,14 @@ using Microsoft.Extensions.Logging;
 namespace Flowspire.Domain.Hubs;
 
 [Authorize]
-public class NotificationHub(ILogger<NotificationHub> logger) : Hub
+public class NotificationHub : Hub
 {
-    private readonly ILogger<NotificationHub> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<NotificationHub> _logger;
+
+    public NotificationHub(ILogger<NotificationHub> logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
     public override async Task OnConnectedAsync()
     {

@@ -7,12 +7,10 @@ using Flowspire.Domain.Interfaces;
 namespace Flowspire.Application.Services;
 
 public class BudgetService(IBudgetRepository budgetRepository, 
-                           ITransactionRepository transactionRepository, 
-                           INotificationService notificationService) : IBudgetService
+                           ITransactionRepository transactionRepository) : IBudgetService
 {
     private readonly IBudgetRepository _budgetRepository = budgetRepository;
     private readonly ITransactionRepository _transactionRepository = transactionRepository;
-    private readonly INotificationService _notificationService = notificationService;
 
     public async Task<BudgetDTO> AddBudgetAsync(BudgetDTO budgetDto)
     {
@@ -73,12 +71,6 @@ public class BudgetService(IBudgetRepository budgetRepository,
             var totalSpent = transactions
                 .Where(t => t.CategoryId == categoryId && t.Date >= budget.StartDate && t.Date <= budget.EndDate)
                 .Sum(t => t.Amount) + transactionAmount;
-
-            if (totalSpent >= budget.Amount * 0.9m)
-            {
-                await _notificationService.SendNotificationAsync(userId,
-                    $"Atenção: Você atingiu 90% do orçamento de {budget.Category.Name} ({totalSpent}/{budget.Amount}).");
-            }
         }
         catch (Exception ex)
         {

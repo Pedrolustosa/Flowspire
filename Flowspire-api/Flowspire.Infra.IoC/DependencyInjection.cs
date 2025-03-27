@@ -11,10 +11,10 @@ using Microsoft.AspNetCore.Identity;
 using FluentValidation.AspNetCore;
 using Flowspire.Application.Validators;
 using Flowspire.Domain.Entities;
-using Flowspire.Domain.Interfaces;
 using Flowspire.Infra.Services;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
+using Flowspire.Domain.Interfaces;
 
 namespace Flowspire.Infra.IoC;
 
@@ -42,12 +42,13 @@ public static class DependencyInjection
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IBudgetRepository, BudgetRepository>();
         services.AddScoped<IBudgetService, BudgetService>();
-        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IAdvisorCustomerRepository, AdvisorCustomerRepository>();
         services.AddScoped<IAdvisorCustomerService, AdvisorCustomerService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<INotificationService, NotificationService>();
+
         services.AddSignalR();
 
         services.AddAuthentication(options =>
@@ -70,6 +71,21 @@ public static class DependencyInjection
                 ValidIssuer = configuration["Jwt:Issuer"],
                 ValidAudience = configuration["Jwt:Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub"))
+                    {
+                        context.Token = accessToken;
+                    }
+                    return Task.CompletedTask;
+                }
             };
         });
 
