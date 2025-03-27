@@ -1,21 +1,30 @@
-<div class="dashboard-wrapper">
-  <header class="dashboard-header">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-12 col-md-8">
-          <h1 class="dashboard-title">Olá, {{ userName }}!</h1>
-          <p class="dashboard-subtitle">Aqui está a visão geral das suas finanças</p>
-        </div>
-        <div class="col-12 col-md-4 d-flex justify-content-md-end justify-content-start">
-          <div class="date-range-selector">
+<div class="container-fluid py-4">
+  <div class="position-relative mb-4 p-4 bg-primary bg-gradient rounded-3 text-white">
+    <div class="position-relative z-2">
+      <h2 class="display-6 fw-bold mb-2">
+        <i class="fa-solid fa-chart-line me-2"></i>Dashboard
+      </h2>
+      <p class="lead mb-0 opacity-75">Visão geral das suas finanças</p>
+    </div>
+    <div class="position-absolute top-0 end-0 p-4">
+      <i class="fa-solid fa-gauge-high opacity-25" style="font-size: 4rem;"></i>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-calendar-days me-2"></i>Período de Análise
+          </h5>
+          <div class="date-range-selector d-flex">
             <div class="form-group me-3">
-              <label for="startMonth" class="form-label">Início</label>
               <select id="startMonth" class="form-select" [(ngModel)]="startMonth" (ngModelChange)="onMonthChange()">
                 <option *ngFor="let month of availableMonths" [value]="month">{{ month }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="endMonth" class="form-label">Fim</label>
               <select id="endMonth" class="form-select" [(ngModel)]="endMonth" (ngModelChange)="onMonthChange()">
                 <option *ngFor="let month of availableMonths" [value]="month">{{ month }}</option>
               </select>
@@ -24,189 +33,211 @@
         </div>
       </div>
     </div>
-  </header>
 
-  <main class="dashboard-content">
-    <div class="container">
-      <section class="overview-section mb-4">
-        <div class="row g-3">
-          <div class="col-lg-4 col-md-6 col-12">
-            <div class="overview-card">
-              <div class="card-icon">
-                <i class="fas fa-arrow-up"></i>
-              </div>
-              <h3 class="card-title">Receitas</h3>
-              <p class="card-value text-success">{{ revenue | currency:'BRL' }}</p>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 col-12">
-            <div class="overview-card">
-              <div class="card-icon">
-                <i class="fas fa-arrow-down"></i>
-              </div>
-              <h3 class="card-title">Despesas</h3>
-              <p class="card-value text-danger">{{ expense | currency:'BRL' }}</p>
-            </div>
-          </div>
-          <div class="col-lg-4 col-md-6 col-12">
-            <div class="overview-card">
-              <div class="card-icon">
-                <i class="fas fa-chart-line"></i>
-              </div>
-              <h3 class="card-title">Saldo</h3>
-              <p class="card-value text-primary">{{ balance | currency:'BRL' }}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="alerts-section mb-4" *ngIf="alerts.length > 0">
-        <div class="card alerts-card">
-          <div class="card-body">
-            <h3 class="section-title">Alertas</h3>
-            <div class="alert-list">
-              <div class="alert-item" *ngFor="let alert of alerts">
-                <span class="alert-text text-warning">{{ alerts }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="chart-and-summary-section mb-4">
-        <div class="row g-4">
-          <div class="col-lg-8 col-12">
-            <div class="card chart-card">
-              <div class="card-body">
-                <h3 class="section-title">Receitas e Despesas Mensais</h3>
-                <div class="chart-container">
-                  <canvas id="monthlyChart"></canvas>
+    <div class="col-12">
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6 col-12">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                  <i class="fa-solid fa-arrow-up text-success"></i>
                 </div>
+                <h5 class="card-title mb-0">Receitas</h5>
               </div>
-            </div>
-          </div>
-          <div class="col-lg-4 col-12">
-            <div class="card summary-card">
-              <div class="card-body">
-                <h3 class="section-title">Resumo por Categoria</h3>
-                <ul class="list-group list-group-flush" *ngIf="categorySummary.length > 0; else noCategories">
-                  <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let category of categorySummary">
-                    <span class="category-name">{{ category.categoryName }}</span>
-                    <span class="badge bg-danger rounded-pill">{{ category.income| currency:'BRL' }}</span>
-                  </li>
-                </ul>
-                <ng-template #noCategories>
-                  <p class="text-muted">Nenhuma categoria disponível.</p>
-                </ng-template>
-              </div>
+              <h3 class="display-6 fw-bold text-success mb-0">{{ revenue | currency:'BRL' }}</h3>
             </div>
           </div>
         </div>
-      </section>
-
-      <section class="budgets-and-trends-section mb-4">
-        <div class="row g-4">
-          <div class="col-lg-6 col-12">
-            <div class="card budgets-card">
-              <div class="card-body">
-                <h3 class="section-title">Orçamentos</h3>
-                <ul class="list-group list-group-flush" *ngIf="budgets.length > 0; else noBudgets">
-                  <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let budget of budgets">
-                    <span class="budget-name">{{ budget.categoryName }}</span>
-                    <span class="badge bg-info rounded-pill">{{ budget.percentageUsed | number:'1.0-0' }}%</span>
-                  </li>
-                </ul>
-                <ng-template #noBudgets>
-                  <p class="text-muted">Nenhum orçamento disponível.</p>
-                </ng-template>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-6 col-12">
-            <div class="card trends-card">
-              <div class="card-body">
-                <h3 class="section-title">Tendências de Categoria</h3>
-                <ul class="list-group list-group-flush" *ngIf="categoryTrends.length > 0; else noTrends">
-                  <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let trend of categoryTrends">
-                    <span class="trend-name">{{ trend.categoryName }}</span>
-                    <span class="badge bg-secondary rounded-pill">{{ trend.trendPercentage | number:'1.0-0' }}%</span>
-                  </li>
-                </ul>
-                <ng-template #noTrends>
-                  <p class="text-muted">Nenhuma tendência disponível.</p>
-                </ng-template>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="transactions-and-goals-section mb-4">
-        <div class="row g-4">
-          <div class="col-lg-6 col-12">
-            <div class="card transactions-card">
-              <div class="card-body">
-                <h3 class="section-title">Transações Recentes</h3>
-                <div class="table-responsive" *ngIf="recentTransactions.length > 0; else noTransactions">
-                  <table class="table table-hover">
-                    <thead>
-                      <tr>
-                        <th>Data</th>
-                        <th>Descrição</th>
-                        <th>Valor</th>
-                        <th>Tipo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let transaction of recentTransactions">
-                        <td>{{ transaction.date | date:'short' }}</td>
-                        <td>{{ transaction.description }}</td>
-                        <td [ngClass]="{'text-success': transaction.type === 'Revenue', 'text-danger': transaction.type === 'Expense'}">
-                          {{ transaction.amount | currency:'BRL' }}
-                        </td>
-                        <td>{{ transaction.type }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+        <div class="col-lg-4 col-md-6 col-12">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                  <i class="fa-solid fa-arrow-down text-danger"></i>
                 </div>
-                <ng-template #noTransactions>
-                  <p class="text-muted">Nenhuma transação recente.</p>
-                </ng-template>
+                <h5 class="card-title mb-0">Despesas</h5>
               </div>
-            </div>
-          </div>
-          <div class="col-lg-6 col-12">
-            <div class="card goals-card">
-              <div class="card-body">
-                <h3 class="section-title">Metas Financeiras</h3>
-                <div *ngIf="financialGoals.length > 0; else noGoals">
-                  <div class="goal-item mb-3" *ngFor="let goal of financialGoals">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <span class="goal-name">{{ goal.name }}</span>
-                      <span class="goal-progress">{{ goal.progressPercentage | number:'1.0-0' }}%</span>
-                    </div>
-                    <div class="progress">
-                      <div
-                        class="progress-bar"
-                        role="progressbar"
-                        [style.width]="goal.progressPercentage + '%'"
-                        [ngClass]="{'bg-success': goal.progressPercentage >= 75, 'bg-warning': goal.progressPercentage >= 25 && goal.progressPercentage < 75, 'bg-danger': goal.progressPercentage < 25}"
-                        [attr.aria-valuenow]="goal.progressPercentage"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                      ></div>
-                    </div>
-                    <small class="text-muted">Prazo: {{ goal.deadline | date:'short' }}</small>
-                  </div>
-                </div>
-                <ng-template #noGoals>
-                  <p class="text-muted">Nenhuma meta financeira definida.</p>
-                </ng-template>
-              </div>
+              <h3 class="display-6 fw-bold text-danger mb-0">{{ expense | currency:'BRL' }}</h3>
             </div>
           </div>
         </div>
-      </section>
+        <div class="col-lg-4 col-md-6 col-12">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                  <i class="fa-solid fa-chart-line text-primary"></i>
+                </div>
+                <h5 class="card-title mb-0">Saldo</h5>
+              </div>
+              <h3 class="display-6 fw-bold text-primary mb-0">{{ balance | currency:'BRL' }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </main>
+
+    <div class="col-12" *ngIf="alerts.length > 0">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light py-3">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-bell me-2"></i>Alertas
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="alert-list">
+            <div class="alert alert-warning" *ngFor="let alert of alerts">
+              <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ alerts }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8 col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light py-3">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-chart-bar me-2"></i>Receitas e Despesas Mensais
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-tags me-2"></i>Resumo por Categoria
+          </h5>
+          <span class="badge bg-primary rounded-pill">
+            {{ categorySummary.length }} {{ categorySummary.length === 1 ? 'Categoria' : 'Categorias' }}
+          </span>
+        </div>
+        <div class="card-body p-0">
+          <ul class="list-group list-group-flush" *ngIf="categorySummary.length > 0; else noCategories">
+            <li class="list-group-item d-flex justify-content-between align-items-center p-3" *ngFor="let category of categorySummary">
+              <div class="d-flex align-items-center">
+                <span class="category-icon rounded-circle bg-light p-2 me-3">
+                  <i class="fa-solid fa-folder text-primary"></i>
+                </span>
+                {{ category.categoryName }}
+              </div>
+              <span class="badge bg-danger rounded-pill">{{ category.income | currency:'BRL' }}</span>
+            </li>
+          </ul>
+          <ng-template #noCategories>
+            <div class="text-center py-5">
+              <div class="text-muted">
+                <span class="display-4 d-block mb-3 text-info opacity-75">
+                  <i class="fa-solid fa-folder-plus"></i>
+                </span>
+                <p>Nenhuma categoria disponível</p>
+                <small>Adicione categorias para visualizar o resumo</small>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-money-bill-trend-up me-2"></i>Transações Recentes
+          </h5>
+          <span class="badge bg-primary rounded-pill">
+            {{ recentTransactions.length }} {{ recentTransactions.length === 1 ? 'Transação' : 'Transações' }}
+          </span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive" *ngIf="recentTransactions.length > 0; else noTransactions">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="border-0 px-4">Data</th>
+                  <th class="border-0 px-4">Descrição</th>
+                  <th class="border-0 px-4">Valor</th>
+                  <th class="border-0 px-4">Tipo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let transaction of recentTransactions">
+                  <td class="px-4">{{ transaction.date | date:'short' }}</td>
+                  <td class="px-4">{{ transaction.description }}</td>
+                  <td class="px-4" [ngClass]="{'text-success': transaction.type === 'Revenue', 'text-danger': transaction.type === 'Expense'}">
+                    {{ transaction.amount | currency:'BRL' }}
+                  </td>
+                  <td class="px-4">{{ transaction.type }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noTransactions>
+            <div class="text-center py-5">
+              <div class="text-muted">
+                <span class="display-4 d-block mb-3 text-info opacity-75">
+                  <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+                <p>Nenhuma transação recente</p>
+                <small>As transações recentes aparecerão aqui</small>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom border-light py-3">
+          <h5 class="card-title mb-0">
+            <i class="fa-solid fa-bullseye me-2"></i>Metas Financeiras
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="p-4" *ngIf="financialGoals.length > 0; else noGoals">
+            <div class="goal-item mb-4" *ngFor="let goal of financialGoals">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="goal-name fw-medium">{{ goal.name }}</span>
+                <span class="goal-progress badge" [ngClass]="{'bg-success': goal.progressPercentage >= 75, 'bg-warning': goal.progressPercentage >= 25 && goal.progressPercentage < 75, 'bg-danger': goal.progressPercentage < 25}">
+                  <div class="text-white">{{ goal.progressPercentage | number:'1.0-0' }}%</div>
+                </span>
+              </div>
+              <div class="progress" style="height: 10px;">
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  [style.width]="goal.progressPercentage + '%'"
+                  [ngClass]="{'bg-success': goal.progressPercentage >= 75, 'bg-warning': goal.progressPercentage >= 25 && goal.progressPercentage < 75, 'bg-danger': goal.progressPercentage < 25}"
+                  [attr.aria-valuenow]="goal.progressPercentage"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+              <small class="text-muted d-block mt-1">Prazo: {{ goal.deadline | date:'short' }}</small>
+            </div>
+          </div>
+          <ng-template #noGoals>
+            <div class="text-center py-5">
+              <div class="text-muted">
+                <span class="display-4 d-block mb-3 text-info opacity-75">
+                  <i class="fa-solid fa-flag-checkered"></i>
+                </span>
+                <p>Nenhuma meta financeira</p>
+                <small>Adicione metas para acompanhar seu progresso</small>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
