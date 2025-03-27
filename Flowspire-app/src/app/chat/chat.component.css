@@ -1,0 +1,23 @@
+.chat-container {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.messages-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background-color: #007bff;
+  border-radius: 4px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
