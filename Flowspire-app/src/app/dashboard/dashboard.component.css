@@ -7,7 +7,7 @@
 /* Header */
 .dashboard-header {
   background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-  color: white;
+  color: rgb(235, 36, 36);
   padding: 2rem 0;
   margin-bottom: 2rem;
 }
