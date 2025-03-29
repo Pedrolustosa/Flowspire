@@ -33,14 +33,13 @@
 }
 
 .logo-img {
-  width: 32px;
-  height: 32px;
+  width: 65px;
   object-fit: contain;
 }
 
 .sidebar.collapsed .logo-img {
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: auto;
 }
 
 .app-name {

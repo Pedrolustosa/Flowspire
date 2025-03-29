@@ -8,12 +8,16 @@ import { AuthService } from '../services/auth.service';
 import { DashboardService } from '../services/dashboard.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { Balance, Budget, Alert, MonthlyHistory, CategoryTrend, CategorySummary, RecentTransaction, FinancialGoal, DashboardOverview } from '../models/Dashboard';
+import { Budget, Alert, MonthlyHistory, CategoryTrend, CategorySummary, RecentTransaction, FinancialGoal } from '../models/Dashboard';
+import { BsDatepickerModule, BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
+import { BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { ptBrLocale } from 'ngx-bootstrap/locale';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BsDatepickerModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -31,6 +35,10 @@ export class DashboardComponent implements AfterViewInit, OnDestroy, OnInit {
   monthlyHistory: MonthlyHistory[] = [];
   chart: Chart | undefined;
 
+  selectedDate: Date = new Date();
+  maxDate: Date = new Date();
+  bsConfig: Partial<BsDatepickerConfig>;
+  
   startMonth: string = '';
   endMonth: string = '';
   availableMonths: string[] = [];
@@ -56,9 +64,22 @@ export class DashboardComponent implements AfterViewInit, OnDestroy, OnInit {
     private dashboardService: DashboardService,
     private spinner: NgxSpinnerService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private localeService: BsLocaleService
   ) {
     this.updateUserName();
+    
+    defineLocale('pt-br', ptBrLocale);
+    this.localeService.use('pt-br');
+    
+    this.bsConfig = {
+      minMode: 'month',
+      dateInputFormat: 'MMMM/YYYY',
+      containerClass: 'theme-green',
+      showWeekNumbers: false,
+      adaptivePosition: true,
+      isAnimated: true
+    };
   }
 
   ngOnInit() {
@@ -83,6 +104,54 @@ export class DashboardComponent implements AfterViewInit, OnDestroy, OnInit {
   private updateUserName(): void {
     const user = this.authService.getCurrentUserValue();
     this.userName = user && user.fullName ? user.fullName : 'Usuário Anônimo';
+  }
+
+  onDateChange(date: Date): void {
+    this.selectedDate = date;
+    
+    const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+    
+    const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    this.loadDashboardDataByDates(startDate, endDate);
+  }
+
+  loadDashboardDataByDates(startDate: Date, endDate: Date): void {
+    this.spinner.show();
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      this.toastr.error('Datas inválidas selecionadas. Usando datas padrão.', 'Erro');
+      const now = new Date();
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    }
+
+    this.dashboardService.getAllData(startDate, endDate).subscribe({
+      next: (data) => {
+        const dashboard = data.dashboard;
+        this.revenue = data.currentBalance.totalRevenue || dashboard.totalIncome || 0;
+        this.expense = data.currentBalance.totalExpense || dashboard.totalExpenses || 0;
+        this.balance = this.revenue - this.expense;
+        this.categorySummary = [...(dashboard.categorySummary || []), ...(data.categorySummaryExpense || []), ...(data.categorySummaryRevenue || [])];
+        this.recentTransactions = data.recentTransactions || [];
+        this.financialGoals = (data.financialGoals || []).map((goal: { deadline: string | number | Date }) => ({
+          ...goal,
+          deadline: new Date(goal.deadline)
+        }));
+        this.alerts = dashboard.alerts || [];
+        this.budgets = dashboard.budgets || [];
+        this.categoryTrends = dashboard.categoryTrends || [];
+        this.monthlyHistory = dashboard.monthlyHistory || [];
+        this.updateUserName();
+        this.updateChart(this.monthlyHistory);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.toastr.error(err.error?.Error || 'Erro ao carregar os dados.', 'Erro');
+        this.loadFallbackData(startDate, endDate);
+      },
+      complete: () => this.spinner.hide()
+    });
   }
 
   generateMonthOptions(): void {

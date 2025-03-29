@@ -18,16 +18,22 @@
           <h5 class="card-title mb-0">
             <i class="fa-solid fa-calendar-days me-2"></i>Período de Análise
           </h5>
-          <div class="date-range-selector d-flex">
-            <div class="form-group me-3">
-              <select id="startMonth" class="form-select" [(ngModel)]="startMonth" (ngModelChange)="onMonthChange()">
-                <option *ngFor="let month of availableMonths" [value]="month">{{ month }}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <select id="endMonth" class="form-select" [(ngModel)]="endMonth" (ngModelChange)="onMonthChange()">
-                <option *ngFor="let month of availableMonths" [value]="month">{{ month }}</option>
-              </select>
+          <div class="date-range-selector d-flex align-items-center">
+            <div class="form-group position-relative">
+              <div class="input-group">
+                <input 
+                  type="text"
+                  class="form-control datepicker-input"
+                  placeholder="Selecione o mês/ano"
+                  bsDatepicker
+                  [bsConfig]="bsConfig"
+                  [(ngModel)]="selectedDate"
+                  [maxDate]="maxDate"
+                  (bsValueChange)="onDateChange($event)">
+                <span class="input-group-text bg-primary text-white">
+                  <i class="fa-solid fa-calendar-days"></i>
+                </span>
+              </div>
             </div>
           </div>
         </div>
