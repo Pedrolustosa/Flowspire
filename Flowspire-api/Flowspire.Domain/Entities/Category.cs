@@ -6,7 +6,7 @@ public class Category
     public string Name { get; private set; }
     public string UserId { get; private set; }
     public User User { get; private set; }
-    public ICollection<Transaction> Transactions { get; private set; } = new List<Transaction>();
+    public ICollection<FinancialTransaction> FinancialTransactions { get; private set; } = new List<FinancialTransaction>();
 
     private Category() { }
 
@@ -28,10 +28,10 @@ public class Category
         Name = name.Trim();
     }
 
-    public void AddTransaction(Transaction transaction)
+    public void AddTransaction(FinancialTransaction transaction)
     {
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         if (transaction.CategoryId != Id) throw new ArgumentException("Transação pertence a outra categoria.");
-        Transactions.Add(transaction);
+        FinancialTransactions.Add(transaction);
     }
 }

@@ -7,10 +7,10 @@ using Flowspire.Domain.Interfaces;
 namespace Flowspire.Application.Services;
 
 public class BudgetService(IBudgetRepository budgetRepository, 
-                           ITransactionRepository transactionRepository) : IBudgetService
+                           IFinancialTransactionRepository transactionRepository) : IBudgetService
 {
     private readonly IBudgetRepository _budgetRepository = budgetRepository;
-    private readonly ITransactionRepository _transactionRepository = transactionRepository;
+    private readonly IFinancialTransactionRepository _transactionRepository = transactionRepository;
 
     public async Task<BudgetDTO> AddBudgetAsync(BudgetDTO budgetDto)
     {

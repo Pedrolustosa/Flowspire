@@ -8,7 +8,7 @@ namespace Flowspire.Infra.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User, IdentityRole, string>(options)
 {
-    public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<FinancialTransaction> FinancialTransactions { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Budget> Budgets { get; set; }
@@ -19,7 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(builder);
 
-        builder.ApplyConfiguration(new TransactionConfiguration());
+        builder.ApplyConfiguration(new FinancialTransactionConfiguration());
         builder.ApplyConfiguration(new UserConfiguration());
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
         builder.ApplyConfiguration(new CategoryConfiguration());
