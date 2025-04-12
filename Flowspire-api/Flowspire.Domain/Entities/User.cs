@@ -1,30 +1,19 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
+﻿using Flowspire.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
-
-public enum Gender
-{
-    Male,
-    Female,
-    NotSpecified
-}
 
 public class User : IdentityUser
 {
-    public ICollection<Transaction> Transactions { get; private set; } = new List<Transaction>();
+    public ICollection<FinancialTransaction> FinancialTransactions { get; private set; } = new List<FinancialTransaction>();
 
-    // Audit fields
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    // Personal Data
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
     public DateTime? BirthDate { get; private set; }
     public Gender Gender { get; private set; }
 
-    // Address Data
     public string? AddressLine1 { get; private set; }
     public string? AddressLine2 { get; private set; }
     public string? City { get; private set; }
@@ -110,12 +99,12 @@ public class User : IdentityUser
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void AddTransaction(Transaction transaction)
+    public void AddTransaction(FinancialTransaction transaction)
     {
         if (transaction == null)
             throw new ArgumentNullException(nameof(transaction));
 
-        Transactions.Add(transaction);
+        FinancialTransactions.Add(transaction);
     }
 
     // Helper method for validating the phone number using E.164 format

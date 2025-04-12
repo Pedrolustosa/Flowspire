@@ -9,10 +9,10 @@ using System.Collections.Generic;
 
 namespace Flowspire.Application.Services;
 
-public class DashboardService(ITransactionRepository transactionRepository,
+public class DashboardService(IFinancialTransactionRepository transactionRepository,
                               IBudgetRepository budgetRepository) : IDashboardService
 {
-    private readonly ITransactionRepository _transactionRepository = transactionRepository;
+    private readonly IFinancialTransactionRepository _transactionRepository = transactionRepository;
     private readonly IBudgetRepository _budgetRepository = budgetRepository;
 
     public async Task<DashboardDTO> GetDashboardAsync(string userId, DateTime startDate, DateTime endDate)

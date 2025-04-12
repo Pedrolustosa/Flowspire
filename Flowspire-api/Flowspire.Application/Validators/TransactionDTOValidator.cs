@@ -2,7 +2,7 @@
 using Flowspire.Application.DTOs;
 
 namespace Flowspire.Application.Validators;
-public class TransactionDTOValidator : AbstractValidator<TransactionDTO>
+public class TransactionDTOValidator : AbstractValidator<FinancialTransactionDTO>
 {
     public TransactionDTOValidator()
     {

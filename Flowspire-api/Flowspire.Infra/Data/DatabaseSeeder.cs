@@ -269,7 +269,7 @@ public static class DatabaseSeeder
             new { Id = 36, Description = "Notebook", Amount = -1500.00m, Date = now.AddMonths(-6).AddDays(-5), CategoryId = 9, UserId = "550e8400-e29b-41d4-a716-446655440006" },
         };
 
-        builder.Entity<Transaction>().HasData(transactions);
+        builder.Entity<FinancialTransaction>().HasData(transactions);
     }
 
     private static void SeedBudgets(ModelBuilder builder)
