@@ -1,29 +1,227 @@
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
-      <div class="card-body">
-        <h2 class="card-title text-center mb-4 text-primary">Registro</h2>
-        <form (ngSubmit)="onSubmit()">
-          <div class="mb-3">
-            <label for="fullName" class="form-label">Nome</label>
-            <input type="text" id="fullName" class="form-control" [(ngModel)]="registerRequest.fullName" name="fullName" required>
+  <div class="card shadow-lg p-4" style="max-width: 600px; width: 100%;">
+    <div class="card-body">
+      <h2 class="card-title text-center mb-4 text-primary">Register</h2>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+        <!-- First Name -->
+        <div class="mb-3">
+          <label for="firstName" class="form-label">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            class="form-control"
+            formControlName="firstName"
+            placeholder="Enter your first name"
+          />
+          <div *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.invalid" class="text-danger">
+            First name is required.
           </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" class="form-control" [(ngModel)]="registerRequest.email" name="email" required>
+        </div>
+
+        <!-- Last Name -->
+        <div class="mb-3">
+          <label for="lastName" class="form-label">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            class="form-control"
+            formControlName="lastName"
+            placeholder="Enter your last name"
+          />
+          <div *ngIf="registerForm.get('lastName')?.touched && registerForm.get('lastName')?.invalid" class="text-danger">
+            Last name is required.
           </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Senha</label>
-            <input type="password" id="password" class="form-control" [(ngModel)]="registerRequest.password" name="password" required>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            formControlName="email"
+            placeholder="Enter your email"
+          />
+          <div *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid" class="text-danger">
+            A valid email is required.
           </div>
-          <div class="mb-3">
-            <label for="confirmPassword" class="form-label">Confirmar Senha</label>
-            <input type="password" id="confirmPassword" class="form-control" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="mb-3">
+          <label for="phoneNumber" class="form-label">Phone Number</label>
+          <input
+            type="text"
+            id="phoneNumber"
+            class="form-control"
+            formControlName="phoneNumber"
+            placeholder="Enter your phone number"
+          />
+          <div *ngIf="registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid" class="text-danger">
+            Phone number is required.
           </div>
-          <button type="submit" class="btn btn-primary w-100">Registrar</button>
-        </form>
-        <p class="text-center mt-3">
-          Já tem uma conta? <a routerLink="['/login']" class="text-primary">Faça login</a>
-        </p>
-      </div>
+        </div>
+
+        <!-- Birth Date -->
+        <div class="mb-3">
+          <label for="birthDate" class="form-label">Birth Date</label>
+          <input
+            type="date"
+            id="birthDate"
+            class="form-control"
+            formControlName="birthDate"
+          />
+          <div *ngIf="registerForm.get('birthDate')?.touched && registerForm.get('birthDate')?.invalid" class="text-danger">
+            Birth date is required.
+          </div>
+        </div>
+
+        <!-- Gender -->
+        <div class="mb-3">
+          <label for="gender" class="form-label">Gender</label>
+          <select id="gender" class="form-select" formControlName="gender">
+            <option value="" disabled>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="NotSpecified">Not Specified</option>
+          </select>
+          <div *ngIf="registerForm.get('gender')?.touched && registerForm.get('gender')?.invalid" class="text-danger">
+            Gender is required.
+          </div>
+        </div>
+
+        <!-- Address Line 1 -->
+        <div class="mb-3">
+          <label for="addressLine1" class="form-label">Address Line 1</label>
+          <input
+            type="text"
+            id="addressLine1"
+            class="form-control"
+            formControlName="addressLine1"
+            placeholder="Enter address line 1"
+          />
+          <div *ngIf="registerForm.get('addressLine1')?.touched && registerForm.get('addressLine1')?.invalid" class="text-danger">
+            Address Line 1 is required.
+          </div>
+        </div>
+
+        <!-- Address Line 2 (optional) -->
+        <div class="mb-3">
+          <label for="addressLine2" class="form-label">Address Line 2 (Optional)</label>
+          <input
+            type="text"
+            id="addressLine2"
+            class="form-control"
+            formControlName="addressLine2"
+            placeholder="Enter address line 2"
+          />
+        </div>
+
+        <!-- City -->
+        <div class="mb-3">
+          <label for="city" class="form-label">City</label>
+          <input
+            type="text"
+            id="city"
+            class="form-control"
+            formControlName="city"
+            placeholder="Enter your city"
+          />
+          <div *ngIf="registerForm.get('city')?.touched && registerForm.get('city')?.invalid" class="text-danger">
+            City is required.
+          </div>
+        </div>
+
+        <!-- State -->
+        <div class="mb-3">
+          <label for="state" class="form-label">State</label>
+          <input
+            type="text"
+            id="state"
+            class="form-control"
+            formControlName="state"
+            placeholder="Enter your state"
+          />
+          <div *ngIf="registerForm.get('state')?.touched && registerForm.get('state')?.invalid" class="text-danger">
+            State is required.
+          </div>
+        </div>
+
+        <!-- Country -->
+        <div class="mb-3">
+          <label for="country" class="form-label">Country</label>
+          <input
+            type="text"
+            id="country"
+            class="form-control"
+            formControlName="country"
+            placeholder="Enter your country"
+          />
+          <div *ngIf="registerForm.get('country')?.touched && registerForm.get('country')?.invalid" class="text-danger">
+            Country is required.
+          </div>
+        </div>
+
+        <!-- Postal Code -->
+        <div class="mb-3">
+          <label for="postalCode" class="form-label">Postal Code</label>
+          <input
+            type="text"
+            id="postalCode"
+            class="form-control"
+            formControlName="postalCode"
+            placeholder="Enter your postal code"
+          />
+          <div *ngIf="registerForm.get('postalCode')?.touched && registerForm.get('postalCode')?.invalid" class="text-danger">
+            Postal Code is required.
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            formControlName="password"
+            placeholder="Enter password"
+          />
+          <div *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid" class="text-danger">
+            Password is required.
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mb-3">
+          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            class="form-control"
+            formControlName="confirmPassword"
+            placeholder="Confirm password"
+          />
+          <div *ngIf="registerForm.get('confirmPassword')?.touched">
+            <div *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']" class="text-danger">
+              Passwords do not match.
+            </div>
+            <div 
+              *ngIf="registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid && !registerForm.get('confirmPassword')?.errors?.['passwordMismatch']"
+              class="text-danger">
+              Confirm Password is required.
+            </div>
+          </div>
+        </div>
+
+
+
+        <button type="submit" class="btn btn-primary w-100">Register</button>
+      </form>
+      <p class="text-center mt-3">
+        Already have an account? <a routerLink="/login" class="text-primary">Login</a>
+      </p>
     </div>
   </div>
+</div>

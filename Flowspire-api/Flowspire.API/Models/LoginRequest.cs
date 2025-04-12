@@ -1,7 +1,8 @@
-﻿namespace Flowspire.API.Models;
-
-public class LoginRequest
+﻿namespace Flowspire.API.Models
 {
-    public string Email { get; set; }
-    public string Password { get; set; }
+    public class LoginRequest
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
 }

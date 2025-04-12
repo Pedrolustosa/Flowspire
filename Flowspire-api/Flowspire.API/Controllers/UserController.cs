@@ -5,165 +5,219 @@ using Flowspire.Application.DTOs;
 using Flowspire.Domain.Enums;
 using System.Security.Claims;
 using Flowspire.API.Models;
+using System.Threading.Tasks;
 
-namespace Flowspire.API.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class UserController(IUserService userService) : ControllerBase
+namespace Flowspire.API.Controllers
 {
-    private readonly IUserService _userService = userService;
-
-    [HttpPost("register")]
-    [Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UserController : ControllerBase
     {
-        try
-        {
-            var requestingUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userDto = await _userService.RegisterUserAsync(request.Email, request.FullName, request.Password, request.Role, requestingUserId);
-            return Ok(new { Message = "Usuário registrado com sucesso", User = userDto });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
+        private readonly IUserService _userService;
 
-    [HttpPost("register-customer")]
-    public async Task<IActionResult> RegisterCustomer([FromBody] RegisterCustomerRequest request)
-    {
-        try
+        public UserController(IUserService userService)
         {
-            var userDto = await _userService.RegisterUserAsync(request.Email, request.FullName, request.Password, UserRole.Customer);
-            return Ok(new { Message = "Usuário registrado com sucesso", User = userDto });
+            _userService = userService;
         }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
-    {
-        try
+        [HttpPost("register")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var (accessToken, refreshToken) = await _userService.LoginUserAsync(request.Email, request.Password);
-            return Ok(new { Message = "Login bem-sucedido", AccessToken = accessToken, RefreshToken = refreshToken });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
+            try
+            {
+                var requestingUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-    [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
-    {
-        try
-        {
-            var (accessToken, refreshToken) = await _userService.RefreshTokenAsync(request.RefreshToken);
-            return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
+                // Passing all new profile and address fields to the service
+                var userDto = await _userService.RegisterUserAsync(
+                    request.Email,
+                    request.FirstName,
+                    request.LastName,
+                    request.Password,
+                    request.PhoneNumber,
+                    request.BirthDate,
+                    request.Gender,
+                    request.AddressLine1,
+                    request.AddressLine2,
+                    request.City,
+                    request.State,
+                    request.Country,
+                    request.PostalCode,
+                    request.Role,
+                    requestingUserId);
 
-    [Authorize]
-    [HttpPut("update")]
-    public async Task<IActionResult> Update([FromBody] UpdateRequestWrapper requestWrapper)
-    {
-        try
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+                return Ok(new { Message = "User registered successfully", User = userDto });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
 
-            var updatedUserDto = await _userService.UpdateUserAsync(userId, requestWrapper.requestWrapper.FullName, requestWrapper.requestWrapper.Roles);
-            return Ok(new { Message = "Usuário atualizado com sucesso", User = updatedUserDto });
-        }
-        catch (Exception ex)
+        [HttpPost("register-customer")]
+        public async Task<IActionResult> RegisterCustomer([FromBody] RegisterCustomerRequest request)
         {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
+            try
+            {
+                var userDto = await _userService.RegisterUserAsync(
+                    request.Email,
+                    request.FirstName,
+                    request.LastName,
+                    request.Password,
+                    request.PhoneNumber,
+                    request.BirthDate,
+                    request.Gender,
+                    request.AddressLine1,
+                    request.AddressLine2,
+                    request.City,
+                    request.State,
+                    request.Country,
+                    request.PostalCode,
+                    UserRole.Customer);
 
-    [Authorize]
-    [HttpGet("me")]
-    public async Task<IActionResult> GetCurrentUser()
-    {
-        try
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+                return Ok(new { Message = "User registered successfully", User = userDto });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
 
-            var userDto = await _userService.GetCurrentUserAsync(userId);
-            return Ok(userDto);
-        }
-        catch (Exception ex)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            return BadRequest(new { Error = ex.Message });
+            try
+            {
+                var (accessToken, refreshToken) = await _userService.LoginUserAsync(request.Email, request.Password);
+                return Ok(new { Message = "Login successful", AccessToken = accessToken, RefreshToken = refreshToken });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
         }
-    }
 
-    [HttpPost("assign")]
-    public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest request)
-    {
-        try
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            await _userService.AssignRoleAsync(request.UserId, request.Role);
-            return Ok(new { Message = $"Role {request.Role} atribuído ao usuário {request.UserId} com sucesso." });
+            try
+            {
+                var (accessToken, refreshToken) = await _userService.RefreshTokenAsync(request.RefreshToken);
+                return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
         }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { Error = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
 
-    [HttpPost("remove")]
-    public async Task<IActionResult> RemoveRole([FromBody] RemoveRoleRequest request)
-    {
-        try
+        [Authorize]
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] UpdateRequestWrapper requestWrapper)
         {
-            await _userService.RemoveRoleAsync(request.UserId, request.Role);
-            return Ok(new { Message = $"Role {request.Role} removido do usuário {request.UserId} com sucesso." });
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { Error = ex.Message });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized();
 
-    [HttpGet("users/{roleName}")]
-    public async Task<IActionResult> GetUsersByRole(string roleName)
-    {
-        try
-        {
-            if (!Enum.TryParse<UserRole>(roleName, true, out var role))
-                return BadRequest(new { Error = "Role inválido." });
+                // Pass profile and address fields from the update request
+                var updatedUserDto = await _userService.UpdateUserAsync(
+                    userId,
+                    requestWrapper.Request.FirstName,
+                    requestWrapper.Request.LastName,
+                    requestWrapper.Request.BirthDate,
+                    requestWrapper.Request.Gender,
+                    requestWrapper.Request.AddressLine1,
+                    requestWrapper.Request.AddressLine2,
+                    requestWrapper.Request.City,
+                    requestWrapper.Request.State,
+                    requestWrapper.Request.Country,
+                    requestWrapper.Request.PostalCode,
+                    requestWrapper.Request.Roles);
 
-            var users = await _userService.GetUsersByRoleAsync(role);
-            return Ok(users);
+                return Ok(new { Message = "User updated successfully", User = updatedUserDto });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
         }
-        catch (Exception ex)
+
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetCurrentUser()
         {
-            return BadRequest(new { Error = ex.Message });
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized();
+
+                var userDto = await _userService.GetCurrentUserAsync(userId);
+                return Ok(userDto);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("assign")]
+        public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest request)
+        {
+            try
+            {
+                await _userService.AssignRoleAsync(request.UserId, request.Role);
+                return Ok(new { Message = $"Role {request.Role} assigned to user {request.UserId} successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpPost("remove")]
+        public async Task<IActionResult> RemoveRole([FromBody] RemoveRoleRequest request)
+        {
+            try
+            {
+                await _userService.RemoveRoleAsync(request.UserId, request.Role);
+                return Ok(new { Message = $"Role {request.Role} removed from user {request.UserId} successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { Error = ex.Message });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        [HttpGet("users/{roleName}")]
+        public async Task<IActionResult> GetUsersByRole(string roleName)
+        {
+            try
+            {
+                if (!System.Enum.TryParse<UserRole>(roleName, true, out var role))
+                    return BadRequest(new { Error = "Invalid role." });
+
+                var users = await _userService.GetUsersByRoleAsync(role);
+                return Ok(users);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
         }
     }
 }

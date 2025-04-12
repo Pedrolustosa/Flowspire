@@ -38,7 +38,6 @@ export class AuthService {
   currentUser$ = this.currentUserSubject.asObservable();
 
   constructor() {
-    // Verificar se o usuário já está autenticado ao inicializar o serviço
     if (this.isAuthenticatedSubject.value) {
       this.getCurrentUser().subscribe({
         next: (user) => {
@@ -46,7 +45,7 @@ export class AuthService {
         },
         error: (err) => {
           console.error('Failed to fetch current user on initialization:', err);
-          this.logout(); // Deslogar se falhar
+          this.logout();
         }
       });
     }
@@ -71,7 +70,7 @@ export class AuthService {
               },
               error: (err) => {
                 console.error('Failed to fetch current user after login:', err);
-                this.logout(); // Deslogar se falhar
+                this.logout();
               }
             });
           }
@@ -145,7 +144,7 @@ export class AuthService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`
     });
-    const body: UpdateRequestWrapper = { requestWrapper: request };
+    const body: UpdateRequestWrapper = { request: request };
     return this.http.put<User>(`${this.apiUrl}/user/update`, body, { headers }).pipe(
       tap({
         next: (response) => {

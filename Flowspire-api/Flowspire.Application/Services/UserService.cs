@@ -10,307 +10,393 @@ using Flowspire.Domain.Enums;
 using Flowspire.Application.DTOs;
 using Flowspire.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Flowspire.Application.Services;
-
-public class UserService(UserManager<User> userManager, 
-                         SignInManager<User> signInManager, 
-                         IConfiguration configuration,
-                         RoleManager<IdentityRole> roleManager, 
-                         IRefreshTokenRepository refreshTokenRepository) : IUserService
+namespace Flowspire.Application.Services
 {
-    private readonly UserManager<User> _userManager = userManager;
-    private readonly SignInManager<User> _signInManager = signInManager;
-    private readonly IConfiguration _configuration = configuration;
-    private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository ?? throw new ArgumentNullException(nameof(refreshTokenRepository));
-
-    public async Task<UserDTO> RegisterUserAsync(string email, string fullName, string password, UserRole role, string requestingUserId = null)
+    public class UserService : IUserService
     {
-        try
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly IConfiguration _configuration;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+
+        public UserService(UserManager<User> userManager,
+                           SignInManager<User> signInManager,
+                           IConfiguration configuration,
+                           RoleManager<IdentityRole> roleManager,
+                           IRefreshTokenRepository refreshTokenRepository)
         {
-            if (requestingUserId != null)
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _configuration = configuration;
+            _roleManager = roleManager;
+            _refreshTokenRepository = refreshTokenRepository ?? throw new ArgumentNullException(nameof(refreshTokenRepository));
+        }
+
+        public async Task<UserDTO> RegisterUserAsync(
+            string email,
+            string firstName,
+            string lastName,
+            string password,
+            string phoneNumber,
+            DateTime? birthDate,
+            Gender gender,
+            string? addressLine1,
+            string? addressLine2,
+            string? city,
+            string? state,
+            string? country,
+            string? postalCode,
+            UserRole role,
+            string requestingUserId = null)
+        {
+            try
             {
-                var requestingUser = await _userManager.FindByIdAsync(requestingUserId);
-                if (requestingUser == null || !await _userManager.IsInRoleAsync(requestingUser, "Administrator"))
-                    throw new UnauthorizedAccessException("Apenas administradores podem registrar usuários com roles específicos.");
+                if (requestingUserId != null)
+                {
+                    var requestingUser = await _userManager.FindByIdAsync(requestingUserId);
+                    if (requestingUser == null || !await _userManager.IsInRoleAsync(requestingUser, "Administrator"))
+                        throw new UnauthorizedAccessException("Only administrators can register users with specific roles.");
+                }
+                else if (role != UserRole.Customer)
+                {
+                    throw new UnauthorizedAccessException("Only administrators can create users with roles other than Customer.");
+                }
+
+                // Create a new user with all the required attributes
+                var user = User.Create(email, password, firstName, lastName, phoneNumber, birthDate, gender, addressLine1, addressLine2, city, state, country, postalCode);
+                var result = await _userManager.CreateAsync(user, password);
+
+                if (!result.Succeeded)
+                    throw new Exception("Error registering user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+
+                string roleName = role.ToString();
+                if (!await _roleManager.RoleExistsAsync(roleName))
+                    await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+                await _userManager.AddToRoleAsync(user, roleName);
+
+                return new UserDTO
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    BirthDate = user.BirthDate,
+                    Gender = user.Gender,
+                    AddressLine1 = user.AddressLine1,
+                    AddressLine2 = user.AddressLine2,
+                    City = user.City,
+                    State = user.State,
+                    Country = user.Country,
+                    PostalCode = user.PostalCode,
+                    Roles = new List<UserRole> { role }
+                };
             }
-            else if (role != UserRole.Customer)
+            catch (DbUpdateException ex)
             {
-                throw new UnauthorizedAccessException("Somente administradores podem criar usuários com roles diferentes de Customer.");
+                throw new Exception("Error saving user to the database.", ex);
             }
-
-            var user = User.Create(email, fullName, password);
-            var result = await _userManager.CreateAsync(user, password);
-
-            if (!result.Succeeded)
-                throw new Exception("Erro ao registrar usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-
-            string roleName = role.ToString();
-            if (!await _roleManager.RoleExistsAsync(roleName))
-                await _roleManager.CreateAsync(new IdentityRole(roleName));
-
-            await _userManager.AddToRoleAsync(user, roleName);
-
-            return new UserDTO
+            catch (UnauthorizedAccessException)
             {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-                Roles = new List<UserRole> { role }
-            };
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao salvar o usuário no banco de dados.", ex);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao registrar usuário.", ex);
-        }
-    }
-    public async Task<(string AccessToken, string RefreshToken)> LoginUserAsync(string email, string password)
-    {
-        try
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                throw new Exception("Usuário não encontrado.");
-            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
-            if (!result.Succeeded)
-                throw new Exception("Login falhou.");
-
-            var accessToken = GenerateJwtToken(user);
-            var refreshToken = RefreshToken.Create(user.Id);
-            await _refreshTokenRepository.AddAsync(refreshToken);
-
-            return (accessToken, refreshToken.Token);
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao salvar o refresh token no banco de dados.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao realizar login.", ex);
-        }
-    }
-
-    public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(string refreshToken)
-    {
-        try
-        {
-            var token = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
-            if (token == null || token.IsRevoked || token.IsExpired())
-                throw new Exception("Refresh token inválido ou expirado.");
-
-            var user = await _userManager.FindByIdAsync(token.UserId);
-            if (user == null)
-                throw new Exception("Usuário não encontrado.");
-
-            var newAccessToken = GenerateJwtToken(user);
-            token.Revoke();
-            await _refreshTokenRepository.UpdateAsync(token);
-
-            var newRefreshToken = RefreshToken.Create(user.Id);
-            await _refreshTokenRepository.AddAsync(newRefreshToken);
-
-            return (newAccessToken, newRefreshToken.Token);
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao atualizar ou salvar refresh tokens no banco de dados.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao atualizar o token.", ex);
-        }
-    }
-
-    public async Task<UserDTO> UpdateUserAsync(string userId, string fullName, List<UserRole> roles = null)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(userId))
-                throw new ArgumentException("O ID do usuário não pode ser vazio.");
-
-            if (string.IsNullOrWhiteSpace(fullName))
-                throw new ArgumentException("O nome completo não pode ser vazio.");
-
-            var user = await _userManager.FindByIdAsync(userId) ?? throw new Exception("Usuário não encontrado.");
-            user.UpdateFullName(fullName);
-
-            // Atualizar roles, se fornecidas
-            if (roles != null && roles.Any())
-            {
-                var currentRoles = await _userManager.GetRolesAsync(user);
-                var rolesToRemove = currentRoles.Except(roles.Select(r => r.ToString())).ToList();
-                var rolesToAdd = roles.Select(r => r.ToString()).Except(currentRoles).ToList();
-
-                if (rolesToRemove.Any())
-                    await _userManager.RemoveFromRolesAsync(user, rolesToRemove.ToArray());
-                if (rolesToAdd.Any())
-                    await _userManager.AddToRolesAsync(user, rolesToAdd.ToArray());
+                throw;
             }
-
-            var result = await _userManager.UpdateAsync(user);
-
-            if (!result.Succeeded)
-                throw new Exception("Erro ao atualizar usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-
-            // Obter todas as roles do usuário
-            var userRoles = await _userManager.GetRolesAsync(user);
-            var roleEnums = userRoles.Select(r => Enum.Parse<UserRole>(r)).ToList();
-
-            return new UserDTO
+            catch (Exception ex)
             {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-                Roles = roleEnums // Retornar todas as roles como lista
+                throw new Exception("Unexpected error while registering user.", ex);
+            }
+        }
+
+        public async Task<(string AccessToken, string RefreshToken)> LoginUserAsync(string email, string password)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                    throw new Exception("User not found.");
+
+                var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+                if (!result.Succeeded)
+                    throw new Exception("Login failed.");
+
+                var accessToken = GenerateJwtToken(user);
+                var refreshToken = RefreshToken.Create(user.Id);
+                await _refreshTokenRepository.AddAsync(refreshToken);
+
+                return (accessToken, refreshToken.Token);
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Error saving refresh token to the database.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error during login.", ex);
+            }
+        }
+
+        public async Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(string refreshToken)
+        {
+            try
+            {
+                var token = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
+                if (token == null || token.IsRevoked || token.IsExpired())
+                    throw new Exception("Invalid or expired refresh token.");
+
+                var user = await _userManager.FindByIdAsync(token.UserId);
+                if (user == null)
+                    throw new Exception("User not found.");
+
+                var newAccessToken = GenerateJwtToken(user);
+                token.Revoke();
+                await _refreshTokenRepository.UpdateAsync(token);
+
+                var newRefreshToken = RefreshToken.Create(user.Id);
+                await _refreshTokenRepository.AddAsync(newRefreshToken);
+
+                return (newAccessToken, newRefreshToken.Token);
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Error updating or saving refresh tokens to the database.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while refreshing token.", ex);
+            }
+        }
+
+        public async Task<UserDTO> UpdateUserAsync(
+            string userId,
+            string firstName,
+            string lastName,
+            DateTime? birthDate,
+            Gender gender,
+            string? addressLine1,
+            string? addressLine2,
+            string? city,
+            string? state,
+            string? country,
+            string? postalCode,
+            List<UserRole> roles = null)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userId))
+                    throw new ArgumentException("User ID cannot be empty.");
+
+                if (string.IsNullOrWhiteSpace(firstName))
+                    throw new ArgumentException("First name cannot be empty.");
+
+                if (string.IsNullOrWhiteSpace(lastName))
+                    throw new ArgumentException("Last name cannot be empty.");
+
+                var user = await _userManager.FindByIdAsync(userId) ?? throw new Exception("User not found.");
+
+                // Update personal info and address
+                user.UpdatePersonalInfo(firstName, lastName, birthDate, gender);
+                user.UpdateAddress(addressLine1, addressLine2, city, state, country, postalCode);
+
+                if (roles != null && roles.Any())
+                {
+                    var currentRoles = await _userManager.GetRolesAsync(user);
+                    var rolesToRemove = currentRoles.Except(roles.Select(r => r.ToString())).ToList();
+                    var rolesToAdd = roles.Select(r => r.ToString()).Except(currentRoles).ToList();
+
+                    if (rolesToRemove.Any())
+                        await _userManager.RemoveFromRolesAsync(user, rolesToRemove.ToArray());
+                    if (rolesToAdd.Any())
+                        await _userManager.AddToRolesAsync(user, rolesToAdd.ToArray());
+                }
+
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                    throw new Exception("Error updating user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+
+                // Rebuild the DTO with updated data
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var roleEnums = userRoles.Select(r => Enum.Parse<UserRole>(r)).ToList();
+
+                return new UserDTO
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    BirthDate = user.BirthDate,
+                    Gender = user.Gender,
+                    AddressLine1 = user.AddressLine1,
+                    AddressLine2 = user.AddressLine2,
+                    City = user.City,
+                    State = user.State,
+                    Country = user.Country,
+                    PostalCode = user.PostalCode,
+                    Roles = roleEnums
+                };
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Error updating user in the database.", ex);
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while updating user.", ex);
+            }
+        }
+
+        public async Task<UserDTO> GetCurrentUserAsync(string userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId) ?? throw new Exception("User not found.");
+                var roles = await _userManager.GetRolesAsync(user);
+                var roleEnums = roles.Select(r => Enum.Parse<UserRole>(r)).ToList();
+
+                return new UserDTO
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    BirthDate = user.BirthDate,
+                    Gender = user.Gender,
+                    AddressLine1 = user.AddressLine1,
+                    AddressLine2 = user.AddressLine2,
+                    City = user.City,
+                    State = user.State,
+                    Country = user.Country,
+                    PostalCode = user.PostalCode,
+                    Roles = roleEnums
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving current user.", ex);
+            }
+        }
+
+        public async Task AssignRoleAsync(string userId, UserRole role)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                    throw new KeyNotFoundException("User not found.");
+
+                string roleName = role.ToString();
+                if (!await _roleManager.RoleExistsAsync(roleName))
+                    await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+                var result = await _userManager.AddToRoleAsync(user, roleName);
+                if (!result.Succeeded)
+                    throw new Exception("Error assigning role to user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Error saving role assignment to the database.", ex);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while assigning role.", ex);
+            }
+        }
+
+        public async Task RemoveRoleAsync(string userId, UserRole role)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                    throw new KeyNotFoundException("User not found.");
+
+                string roleName = role.ToString();
+                if (!await _userManager.IsInRoleAsync(user, roleName))
+                    throw new Exception("User does not have the specified role.");
+
+                var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+                if (!result.Succeeded)
+                    throw new Exception("Error removing role from user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Error saving role removal to the database.", ex);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while removing role.", ex);
+            }
+        }
+
+        public async Task<List<UserDTO>> GetUsersByRoleAsync(UserRole role)
+        {
+            try
+            {
+                string roleName = role.ToString();
+                var users = await _userManager.GetUsersInRoleAsync(roleName);
+                return users.Select(user => new UserDTO
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    BirthDate = user.BirthDate,
+                    Gender = user.Gender,
+                    AddressLine1 = user.AddressLine1,
+                    AddressLine2 = user.AddressLine2,
+                    City = user.City,
+                    State = user.State,
+                    Country = user.Country,
+                    PostalCode = user.PostalCode,
+                    Roles = new List<UserRole> { role }
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while retrieving users by role.", ex);
+            }
+        }
+
+        // Generate JWT token using user claims and roles
+        private string GenerateJwtToken(User user)
+        {
+            var roles = _userManager.GetRolesAsync(user).Result;
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao atualizar o usuário no banco de dados.", ex);
-        }
-        catch (ArgumentException ex)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao atualizar usuário.", ex);
-        }
-    }
 
-    public async Task<UserDTO> GetCurrentUserAsync(string userId)
-    {
-        try
-        {
-            var user = await _userManager.FindByIdAsync(userId) ?? throw new Exception("Usuário não encontrado.");
-            var roles = await _userManager.GetRolesAsync(user);
-            var roleEnums = roles.Select(r => Enum.Parse<UserRole>(r)).ToList();
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            return new UserDTO
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-                Roles = roleEnums
-            };
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro ao obter usuário atual.", ex);
-        }
-    }
-    public async Task AssignRoleAsync(string userId, UserRole role)
-    {
-        try
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                throw new KeyNotFoundException("Usuário não encontrado.");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            string roleName = role.ToString();
-            if (!await _roleManager.RoleExistsAsync(roleName))
-                await _roleManager.CreateAsync(new IdentityRole(roleName));
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(15),
+                signingCredentials: creds);
 
-            var result = await _userManager.AddToRoleAsync(user, roleName);
-            if (!result.Succeeded)
-                throw new Exception("Erro ao atribuir o role ao usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao salvar a atribuição de role no banco de dados.", ex);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao atribuir role.", ex);
-        }
-    }
-
-    public async Task RemoveRoleAsync(string userId, UserRole role)
-    {
-        try
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-                throw new KeyNotFoundException("Usuário não encontrado.");
-
-            string roleName = role.ToString();
-            if (!await _userManager.IsInRoleAsync(user, roleName))
-                throw new Exception("O usuário não possui este role.");
-
-            var result = await _userManager.RemoveFromRoleAsync(user, roleName);
-            if (!result.Succeeded)
-                throw new Exception("Erro ao remover o role do usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao salvar a remoção de role no banco de dados.", ex);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao remover role.", ex);
-        }
-    }
-
-    public async Task<List<UserDTO>> GetUsersByRoleAsync(UserRole role)
-    {
-        try
-        {
-            string roleName = role.ToString();
-            var users = await _userManager.GetUsersInRoleAsync(roleName);
-            return users.Select(user => new UserDTO
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.FullName,
-                Roles = new List<UserRole> { role }
-            }).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao recuperar usuários por role.", ex);
-        }
-    }
-
-    private string GenerateJwtToken(User user)
-    {
-        var roles = _userManager.GetRolesAsync(user).Result;
-        var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
-
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(15),
-            signingCredentials: creds);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

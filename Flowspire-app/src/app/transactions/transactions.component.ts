@@ -230,7 +230,7 @@ export class TransactionComponent implements OnInit {
   private createPDFReport(): void {
     const doc = new jsPDF();
     const user = this.authService.getCurrentUserValue();
-    const userName = user?.fullName || 'Usuário Não Identificado';
+    const userName = user?.firstName || 'Usuário Não Identificado';
     const startDateStr = this.startDate instanceof Date && !isNaN(this.startDate.getTime())
       ? this.startDate.toLocaleDateString('pt-BR')
       : 'Data Não Selecionada';

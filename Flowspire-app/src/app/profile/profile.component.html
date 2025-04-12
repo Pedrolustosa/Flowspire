@@ -1,10 +1,11 @@
 <div class="container-fluid py-4">
+  <!-- Header -->
   <div class="position-relative mb-4 p-4 bg-primary bg-gradient rounded-3 text-white">
     <div class="position-relative z-2">
       <h2 class="display-6 fw-bold mb-2">
-        <i class="fa-solid fa-user me-2"></i>Perfil do Usuário
+        <i class="fa-solid fa-user me-2"></i>User Profile
       </h2>
-      <p class="lead mb-0 opacity-75">Gerencie suas informações pessoais</p>
+      <p class="lead mb-0 opacity-75">Manage your personal information</p>
     </div>
     <div class="position-absolute top-0 end-0 p-4">
       <i class="fa-solid fa-id-card opacity-25" style="font-size: 4rem;"></i>
@@ -12,15 +13,16 @@
   </div>
 
   <div class="row g-4">
-    <div class="col-12 col-lg-12 mx-auto">
+    <div class="col-12 col-lg-10 mx-auto">
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom border-light py-3">
           <h5 class="card-title mb-0">
-            <i class="fa-solid fa-pen-to-square me-2"></i>Editar Perfil
+            <i class="fa-solid fa-pen-to-square me-2"></i>Edit Profile
           </h5>
         </div>
         <div class="card-body p-4">
-          <form *ngIf="user" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" novalidate>
+            <!-- Row 1: Email (full width) -->
             <div class="mb-4">
               <label for="email" class="form-label">Email</label>
               <div class="input-group">
@@ -29,37 +31,167 @@
                 </span>
                 <input
                   type="text"
-                  class="form-control border-start-0 ps-0 bg-light"
                   id="email"
-                  value="{{ user.email }}"
+                  class="form-control border-start-0 ps-0 bg-light"
+                  [value]="user?.email"
                   disabled
                   readonly
                 />
               </div>
-              <small class="text-muted">O email não pode ser alterado</small>
+              <small class="text-muted">Email cannot be changed</small>
             </div>
-            
-            <div class="mb-4">
-              <label for="fullName" class="form-label">Nome Completo</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light border-end-0">
-                  <i class="fa-solid fa-user"></i>
-                </span>
+
+            <!-- Row 2: First Name and Last Name -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="firstName" class="form-label">First Name</label>
                 <input
                   type="text"
-                  id="fullName"
-                  class="form-control border-start-0 ps-0"
-                  [(ngModel)]="updateRequest.fullName"
-                  name="fullName"
-                  required
-                  placeholder="Digite seu nome completo"
+                  id="firstName"
+                  class="form-control"
+                  formControlName="firstName"
+                  placeholder="Enter your first name"
                 />
-                <div class="invalid-feedback">O nome completo é obrigatório.</div>
+                <div *ngIf="profileForm.get('firstName')?.touched && profileForm.get('firstName')?.invalid" class="text-danger">
+                  First name is required.
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  class="form-control"
+                  formControlName="lastName"
+                  placeholder="Enter your last name"
+                />
+                <div *ngIf="profileForm.get('lastName')?.touched && profileForm.get('lastName')?.invalid" class="text-danger">
+                  Last name is required.
+                </div>
               </div>
             </div>
-            
+
+            <!-- Row 3: Birth Date and Gender -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="birthDate" class="form-label">Birth Date</label>
+                <input
+                  type="date"
+                  id="birthDate"
+                  class="form-control"
+                  formControlName="birthDate"
+                />
+                <div *ngIf="profileForm.get('birthDate')?.touched && profileForm.get('birthDate')?.invalid" class="text-danger">
+                  Birth date is required.
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="gender" class="form-label">Gender</label>
+                <select id="gender" class="form-select" formControlName="gender">
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="NotSpecified">Not Specified</option>
+                </select>
+                <div *ngIf="profileForm.get('gender')?.touched && profileForm.get('gender')?.invalid" class="text-danger">
+                  Gender is required.
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 4: Address Line 1 and Address Line 2 -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="addressLine1" class="form-label">Address Line 1</label>
+                <input
+                  type="text"
+                  id="addressLine1"
+                  class="form-control"
+                  formControlName="addressLine1"
+                  placeholder="Enter address line 1"
+                />
+                <div *ngIf="profileForm.get('addressLine1')?.touched && profileForm.get('addressLine1')?.invalid" class="text-danger">
+                  Address Line 1 is required.
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="addressLine2" class="form-label">Address Line 2 (Optional)</label>
+                <input
+                  type="text"
+                  id="addressLine2"
+                  class="form-control"
+                  formControlName="addressLine2"
+                  placeholder="Enter address line 2"
+                />
+              </div>
+            </div>
+
+            <!-- Row 5: City, State, Postal Code -->
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="city" class="form-label">City</label>
+                <input
+                  type="text"
+                  id="city"
+                  class="form-control"
+                  formControlName="city"
+                  placeholder="Enter your city"
+                />
+                <div *ngIf="profileForm.get('city')?.touched && profileForm.get('city')?.invalid" class="text-danger">
+                  City is required.
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="state" class="form-label">State</label>
+                <input
+                  type="text"
+                  id="state"
+                  class="form-control"
+                  formControlName="state"
+                  placeholder="Enter your state"
+                />
+                <div *ngIf="profileForm.get('state')?.touched && profileForm.get('state')?.invalid" class="text-danger">
+                  State is required.
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="postalCode" class="form-label">Postal Code</label>
+                <input
+                  type="text"
+                  id="postalCode"
+                  class="form-control"
+                  formControlName="postalCode"
+                  placeholder="Enter your postal code"
+                />
+                <div *ngIf="profileForm.get('postalCode')?.touched && profileForm.get('postalCode')?.invalid" class="text-danger">
+                  Postal Code is required.
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 6: Country -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="country" class="form-label">Country</label>
+                <input
+                  type="text"
+                  id="country"
+                  class="form-control"
+                  formControlName="country"
+                  placeholder="Enter your country"
+                />
+                <div *ngIf="profileForm.get('country')?.touched && profileForm.get('country')?.invalid" class="text-danger">
+                  Country is required.
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <!-- Optionally, additional fields or leave empty to balance layout -->
+              </div>
+            </div>
+
+            <!-- Row 7: Roles Section (full width) -->
             <div class="mb-4">
-              <label class="form-label">Funções</label>
+              <label class="form-label">Roles</label>
               <div class="d-flex flex-wrap gap-3 mt-2">
                 <div class="form-check form-check-inline" *ngFor="let role of roleOptions">
                   <input
@@ -73,21 +205,14 @@
                 </div>
               </div>
             </div>
-            
+
+            <!-- Submission Buttons -->
             <div class="d-grid gap-2">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                [disabled]="!updateRequest.fullName.trim()"
-              >
-                <i class="fa-solid fa-save me-2"></i>Salvar Alterações
+              <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-save me-2"></i>Save Changes
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                (click)="resetForm()"
-              >
-                <i class="fa-solid fa-xmark me-2"></i>Cancelar
+              <button type="button" class="btn btn-outline-secondary" (click)="resetForm()">
+                <i class="fa-solid fa-xmark me-2"></i>Cancel
               </button>
             </div>
           </form>

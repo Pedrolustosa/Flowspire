@@ -1,38 +1,55 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
-import { UpdateRequest } from '../models/UpdateRequest';
-import { User } from '../models/User';
-import { NgFor, NgIf } from '@angular/common';
+import { NgIf, NgFor } from '@angular/common';
 import { LoadingService } from '../services/loading.service';
+import { User } from '../models/User';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [FormsModule, RouterModule, NgIf, NgFor],
+  imports: [ReactiveFormsModule, RouterModule, NgIf, NgFor],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+  profileForm!: FormGroup;
   user: User | null = null;
-  updateRequest: UpdateRequest = { fullName: '', roles: [] };
 
   roleOptions = [
-    { id: 0, name: 'Administrador' },
-    { id: 1, name: 'Assessor Financeiro' },
-    { id: 2, name: 'Cliente' }
+    { id: 0, name: 'Administrator' },
+    { id: 1, name: 'Financial Advisor' },
+    { id: 2, name: 'Customer' }
   ];
 
   constructor(
+    private fb: FormBuilder,
     private authService: AuthService,
     private toastr: ToastrService,
     private loadingService: LoadingService
   ) {}
 
   ngOnInit(): void {
+    this.initializeForm();
     this.loadUserProfile();
+  }
+
+  private initializeForm(): void {
+    this.profileForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      birthDate: ['', Validators.required],
+      gender: ['', Validators.required],
+      addressLine1: ['', Validators.required],
+      addressLine2: [''], // optional
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      country: ['', Validators.required],
+      postalCode: ['', Validators.required],
+      roles: [[], Validators.required]
+    });
   }
 
   loadUserProfile(): void {
@@ -40,61 +57,82 @@ export class ProfileComponent implements OnInit {
     this.authService.getCurrentUser().subscribe({
       next: (user) => {
         this.user = user;
-        this.updateRequest.fullName = user.fullName;
-        this.updateRequest.roles = Array.isArray(user.roles)
-          ? user.roles.filter(role => this.roleOptions.some(option => option.id === role))
-          : [];
+        this.profileForm.patchValue({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          birthDate: user.birthDate,
+          gender: user.gender,
+          addressLine1: user.addressLine1,
+          addressLine2: user.addressLine2,
+          city: user.city,
+          state: user.state,
+          country: user.country,
+          postalCode: user.postalCode,
+          roles: Array.isArray(user.roles)
+            ? user.roles.filter(role => this.roleOptions.some(option => option.id === role))
+            : []
+        });
         this.loadingService.setLoading(false);
       },
       error: (err) => {
-        this.toastr.error('Erro ao carregar o perfil.', 'Erro');
+        this.toastr.error('Error loading profile.', 'Error');
         this.loadingService.setLoading(false);
       }
     });
   }
 
   onSubmit(): void {
-    if (!this.updateRequest.fullName.trim()) {
-      this.toastr.error('O nome completo não pode estar vazio.', 'Erro');
+    if (this.profileForm.invalid) {
+      this.toastr.error('Please fill all required fields.', 'Error');
       return;
     }
 
+    const updateData = this.profileForm.value;
     this.loadingService.setLoading(true);
-    this.authService.updateUser(this.updateRequest).subscribe({
+    this.authService.updateUser(updateData).subscribe({
       next: (updatedUser) => {
         this.user = updatedUser;
-        this.loadUserProfile();
-        this.toastr.success('Perfil atualizado com sucesso!', 'Sucesso');
+        this.toastr.success('Profile updated successfully!', 'Success');
         this.loadingService.setLoading(false);
       },
       error: (err) => {
-        this.toastr.error(err.error?.title || 'Erro ao atualizar o perfil.', 'Erro');
+        this.toastr.error(err.error?.title || 'Error updating profile.', 'Error');
         this.loadingService.setLoading(false);
       }
     });
   }
 
-  // Método para verificar se uma role está selecionada
+  // Utility functions to toggle roles in the form control
   isRoleSelected(roleId: number): boolean {
-    return this.updateRequest.roles.includes(roleId);
+    const roles: number[] = this.profileForm.get('roles')?.value || [];
+    return roles.includes(roleId);
   }
 
-  // Método para alternar a seleção de uma role
   toggleRole(roleId: number): void {
-    if (this.isRoleSelected(roleId)) {
-      this.updateRequest.roles = this.updateRequest.roles.filter(id => id !== roleId);
+    let roles: number[] = this.profileForm.get('roles')?.value || [];
+    if (roles.includes(roleId)) {
+      roles = roles.filter(r => r !== roleId);
     } else {
-      this.updateRequest.roles.push(roleId);
+      roles.push(roleId);
     }
+    this.profileForm.get('roles')?.setValue(roles);
   }
 
-  // Método para resetar o formulário
   resetForm(): void {
     if (this.user) {
-      this.updateRequest.fullName = this.user.fullName;
-      this.updateRequest.roles = Array.isArray(this.user.roles)
-        ? [...this.user.roles]
-        : [];
+      this.profileForm.patchValue({
+        firstName: this.user.firstName,
+        lastName: this.user.lastName,
+        birthDate: this.user.birthDate,
+        gender: this.user.gender,
+        addressLine1: this.user.addressLine1,
+        addressLine2: this.user.addressLine2,
+        city: this.user.city,
+        state: this.user.state,
+        country: this.user.country,
+        postalCode: this.user.postalCode,
+        roles: Array.isArray(this.user.roles) ? [...this.user.roles] : []
+      });
     }
   }
 }

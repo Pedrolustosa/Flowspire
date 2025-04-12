@@ -1,8 +1,17 @@
 export interface UpdateRequestWrapper {
-  requestWrapper: UpdateRequest;
+  request: UpdateRequest;
 }
 
 export interface UpdateRequest {
-  fullName: string;
+  firstName: string;
+  lastName: string;
+  birthDate?: Date | string;
+  gender?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
   roles: number[];
 }

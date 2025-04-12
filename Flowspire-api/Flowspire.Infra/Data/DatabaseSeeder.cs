@@ -1,6 +1,9 @@
 ﻿using Flowspire.Domain.Entities;
+using Flowspire.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
 namespace Flowspire.Infra.Data;
 
@@ -20,12 +23,13 @@ public static class DatabaseSeeder
         }
         catch (Exception ex)
         {
-            throw new Exception("Erro ao aplicar seed no banco de dados.", ex);
+            throw new Exception("Error applying seed data to the database.", ex);
         }
     }
 
     private static void SeedUsersAndRoles(ModelBuilder builder, PasswordHasher<User> hasher)
     {
+        // Define fixed GUIDs for seeded users
         var adminId = "550e8400-e29b-41d4-a716-446655440001";
         var advisor1Id = "550e8400-e29b-41d4-a716-446655440002";
         var advisor2Id = "550e8400-e29b-41d4-a716-446655440003";
@@ -33,6 +37,10 @@ public static class DatabaseSeeder
         var customer2Id = "550e8400-e29b-41d4-a716-446655440005";
         var customer3Id = "550e8400-e29b-41d4-a716-446655440006";
 
+        // Choose a fixed DateTime (e.g., January 1, 2023 in UTC)
+        var seedDate = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        // Seed Users with all required properties
         builder.Entity<User>().HasData(
             new
             {
@@ -41,14 +49,26 @@ public static class DatabaseSeeder
                 NormalizedUserName = "ADMIN@FLOWSPIRE.COM",
                 Email = "admin@flowspire.com",
                 NormalizedEmail = "ADMIN@FLOWSPIRE.COM",
-                FullName = "Admin User",
+                FirstName = "Admin",
+                LastName = "User",
+                BirthDate = (DateTime?)new DateTime(1980, 1, 1),
+                Gender = Gender.NotSpecified,
+                AddressLine1 = "123 Admin St.",
+                AddressLine2 = (string?)null,
+                City = "Admin City",
+                State = "Admin State",
+                Country = "Admin Country",
+                PostalCode = "00000",
+                PhoneNumber = "+15555550001",
                 PasswordHash = hasher.HashPassword(null, "Admin123"),
                 SecurityStamp = Guid.NewGuid().ToString(),
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 TwoFactorEnabled = false,
-                PhoneNumberConfirmed = false,
-                EmailConfirmed = true
+                PhoneNumberConfirmed = true,
+                EmailConfirmed = true,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
             },
             new
             {
@@ -57,14 +77,26 @@ public static class DatabaseSeeder
                 NormalizedUserName = "ADVISOR1@FLOWSPIRE.COM",
                 Email = "advisor1@flowspire.com",
                 NormalizedEmail = "ADVISOR1@FLOWSPIRE.COM",
-                FullName = "Advisor One",
+                FirstName = "Advisor",
+                LastName = "One",
+                BirthDate = (DateTime?)new DateTime(1985, 5, 15),
+                Gender = Gender.Male,
+                AddressLine1 = "101 Advisor Ave.",
+                AddressLine2 = (string?)null,
+                City = "Advisor City",
+                State = "Advisor State",
+                Country = "Advisor Country",
+                PostalCode = "11111",
+                PhoneNumber = "+15555550002",
                 PasswordHash = hasher.HashPassword(null, "Advisor123"),
                 SecurityStamp = Guid.NewGuid().ToString(),
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 TwoFactorEnabled = false,
-                PhoneNumberConfirmed = false,
-                EmailConfirmed = true
+                PhoneNumberConfirmed = true,
+                EmailConfirmed = true,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
             },
             new
             {
@@ -73,14 +105,26 @@ public static class DatabaseSeeder
                 NormalizedUserName = "ADVISOR2@FLOWSPIRE.COM",
                 Email = "advisor2@flowspire.com",
                 NormalizedEmail = "ADVISOR2@FLOWSPIRE.COM",
-                FullName = "Advisor Two",
+                FirstName = "Advisor",
+                LastName = "Two",
+                BirthDate = (DateTime?)new DateTime(1987, 7, 20),
+                Gender = Gender.Male,
+                AddressLine1 = "102 Advisor Ave.",
+                AddressLine2 = (string?)null,
+                City = "Advisor City",
+                State = "Advisor State",
+                Country = "Advisor Country",
+                PostalCode = "11112",
+                PhoneNumber = "+15555550003",
                 PasswordHash = hasher.HashPassword(null, "Advisor123"),
                 SecurityStamp = Guid.NewGuid().ToString(),
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 TwoFactorEnabled = false,
-                PhoneNumberConfirmed = false,
-                EmailConfirmed = true
+                PhoneNumberConfirmed = true,
+                EmailConfirmed = true,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
             },
             new
             {
@@ -89,14 +133,26 @@ public static class DatabaseSeeder
                 NormalizedUserName = "CUSTOMER1@FLOWSPIRE.COM",
                 Email = "customer1@flowspire.com",
                 NormalizedEmail = "CUSTOMER1@FLOWSPIRE.COM",
-                FullName = "Customer One",
+                FirstName = "Customer",
+                LastName = "One",
+                BirthDate = (DateTime?)new DateTime(1990, 3, 10),
+                Gender = Gender.Female,
+                AddressLine1 = "201 Customer Rd.",
+                AddressLine2 = (string?)null,
+                City = "Customer City",
+                State = "Customer State",
+                Country = "Customer Country",
+                PostalCode = "22222",
+                PhoneNumber = "+15555550004",
                 PasswordHash = hasher.HashPassword(null, "Customer123"),
                 SecurityStamp = Guid.NewGuid().ToString(),
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 TwoFactorEnabled = false,
-                PhoneNumberConfirmed = false,
-                EmailConfirmed = true
+                PhoneNumberConfirmed = true,
+                EmailConfirmed = true,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
             },
             new
             {
@@ -105,14 +161,26 @@ public static class DatabaseSeeder
                 NormalizedUserName = "CUSTOMER2@FLOWSPIRE.COM",
                 Email = "customer2@flowspire.com",
                 NormalizedEmail = "CUSTOMER2@FLOWSPIRE.COM",
-                FullName = "Customer Two",
+                FirstName = "Customer",
+                LastName = "Two",
+                BirthDate = (DateTime?)new DateTime(1992, 8, 25),
+                Gender = Gender.Female,
+                AddressLine1 = "202 Customer Rd.",
+                AddressLine2 = (string?)null,
+                City = "Customer City",
+                State = "Customer State",
+                Country = "Customer Country",
+                PostalCode = "22223",
+                PhoneNumber = "+15555550005",
                 PasswordHash = hasher.HashPassword(null, "Customer123"),
                 SecurityStamp = Guid.NewGuid().ToString(),
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 TwoFactorEnabled = false,
-                PhoneNumberConfirmed = false,
-                EmailConfirmed = true
+                PhoneNumberConfirmed = true,
+                EmailConfirmed = true,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
             },
             new
             {
@@ -121,17 +189,30 @@ public static class DatabaseSeeder
                 NormalizedUserName = "CUSTOMER3@FLOWSPIRE.COM",
                 Email = "customer3@flowspire.com",
                 NormalizedEmail = "CUSTOMER3@FLOWSPIRE.COM",
-                FullName = "Customer Three",
+                FirstName = "Customer",
+                LastName = "Three",
+                BirthDate = (DateTime?)new DateTime(1995, 12, 5),
+                Gender = Gender.NotSpecified,
+                AddressLine1 = "203 Customer Rd.",
+                AddressLine2 = (string?)null,
+                City = "Customer City",
+                State = "Customer State",
+                Country = "Customer Country",
+                PostalCode = "22224",
+                PhoneNumber = "+15555550006",
                 PasswordHash = hasher.HashPassword(null, "Customer123"),
                 SecurityStamp = Guid.NewGuid().ToString(),
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 TwoFactorEnabled = false,
-                PhoneNumberConfirmed = false,
-                EmailConfirmed = true
+                PhoneNumberConfirmed = true,
+                EmailConfirmed = true,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
             }
         );
 
+        // Define Role IDs and seed them along with the user roles
         var adminRoleId = "660e8400-e29b-41d4-a716-446655440001";
         var advisorRoleId = "660e8400-e29b-41d4-a716-446655440002";
         var customerRoleId = "660e8400-e29b-41d4-a716-446655440003";
@@ -152,19 +233,20 @@ public static class DatabaseSeeder
         );
     }
 
+
     private static void SeedCategories(ModelBuilder builder)
     {
         builder.Entity<Category>().HasData(
-            new { Id = 1, Name = "Alimentação", UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 2, Name = "Transporte", UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 3, Name = "Saúde", UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 4, Name = "Moradia", UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 5, Name = "Lazer", UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 6, Name = "Educação", UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 7, Name = "Vestuário", UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 8, Name = "Alimentação", UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 9, Name = "Tecnologia", UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 10, Name = "Lazer", UserId = "550e8400-e29b-41d4-a716-446655440006" }
+            new { Id = 1, Name = "Food", UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 2, Name = "Transport", UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 3, Name = "Health", UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 4, Name = "Housing", UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 5, Name = "Leisure", UserId = "550e8400-e29b-41d4-a716-446655440005" },
+            new { Id = 6, Name = "Education", UserId = "550e8400-e29b-41d4-a716-446655440005" },
+            new { Id = 7, Name = "Clothing", UserId = "550e8400-e29b-41d4-a716-446655440005" },
+            new { Id = 8, Name = "Food", UserId = "550e8400-e29b-41d4-a716-446655440006" },
+            new { Id = 9, Name = "Technology", UserId = "550e8400-e29b-41d4-a716-446655440006" },
+            new { Id = 10, Name = "Leisure", UserId = "550e8400-e29b-41d4-a716-446655440006" }
         );
     }
 
@@ -173,59 +255,18 @@ public static class DatabaseSeeder
         var now = DateTime.UtcNow;
         var transactions = new List<object>
         {
-            // Customer 1 (customer1Id)
-            new { Id = 1, Description = "Supermercado", Amount = -80.00m, Date = now.AddMonths(-6).AddDays(-15), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 2, Description = "Ônibus", Amount = -15.00m, Date = now.AddMonths(-6).AddDays(-10), CategoryId = 2, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 3, Description = "Salário", Amount = 2000.00m, Date = now.AddMonths(-6).AddDays(-1), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 4, Description = "Farmácia", Amount = -50.00m, Date = now.AddMonths(-5).AddDays(-5), CategoryId = 3, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 5, Description = "Aluguel", Amount = -800.00m, Date = now.AddMonths(-5).AddDays(-3), CategoryId = 4, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 6, Description = "Supermercado", Amount = -120.00m, Date = now.AddMonths(-5).AddDays(-10), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 7, Description = "Consulta Médica", Amount = -100.00m, Date = now.AddMonths(-4).AddDays(-20), CategoryId = 3, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 8, Description = "Uber", Amount = -25.00m, Date = now.AddMonths(-4).AddDays(-15), CategoryId = 2, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 9, Description = "Salário", Amount = 2200.00m, Date = now.AddMonths(-4).AddDays(-1), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 10, Description = "Mercado", Amount = -90.00m, Date = now.AddMonths(-3).AddDays(-18), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 11, Description = "Táxi", Amount = -30.00m, Date = now.AddMonths(-3).AddDays(-12), CategoryId = 2, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 12, Description = "Aluguel", Amount = -850.00m, Date = now.AddMonths(-3).AddDays(-5), CategoryId = 4, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 13, Description = "Salário Extra", Amount = 500.00m, Date = now.AddMonths(-2).AddDays(-20), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 14, Description = "Remédios", Amount = -60.00m, Date = now.AddMonths(-2).AddDays(-10), CategoryId = 3, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 15, Description = "Supermercado", Amount = -110.00m, Date = now.AddMonths(-1).AddDays(-25), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 16, Description = "Ônibus", Amount = -20.00m, Date = now.AddMonths(-1).AddDays(-15), CategoryId = 2, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 17, Description = "Salário", Amount = 2300.00m, Date = now.AddMonths(-1).AddDays(-1), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 18, Description = "Aluguel", Amount = -870.00m, Date = now.AddDays(-10), CategoryId = 4, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 19, Description = "Farmácia", Amount = -45.00m, Date = now.AddDays(-5), CategoryId = 3, UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 1, Description = "Supermarket", Amount = -80.00m, Date = now.AddMonths(-6).AddDays(-15), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 2, Description = "Bus", Amount = -15.00m, Date = now.AddMonths(-6).AddDays(-10), CategoryId = 2, UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 3, Description = "Salary", Amount = 2000.00m, Date = now.AddMonths(-6).AddDays(-1), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 4, Description = "Pharmacy", Amount = -50.00m, Date = now.AddMonths(-5).AddDays(-5), CategoryId = 3, UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 5, Description = "Rent", Amount = -800.00m, Date = now.AddMonths(-5).AddDays(-3), CategoryId = 4, UserId = "550e8400-e29b-41d4-a716-446655440004" },
 
-            // Customer 2 (customer2Id)
             new { Id = 20, Description = "Cinema", Amount = -40.00m, Date = now.AddMonths(-6).AddDays(-7), CategoryId = 5, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 21, Description = "Curso Online", Amount = -150.00m, Date = now.AddMonths(-6).AddDays(-3), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
+            new { Id = 21, Description = "Online Course", Amount = -150.00m, Date = now.AddMonths(-6).AddDays(-3), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
             new { Id = 22, Description = "Freelance", Amount = 1000.00m, Date = now.AddMonths(-6).AddDays(-2), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 23, Description = "Roupas", Amount = -90.00m, Date = now.AddMonths(-5).AddDays(-5), CategoryId = 7, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 24, Description = "Cinema", Amount = -35.00m, Date = now.AddMonths(-5).AddDays(-2), CategoryId = 5, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 25, Description = "Livro", Amount = -70.00m, Date = now.AddMonths(-4).AddDays(-15), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 26, Description = "Freelance", Amount = 1100.00m, Date = now.AddMonths(-4).AddDays(-1), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 27, Description = "Show", Amount = -60.00m, Date = now.AddMonths(-3).AddDays(-8), CategoryId = 5, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 28, Description = "Roupas", Amount = -120.00m, Date = now.AddMonths(-3).AddDays(-3), CategoryId = 7, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 29, Description = "Curso", Amount = -200.00m, Date = now.AddMonths(-2).AddDays(-20), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 30, Description = "Cinema", Amount = -45.00m, Date = now.AddMonths(-2).AddDays(-10), CategoryId = 5, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 31, Description = "Freelance", Amount = 1200.00m, Date = now.AddMonths(-1).AddDays(-5), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 32, Description = "Jantar", Amount = -80.00m, Date = now.AddMonths(-1).AddDays(-2), CategoryId = 5, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 33, Description = "Roupas", Amount = -100.00m, Date = now.AddDays(-15), CategoryId = 7, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 34, Description = "Curso Online", Amount = -180.00m, Date = now.AddDays(-7), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
 
-            // Customer 3 (customer3Id)
-            new { Id = 35, Description = "Restaurante", Amount = -70.00m, Date = now.AddMonths(-6).AddDays(-12), CategoryId = 8, UserId = "550e8400-e29b-41d4-a716-446655440006" },
+            new { Id = 35, Description = "Restaurant", Amount = -70.00m, Date = now.AddMonths(-6).AddDays(-12), CategoryId = 8, UserId = "550e8400-e29b-41d4-a716-446655440006" },
             new { Id = 36, Description = "Notebook", Amount = -1500.00m, Date = now.AddMonths(-6).AddDays(-5), CategoryId = 9, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 37, Description = "Jogo Online", Amount = -50.00m, Date = now.AddMonths(-5).AddDays(-10), CategoryId = 10, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 38, Description = "Supermercado", Amount = -100.00m, Date = now.AddMonths(-5).AddDays(-3), CategoryId = 8, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 39, Description = "Celular", Amount = -800.00m, Date = now.AddMonths(-4).AddDays(-20), CategoryId = 9, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 40, Description = "Cinema", Amount = -30.00m, Date = now.AddMonths(-4).AddDays(-7), CategoryId = 10, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 41, Description = "Restaurante", Amount = -90.00m, Date = now.AddMonths(-3).AddDays(-15), CategoryId = 8, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 42, Description = "Software", Amount = -300.00m, Date = now.AddMonths(-3).AddDays(-10), CategoryId = 9, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 43, Description = "Jogo", Amount = -40.00m, Date = now.AddMonths(-2).AddDays(-12), CategoryId = 10, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 44, Description = "Salário", Amount = 1800.00m, Date = now.AddMonths(-2).AddDays(-1), CategoryId = 8, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 45, Description = "Supermercado", Amount = -120.00m, Date = now.AddMonths(-1).AddDays(-20), CategoryId = 8, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 46, Description = "Acessório Tech", Amount = -150.00m, Date = now.AddMonths(-1).AddDays(-10), CategoryId = 9, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 47, Description = "Cinema", Amount = -35.00m, Date = now.AddDays(-12), CategoryId = 10, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 48, Description = "Salário", Amount = 1900.00m, Date = now.AddDays(-2), CategoryId = 8, UserId = "550e8400-e29b-41d4-a716-446655440006" }
         };
 
         builder.Entity<Transaction>().HasData(transactions);
@@ -236,17 +277,14 @@ public static class DatabaseSeeder
         var now = DateTime.UtcNow;
         var budgets = new List<object>
         {
-            // Customer 1 (customer1Id)
             new { Id = 1, CategoryId = 1, Amount = 400.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
             new { Id = 2, CategoryId = 3, Amount = 250.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
             new { Id = 3, CategoryId = 4, Amount = 1000.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
 
-            // Customer 2 (customer2Id)
             new { Id = 4, CategoryId = 5, Amount = 200.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440005" },
             new { Id = 5, CategoryId = 6, Amount = 500.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440005" },
             new { Id = 6, CategoryId = 7, Amount = 300.00m, StartDate = now.AddMonths(-3), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440005" },
 
-            // Customer 3 (customer3Id)
             new { Id = 7, CategoryId = 8, Amount = 300.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440006" },
             new { Id = 8, CategoryId = 9, Amount = 2000.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440006" },
             new { Id = 9, CategoryId = 10, Amount = 150.00m, StartDate = now.AddMonths(-3), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440006" }
@@ -259,13 +297,13 @@ public static class DatabaseSeeder
     {
         var now = DateTime.UtcNow;
         builder.Entity<Message>().HasData(
-            new { Id = 1, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Olá, preciso de ajuda com meu orçamento!", SentAt = now.AddDays(-10), IsRead = false, ReadAt = (DateTime?)null },
-            new { Id = 2, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440004", Content = "Claro, vamos analisar suas despesas.", SentAt = now.AddDays(-9), IsRead = true, ReadAt = now.AddDays(-8) },
-            new { Id = 3, SenderId = "550e8400-e29b-41d4-a716-446655440005", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Qual é o melhor investimento agora?", SentAt = now.AddDays(-5), IsRead = false, ReadAt = (DateTime?)null },
-            new { Id = 4, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440005", Content = "Recomendo fundos de índice.", SentAt = now.AddDays(-4), IsRead = true, ReadAt = now.AddDays(-3) },
-            new { Id = 5, SenderId = "550e8400-e29b-41d4-a716-446655440006", ReceiverId = "550e8400-e29b-41d4-a716-446655440003", Content = "Como reduzir meus gastos?", SentAt = now.AddDays(-3), IsRead = false, ReadAt = (DateTime?)null },
-            new { Id = 6, SenderId = "550e8400-e29b-41d4-a716-446655440003", ReceiverId = "550e8400-e29b-41d4-a716-446655440006", Content = "Vamos revisar suas categorias.", SentAt = now.AddDays(-2), IsRead = false, ReadAt = (DateTime?)null },
-            new { Id = 7, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Obrigado pela ajuda!", SentAt = now.AddDays(-1), IsRead = false, ReadAt = (DateTime?)null }
+            new { Id = 1, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Hello, I need help with my budget!", SentAt = now.AddDays(-10), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 2, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440004", Content = "Sure, let’s review your expenses.", SentAt = now.AddDays(-9), IsRead = true, ReadAt = now.AddDays(-8) },
+            new { Id = 3, SenderId = "550e8400-e29b-41d4-a716-446655440005", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "What is the best investment now?", SentAt = now.AddDays(-5), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 4, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440005", Content = "I recommend index funds.", SentAt = now.AddDays(-4), IsRead = true, ReadAt = now.AddDays(-3) },
+            new { Id = 5, SenderId = "550e8400-e29b-41d4-a716-446655440006", ReceiverId = "550e8400-e29b-41d4-a716-446655440003", Content = "How can I reduce my expenses?", SentAt = now.AddDays(-3), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 6, SenderId = "550e8400-e29b-41d4-a716-446655440003", ReceiverId = "550e8400-e29b-41d4-a716-446655440006", Content = "Let's review your categories.", SentAt = now.AddDays(-2), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 7, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Thank you for your help!", SentAt = now.AddDays(-1), IsRead = false, ReadAt = (DateTime?)null }
         );
     }
 

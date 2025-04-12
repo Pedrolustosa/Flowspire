@@ -90,7 +90,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     this.authService.getCurrentUser().subscribe(user => {
-      this.userName = user && user.fullName ? user.fullName : 'Usuário Anônimo';
+      this.userName = user && user.firstName ? user.firstName : 'Usuário Anônimo';
       this.cdr.detectChanges();
     });
   }
@@ -103,17 +103,20 @@ export class DashboardComponent implements AfterViewInit, OnDestroy, OnInit {
 
   private updateUserName(): void {
     const user = this.authService.getCurrentUserValue();
-    this.userName = user && user.fullName ? user.fullName : 'Usuário Anônimo';
+    this.userName = user && user.firstName ? user.firstName : 'Usuário Anônimo';
   }
 
   onDateChange(date: Date): void {
+    if (!date) {
+      return;
+    }
+    
     this.selectedDate = date;
-    
-    const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
-    
-    const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    
-    this.loadDashboardDataByDates(startDate, endDate);
+    setTimeout(() => {
+      const startDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      const endDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      this.loadDashboardDataByDates(startDate, endDate);
+    });
   }
 
   loadDashboardDataByDates(startDate: Date, endDate: Date): void {
