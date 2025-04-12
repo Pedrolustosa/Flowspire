@@ -4,68 +4,75 @@ using Flowspire.Infra.Data;
 using Flowspire.Domain.Interfaces;
 using Microsoft.Data.Sqlite;
 
-namespace Flowspire.Infra.Repositories;
-public class RefreshTokenRepository(ApplicationDbContext context) : IRefreshTokenRepository
+namespace Flowspire.Infra.Repositories
 {
-    private readonly ApplicationDbContext _context = context;
-
-    public async Task<RefreshToken> AddAsync(RefreshToken refreshToken)
+    public class RefreshTokenRepository : IRefreshTokenRepository
     {
-        try
-        {
-            _context.RefreshTokens.Add(refreshToken);
-            await _context.SaveChangesAsync();
-            return refreshToken;
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao adicionar o refresh token ao banco de dados.", ex);
-        }
-        catch (SqliteException ex)
-        {
-            throw new Exception("Erro de conexão ou operação no SQLite ao adicionar refresh token.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao adicionar refresh token.", ex);
-        }
-    }
+        private readonly ApplicationDbContext _context;
 
-    public async Task<RefreshToken> GetByTokenAsync(string token)
-    {
-        try
+        public RefreshTokenRepository(ApplicationDbContext context)
         {
-            return await _context.RefreshTokens
-                .FirstOrDefaultAsync(rt => rt.Token == token);
+            _context = context;
         }
-        catch (SqliteException ex)
-        {
-            throw new Exception("Erro de conexão ou operação no SQLite ao recuperar refresh token.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao recuperar refresh token.", ex);
-        }
-    }
 
-    public async Task UpdateAsync(RefreshToken refreshToken)
-    {
-        try
+        public async Task<RefreshToken> AddAsync(RefreshToken refreshToken)
         {
-            _context.RefreshTokens.Update(refreshToken);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.RefreshTokens.Add(refreshToken);
+                await _context.SaveChangesAsync();
+                return refreshToken;
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Error adding refresh token to the database.", ex);
+            }
+            catch (SqliteException ex)
+            {
+                throw new Exception("SQLite connection or operation error while adding refresh token.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while adding refresh token.", ex);
+            }
         }
-        catch (DbUpdateException ex)
+
+        public async Task<RefreshToken> GetByTokenAsync(string token)
         {
-            throw new Exception("Erro ao atualizar o refresh token no banco de dados.", ex);
+            try
+            {
+                return await _context.RefreshTokens
+                    .FirstOrDefaultAsync(rt => rt.Token == token);
+            }
+            catch (SqliteException ex)
+            {
+                throw new Exception("SQLite connection or operation error while retrieving refresh token.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while retrieving refresh token.", ex);
+            }
         }
-        catch (SqliteException ex)
+
+        public async Task UpdateAsync(RefreshToken refreshToken)
         {
-            throw new Exception("Erro de conexão ou operação no SQLite ao atualizar refresh token.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao atualizar refresh token.", ex);
+            try
+            {
+                _context.RefreshTokens.Update(refreshToken);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Error updating refresh token in the database.", ex);
+            }
+            catch (SqliteException ex)
+            {
+                throw new Exception("SQLite connection or operation error while updating refresh token.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error while updating refresh token.", ex);
+            }
         }
     }
 }

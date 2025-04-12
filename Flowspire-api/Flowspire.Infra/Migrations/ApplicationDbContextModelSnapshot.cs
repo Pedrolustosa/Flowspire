@@ -39,19 +39,19 @@ namespace Flowspire.Infra.Migrations
                         {
                             AdvisorId = "550e8400-e29b-41d4-a716-446655440002",
                             CustomerId = "550e8400-e29b-41d4-a716-446655440004",
-                            AssignedAt = new DateTime(2025, 3, 4, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2545)
+                            AssignedAt = new DateTime(2025, 3, 22, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2840)
                         },
                         new
                         {
                             AdvisorId = "550e8400-e29b-41d4-a716-446655440002",
                             CustomerId = "550e8400-e29b-41d4-a716-446655440005",
-                            AssignedAt = new DateTime(2025, 3, 9, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2545)
+                            AssignedAt = new DateTime(2025, 3, 27, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2840)
                         },
                         new
                         {
                             AdvisorId = "550e8400-e29b-41d4-a716-446655440003",
                             CustomerId = "550e8400-e29b-41d4-a716-446655440006",
-                            AssignedAt = new DateTime(2025, 3, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2545)
+                            AssignedAt = new DateTime(2025, 4, 1, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2840)
                         });
                 });
 
@@ -91,8 +91,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 1,
                             Amount = 400.00m,
                             CategoryId = 1,
-                            EndDate = new DateTime(2025, 4, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 9, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 5, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2024, 10, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
@@ -100,8 +100,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 2,
                             Amount = 250.00m,
                             CategoryId = 3,
-                            EndDate = new DateTime(2025, 4, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 9, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 5, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2024, 10, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
@@ -109,8 +109,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 3,
                             Amount = 1000.00m,
                             CategoryId = 4,
-                            EndDate = new DateTime(2025, 4, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 9, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 5, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2024, 10, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
@@ -118,8 +118,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 4,
                             Amount = 200.00m,
                             CategoryId = 5,
-                            EndDate = new DateTime(2025, 4, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 9, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 5, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2024, 10, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
                         new
@@ -127,8 +127,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 5,
                             Amount = 500.00m,
                             CategoryId = 6,
-                            EndDate = new DateTime(2025, 4, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 9, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 5, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2024, 10, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
                         new
@@ -136,8 +136,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 6,
                             Amount = 300.00m,
                             CategoryId = 7,
-                            EndDate = new DateTime(2025, 5, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 12, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 6, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2025, 1, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
                         new
@@ -145,8 +145,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 7,
                             Amount = 300.00m,
                             CategoryId = 8,
-                            EndDate = new DateTime(2025, 4, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 9, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 5, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2024, 10, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440006"
                         },
                         new
@@ -154,8 +154,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 8,
                             Amount = 2000.00m,
                             CategoryId = 9,
-                            EndDate = new DateTime(2025, 4, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 9, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 5, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2024, 10, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440006"
                         },
                         new
@@ -163,8 +163,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 9,
                             Amount = 150.00m,
                             CategoryId = 10,
-                            EndDate = new DateTime(2025, 5, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
-                            StartDate = new DateTime(2024, 12, 24, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(1612),
+                            EndDate = new DateTime(2025, 6, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
+                            StartDate = new DateTime(2025, 1, 11, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2707),
                             UserId = "550e8400-e29b-41d4-a716-446655440006"
                         });
                 });
@@ -194,61 +194,61 @@ namespace Flowspire.Infra.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Alimentação",
+                            Name = "Food",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Transporte",
+                            Name = "Transport",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Saúde",
+                            Name = "Health",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
                         {
                             Id = 4,
-                            Name = "Moradia",
+                            Name = "Housing",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
                         {
                             Id = 5,
-                            Name = "Lazer",
+                            Name = "Leisure",
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
                         new
                         {
                             Id = 6,
-                            Name = "Educação",
+                            Name = "Education",
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
                         new
                         {
                             Id = 7,
-                            Name = "Vestuário",
+                            Name = "Clothing",
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
                         new
                         {
                             Id = 8,
-                            Name = "Alimentação",
+                            Name = "Food",
                             UserId = "550e8400-e29b-41d4-a716-446655440006"
                         },
                         new
                         {
                             Id = 9,
-                            Name = "Tecnologia",
+                            Name = "Technology",
                             UserId = "550e8400-e29b-41d4-a716-446655440006"
                         },
                         new
                         {
                             Id = 10,
-                            Name = "Lazer",
+                            Name = "Leisure",
                             UserId = "550e8400-e29b-41d4-a716-446655440006"
                         });
                 });
@@ -293,65 +293,67 @@ namespace Flowspire.Infra.Migrations
                         new
                         {
                             Id = 1,
-                            Content = "Olá, preciso de ajuda com meu orçamento!",
+                            Content = "Hello, I need help with my budget!",
                             IsRead = false,
                             ReceiverId = "550e8400-e29b-41d4-a716-446655440002",
                             SenderId = "550e8400-e29b-41d4-a716-446655440004",
-                            SentAt = new DateTime(2025, 3, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2235)
+                            SentAt = new DateTime(2025, 4, 1, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788)
                         },
                         new
                         {
                             Id = 2,
-                            Content = "Claro, vamos analisar suas despesas.",
+                            Content = "Sure, let’s review your expenses.",
                             IsRead = true,
+                            ReadAt = new DateTime(2025, 4, 3, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788),
                             ReceiverId = "550e8400-e29b-41d4-a716-446655440004",
                             SenderId = "550e8400-e29b-41d4-a716-446655440002",
-                            SentAt = new DateTime(2025, 3, 15, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2235)
+                            SentAt = new DateTime(2025, 4, 2, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788)
                         },
                         new
                         {
                             Id = 3,
-                            Content = "Qual é o melhor investimento agora?",
+                            Content = "What is the best investment now?",
                             IsRead = false,
                             ReceiverId = "550e8400-e29b-41d4-a716-446655440002",
                             SenderId = "550e8400-e29b-41d4-a716-446655440005",
-                            SentAt = new DateTime(2025, 3, 19, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2235)
+                            SentAt = new DateTime(2025, 4, 6, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788)
                         },
                         new
                         {
                             Id = 4,
-                            Content = "Recomendo fundos de índice.",
+                            Content = "I recommend index funds.",
                             IsRead = true,
+                            ReadAt = new DateTime(2025, 4, 8, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788),
                             ReceiverId = "550e8400-e29b-41d4-a716-446655440005",
                             SenderId = "550e8400-e29b-41d4-a716-446655440002",
-                            SentAt = new DateTime(2025, 3, 20, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2235)
+                            SentAt = new DateTime(2025, 4, 7, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788)
                         },
                         new
                         {
                             Id = 5,
-                            Content = "Como reduzir meus gastos?",
+                            Content = "How can I reduce my expenses?",
                             IsRead = false,
                             ReceiverId = "550e8400-e29b-41d4-a716-446655440003",
                             SenderId = "550e8400-e29b-41d4-a716-446655440006",
-                            SentAt = new DateTime(2025, 3, 21, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2235)
+                            SentAt = new DateTime(2025, 4, 8, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788)
                         },
                         new
                         {
                             Id = 6,
-                            Content = "Vamos revisar suas categorias.",
+                            Content = "Let's review your categories.",
                             IsRead = false,
                             ReceiverId = "550e8400-e29b-41d4-a716-446655440006",
                             SenderId = "550e8400-e29b-41d4-a716-446655440003",
-                            SentAt = new DateTime(2025, 3, 22, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2235)
+                            SentAt = new DateTime(2025, 4, 9, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788)
                         },
                         new
                         {
                             Id = 7,
-                            Content = "Obrigado pela ajuda!",
+                            Content = "Thank you for your help!",
                             IsRead = false,
                             ReceiverId = "550e8400-e29b-41d4-a716-446655440002",
                             SenderId = "550e8400-e29b-41d4-a716-446655440004",
-                            SentAt = new DateTime(2025, 3, 23, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(2235)
+                            SentAt = new DateTime(2025, 4, 10, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2788)
                         });
                 });
 
@@ -603,8 +605,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 1,
                             Amount = -80.00m,
                             CategoryId = 1,
-                            Date = new DateTime(2024, 9, 9, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Supermercado",
+                            Date = new DateTime(2024, 9, 26, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
+                            Description = "Supermarket",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
@@ -612,8 +614,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 2,
                             Amount = -15.00m,
                             CategoryId = 2,
-                            Date = new DateTime(2024, 9, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Ônibus",
+                            Date = new DateTime(2024, 10, 1, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
+                            Description = "Bus",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
@@ -621,8 +623,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 3,
                             Amount = 2000.00m,
                             CategoryId = 1,
-                            Date = new DateTime(2024, 9, 23, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Salário",
+                            Date = new DateTime(2024, 10, 10, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
+                            Description = "Salary",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
@@ -630,8 +632,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 4,
                             Amount = -50.00m,
                             CategoryId = 3,
-                            Date = new DateTime(2024, 10, 19, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Farmácia",
+                            Date = new DateTime(2024, 11, 6, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
+                            Description = "Pharmacy",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
@@ -639,134 +641,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 5,
                             Amount = -800.00m,
                             CategoryId = 4,
-                            Date = new DateTime(2024, 10, 21, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Aluguel",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Amount = -120.00m,
-                            CategoryId = 1,
-                            Date = new DateTime(2024, 10, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Supermercado",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Amount = -100.00m,
-                            CategoryId = 3,
-                            Date = new DateTime(2024, 11, 4, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Consulta Médica",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Amount = -25.00m,
-                            CategoryId = 2,
-                            Date = new DateTime(2024, 11, 9, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Uber",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Amount = 2200.00m,
-                            CategoryId = 1,
-                            Date = new DateTime(2024, 11, 23, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Salário",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Amount = -90.00m,
-                            CategoryId = 1,
-                            Date = new DateTime(2024, 12, 6, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Mercado",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Amount = -30.00m,
-                            CategoryId = 2,
-                            Date = new DateTime(2024, 12, 12, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Táxi",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Amount = -850.00m,
-                            CategoryId = 4,
-                            Date = new DateTime(2024, 12, 19, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Aluguel",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Amount = 500.00m,
-                            CategoryId = 1,
-                            Date = new DateTime(2025, 1, 4, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Salário Extra",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Amount = -60.00m,
-                            CategoryId = 3,
-                            Date = new DateTime(2025, 1, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Remédios",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Amount = -110.00m,
-                            CategoryId = 1,
-                            Date = new DateTime(2025, 1, 30, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Supermercado",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Amount = -20.00m,
-                            CategoryId = 2,
-                            Date = new DateTime(2025, 2, 9, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Ônibus",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Amount = 2300.00m,
-                            CategoryId = 1,
-                            Date = new DateTime(2025, 2, 23, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Salário",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Amount = -870.00m,
-                            CategoryId = 4,
-                            Date = new DateTime(2025, 3, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Aluguel",
-                            UserId = "550e8400-e29b-41d4-a716-446655440004"
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Amount = -45.00m,
-                            CategoryId = 3,
-                            Date = new DateTime(2025, 3, 19, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Farmácia",
+                            Date = new DateTime(2024, 11, 8, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
+                            Description = "Rent",
                             UserId = "550e8400-e29b-41d4-a716-446655440004"
                         },
                         new
@@ -774,7 +650,7 @@ namespace Flowspire.Infra.Migrations
                             Id = 20,
                             Amount = -40.00m,
                             CategoryId = 5,
-                            Date = new DateTime(2024, 9, 17, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
+                            Date = new DateTime(2024, 10, 4, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
                             Description = "Cinema",
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
@@ -783,8 +659,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 21,
                             Amount = -150.00m,
                             CategoryId = 6,
-                            Date = new DateTime(2024, 9, 21, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Curso Online",
+                            Date = new DateTime(2024, 10, 8, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
+                            Description = "Online Course",
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
                         new
@@ -792,116 +668,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 22,
                             Amount = 1000.00m,
                             CategoryId = 6,
-                            Date = new DateTime(2024, 9, 22, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
+                            Date = new DateTime(2024, 10, 9, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
                             Description = "Freelance",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 23,
-                            Amount = -90.00m,
-                            CategoryId = 7,
-                            Date = new DateTime(2024, 10, 19, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Roupas",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 24,
-                            Amount = -35.00m,
-                            CategoryId = 5,
-                            Date = new DateTime(2024, 10, 22, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Cinema",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 25,
-                            Amount = -70.00m,
-                            CategoryId = 6,
-                            Date = new DateTime(2024, 11, 9, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Livro",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 26,
-                            Amount = 1100.00m,
-                            CategoryId = 6,
-                            Date = new DateTime(2024, 11, 23, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Freelance",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 27,
-                            Amount = -60.00m,
-                            CategoryId = 5,
-                            Date = new DateTime(2024, 12, 16, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Show",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 28,
-                            Amount = -120.00m,
-                            CategoryId = 7,
-                            Date = new DateTime(2024, 12, 21, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Roupas",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 29,
-                            Amount = -200.00m,
-                            CategoryId = 6,
-                            Date = new DateTime(2025, 1, 4, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Curso",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 30,
-                            Amount = -45.00m,
-                            CategoryId = 5,
-                            Date = new DateTime(2025, 1, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Cinema",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 31,
-                            Amount = 1200.00m,
-                            CategoryId = 6,
-                            Date = new DateTime(2025, 2, 19, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Freelance",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 32,
-                            Amount = -80.00m,
-                            CategoryId = 5,
-                            Date = new DateTime(2025, 2, 22, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Jantar",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 33,
-                            Amount = -100.00m,
-                            CategoryId = 7,
-                            Date = new DateTime(2025, 3, 9, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Roupas",
-                            UserId = "550e8400-e29b-41d4-a716-446655440005"
-                        },
-                        new
-                        {
-                            Id = 34,
-                            Amount = -180.00m,
-                            CategoryId = 6,
-                            Date = new DateTime(2025, 3, 17, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Curso Online",
                             UserId = "550e8400-e29b-41d4-a716-446655440005"
                         },
                         new
@@ -909,8 +677,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 35,
                             Amount = -70.00m,
                             CategoryId = 8,
-                            Date = new DateTime(2024, 9, 12, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Restaurante",
+                            Date = new DateTime(2024, 9, 29, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
+                            Description = "Restaurant",
                             UserId = "550e8400-e29b-41d4-a716-446655440006"
                         },
                         new
@@ -918,116 +686,8 @@ namespace Flowspire.Infra.Migrations
                             Id = 36,
                             Amount = -1500.00m,
                             CategoryId = 9,
-                            Date = new DateTime(2024, 9, 19, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
+                            Date = new DateTime(2024, 10, 6, 3, 42, 7, 403, DateTimeKind.Utc).AddTicks(2590),
                             Description = "Notebook",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 37,
-                            Amount = -50.00m,
-                            CategoryId = 10,
-                            Date = new DateTime(2024, 10, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Jogo Online",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 38,
-                            Amount = -100.00m,
-                            CategoryId = 8,
-                            Date = new DateTime(2024, 10, 21, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Supermercado",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 39,
-                            Amount = -800.00m,
-                            CategoryId = 9,
-                            Date = new DateTime(2024, 11, 4, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Celular",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 40,
-                            Amount = -30.00m,
-                            CategoryId = 10,
-                            Date = new DateTime(2024, 11, 17, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Cinema",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 41,
-                            Amount = -90.00m,
-                            CategoryId = 8,
-                            Date = new DateTime(2024, 12, 9, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Restaurante",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 42,
-                            Amount = -300.00m,
-                            CategoryId = 9,
-                            Date = new DateTime(2024, 12, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Software",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 43,
-                            Amount = -40.00m,
-                            CategoryId = 10,
-                            Date = new DateTime(2025, 1, 12, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Jogo",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 44,
-                            Amount = 1800.00m,
-                            CategoryId = 8,
-                            Date = new DateTime(2025, 1, 23, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Salário",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 45,
-                            Amount = -120.00m,
-                            CategoryId = 8,
-                            Date = new DateTime(2025, 2, 4, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Supermercado",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 46,
-                            Amount = -150.00m,
-                            CategoryId = 9,
-                            Date = new DateTime(2025, 2, 14, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Acessório Tech",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 47,
-                            Amount = -35.00m,
-                            CategoryId = 10,
-                            Date = new DateTime(2025, 3, 12, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Cinema",
-                            UserId = "550e8400-e29b-41d4-a716-446655440006"
-                        },
-                        new
-                        {
-                            Id = 48,
-                            Amount = 1900.00m,
-                            CategoryId = 8,
-                            Date = new DateTime(2025, 3, 22, 1, 0, 35, 210, DateTimeKind.Utc).AddTicks(979),
-                            Description = "Salário",
                             UserId = "550e8400-e29b-41d4-a716-446655440006"
                         });
                 });
@@ -1040,8 +700,30 @@ namespace Flowspire.Infra.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("AddressLine1")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AddressLine2")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Country")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -1051,7 +733,15 @@ namespace Flowspire.Infra.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("FullName")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
@@ -1079,11 +769,22 @@ namespace Flowspire.Infra.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("State")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -1105,96 +806,162 @@ namespace Flowspire.Infra.Migrations
                         {
                             Id = "550e8400-e29b-41d4-a716-446655440001",
                             AccessFailedCount = 0,
+                            AddressLine1 = "123 Admin St.",
+                            BirthDate = new DateTime(1980, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            City = "Admin City",
+                            Country = "Admin Country",
+                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@flowspire.com",
                             EmailConfirmed = true,
-                            FullName = "Admin User",
+                            FirstName = "Admin",
+                            Gender = 2,
+                            LastName = "User",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@FLOWSPIRE.COM",
                             NormalizedUserName = "ADMIN@FLOWSPIRE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEH7GAeUrQLGgmhPVP232MpBC0Py5RyfikFS0JhzQoAU4w6ZIWPK8evL1YvyrnrImZg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "090079ad-b0a0-4cc7-8560-2fc65867b41b",
+                            PasswordHash = "AQAAAAIAAYagAAAAEG6vczofrACNns/I8+X0rL0dW82I3gE2pGLmyJQP708Sq1VlBitrgLxaO95NslKwXg==",
+                            PhoneNumber = "+15555550001",
+                            PhoneNumberConfirmed = true,
+                            PostalCode = "00000",
+                            SecurityStamp = "c9a9e2d1-4ef6-45ac-9330-84beea2c9191",
+                            State = "Admin State",
                             TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "admin@flowspire.com"
                         },
                         new
                         {
                             Id = "550e8400-e29b-41d4-a716-446655440002",
                             AccessFailedCount = 0,
+                            AddressLine1 = "101 Advisor Ave.",
+                            BirthDate = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            City = "Advisor City",
+                            Country = "Advisor Country",
+                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "advisor1@flowspire.com",
                             EmailConfirmed = true,
-                            FullName = "Advisor One",
+                            FirstName = "Advisor",
+                            Gender = 0,
+                            LastName = "One",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADVISOR1@FLOWSPIRE.COM",
                             NormalizedUserName = "ADVISOR1@FLOWSPIRE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKGN42al2OAD1wyV1DOhImf1FYtMY5ugJ1BQolI+Zbrp6ZY0lCN8vr2ZiVaJMlKfKg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "b81bace4-1f48-49bd-b9f3-971bc2d1ef34",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB4bhYBWqxe94lq8SK2ufkDWM25rIt+HC0yi8szLEgA4jpw1jOtsNrWKi9RXvR/SsQ==",
+                            PhoneNumber = "+15555550002",
+                            PhoneNumberConfirmed = true,
+                            PostalCode = "11111",
+                            SecurityStamp = "83facfb5-7998-48aa-9d6d-d052d82b7dd0",
+                            State = "Advisor State",
                             TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "advisor1@flowspire.com"
                         },
                         new
                         {
                             Id = "550e8400-e29b-41d4-a716-446655440003",
                             AccessFailedCount = 0,
+                            AddressLine1 = "102 Advisor Ave.",
+                            BirthDate = new DateTime(1987, 7, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            City = "Advisor City",
+                            Country = "Advisor Country",
+                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "advisor2@flowspire.com",
                             EmailConfirmed = true,
-                            FullName = "Advisor Two",
+                            FirstName = "Advisor",
+                            Gender = 0,
+                            LastName = "Two",
                             LockoutEnabled = false,
                             NormalizedEmail = "ADVISOR2@FLOWSPIRE.COM",
                             NormalizedUserName = "ADVISOR2@FLOWSPIRE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBwhW39tJmfssp4Ouhe4MGc56JIU0xoBv2pb7eqNVUs3kJ+6v0EacYZVvptgFkk2CQ==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "bb7e7e16-a090-4c60-8b91-50a6908d7714",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGbHd95LKof9KKwTWl5dUaWU25bE0nZSdBAWhCvM/NS1ECANr/aU6eW/1m4KC0ArbA==",
+                            PhoneNumber = "+15555550003",
+                            PhoneNumberConfirmed = true,
+                            PostalCode = "11112",
+                            SecurityStamp = "56823915-13eb-4974-acbc-c9fd25cc3846",
+                            State = "Advisor State",
                             TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "advisor2@flowspire.com"
                         },
                         new
                         {
                             Id = "550e8400-e29b-41d4-a716-446655440004",
                             AccessFailedCount = 0,
+                            AddressLine1 = "201 Customer Rd.",
+                            BirthDate = new DateTime(1990, 3, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            City = "Customer City",
+                            Country = "Customer Country",
+                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "customer1@flowspire.com",
                             EmailConfirmed = true,
-                            FullName = "Customer One",
+                            FirstName = "Customer",
+                            Gender = 1,
+                            LastName = "One",
                             LockoutEnabled = false,
                             NormalizedEmail = "CUSTOMER1@FLOWSPIRE.COM",
                             NormalizedUserName = "CUSTOMER1@FLOWSPIRE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOgYDN1F6kF4dIEt7a/fpXQv42tf0+9dvX+bN2JIOLebpZA1yl509yM8ziv/qn1h/g==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "ea9ff4b4-5040-4b91-a563-1a04522cc76e",
+                            PasswordHash = "AQAAAAIAAYagAAAAEA5n4mJExREdmm9/9N+l8/BELlaSxi4/U3ufCfexlnqHs9DdkM+8KsnhTpL8zQndwQ==",
+                            PhoneNumber = "+15555550004",
+                            PhoneNumberConfirmed = true,
+                            PostalCode = "22222",
+                            SecurityStamp = "3d0932ef-e1ca-4f34-8364-0642bc195218",
+                            State = "Customer State",
                             TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "customer1@flowspire.com"
                         },
                         new
                         {
                             Id = "550e8400-e29b-41d4-a716-446655440005",
                             AccessFailedCount = 0,
+                            AddressLine1 = "202 Customer Rd.",
+                            BirthDate = new DateTime(1992, 8, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            City = "Customer City",
+                            Country = "Customer Country",
+                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "customer2@flowspire.com",
                             EmailConfirmed = true,
-                            FullName = "Customer Two",
+                            FirstName = "Customer",
+                            Gender = 1,
+                            LastName = "Two",
                             LockoutEnabled = false,
                             NormalizedEmail = "CUSTOMER2@FLOWSPIRE.COM",
                             NormalizedUserName = "CUSTOMER2@FLOWSPIRE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPcEaZsjX4g994lAC0W9lNXBdyv4oJSyEyIpWNJhov76wlvMt2dM/qBmOBhPW1fPMQ==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "3bb4f7ae-6838-4439-9863-29c03c2df0bb",
+                            PasswordHash = "AQAAAAIAAYagAAAAENuB6jGTQdA4BJ0t1z+RgtgIKC3QHjwYytsfO0ZcaH46l6HiLfWCTfBMd6kuBko01Q==",
+                            PhoneNumber = "+15555550005",
+                            PhoneNumberConfirmed = true,
+                            PostalCode = "22223",
+                            SecurityStamp = "837191ad-c608-48b4-9a75-9edf70f3342c",
+                            State = "Customer State",
                             TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "customer2@flowspire.com"
                         },
                         new
                         {
                             Id = "550e8400-e29b-41d4-a716-446655440006",
                             AccessFailedCount = 0,
+                            AddressLine1 = "203 Customer Rd.",
+                            BirthDate = new DateTime(1995, 12, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            City = "Customer City",
+                            Country = "Customer Country",
+                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "customer3@flowspire.com",
                             EmailConfirmed = true,
-                            FullName = "Customer Three",
+                            FirstName = "Customer",
+                            Gender = 2,
+                            LastName = "Three",
                             LockoutEnabled = false,
                             NormalizedEmail = "CUSTOMER3@FLOWSPIRE.COM",
                             NormalizedUserName = "CUSTOMER3@FLOWSPIRE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAELj/uFNN53wDdqPeVSnz1iJlbtJsIwcmimvvPHulavPdHQEJO4nYPeHkFA9KX0mdYA==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "334ec97c-1ab0-487c-a6dc-631e90f44c04",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEU1TLbqNmWfzgyIwJKVwDT5nYYzRfK96/xaRsB10QV8D4Y98/n8eobEowzStz2j+g==",
+                            PhoneNumber = "+15555550006",
+                            PhoneNumberConfirmed = true,
+                            PostalCode = "22224",
+                            SecurityStamp = "15170f89-09dc-49ca-a082-e84414724e62",
+                            State = "Customer State",
                             TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UserName = "customer3@flowspire.com"
                         });
                 });
