@@ -34,9 +34,10 @@ public static class DependencyInjection
         .AddSignInManager()
         .AddRoles<IdentityRole>();
 
+        services.AddScoped<IFinancialTransactionService, FinancialTransactionService>();
         services.AddScoped<IFinancialTransactionRepository, FinancialTransactionRepository>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IFinancialTransactionService, FinancialTransactionService>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ICategoryService, CategoryService>();

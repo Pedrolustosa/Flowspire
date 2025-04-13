@@ -246,52 +246,367 @@ public static class DatabaseSeeder
             new { Id = 7, Name = "Clothing", UserId = "550e8400-e29b-41d4-a716-446655440005" },
             new { Id = 8, Name = "Food", UserId = "550e8400-e29b-41d4-a716-446655440006" },
             new { Id = 9, Name = "Technology", UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 10, Name = "Leisure", UserId = "550e8400-e29b-41d4-a716-446655440006" }
+            new { Id = 10, Name = "Leisure", UserId = "550e8400-e29b-41d4-a716-446655440006" },
+            new { Id = 11, Name = "Health", UserId = "550e8400-e29b-41d4-a716-446655440005" },
+            new { Id = 12, Name = "Education", UserId = "550e8400-e29b-41d4-a716-446655440006" }
         );
     }
 
     private static void SeedTransactions(ModelBuilder builder)
     {
         var now = DateTime.UtcNow;
-        var transactions = new List<object>
-        {
-            new { Id = 1, Description = "Supermarket", Amount = -80.00m, Date = now.AddMonths(-6).AddDays(-15), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 2, Description = "Bus", Amount = -15.00m, Date = now.AddMonths(-6).AddDays(-10), CategoryId = 2, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 3, Description = "Salary", Amount = 2000.00m, Date = now.AddMonths(-6).AddDays(-1), CategoryId = 1, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 4, Description = "Pharmacy", Amount = -50.00m, Date = now.AddMonths(-5).AddDays(-5), CategoryId = 3, UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 5, Description = "Rent", Amount = -800.00m, Date = now.AddMonths(-5).AddDays(-3), CategoryId = 4, UserId = "550e8400-e29b-41d4-a716-446655440004" },
 
-            new { Id = 20, Description = "Cinema", Amount = -40.00m, Date = now.AddMonths(-6).AddDays(-7), CategoryId = 5, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 21, Description = "Online Course", Amount = -150.00m, Date = now.AddMonths(-6).AddDays(-3), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 22, Description = "Freelance", Amount = 1000.00m, Date = now.AddMonths(-6).AddDays(-2), CategoryId = 6, UserId = "550e8400-e29b-41d4-a716-446655440005" },
-
-            new { Id = 35, Description = "Restaurant", Amount = -70.00m, Date = now.AddMonths(-6).AddDays(-12), CategoryId = 8, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 36, Description = "Notebook", Amount = -1500.00m, Date = now.AddMonths(-6).AddDays(-5), CategoryId = 9, UserId = "550e8400-e29b-41d4-a716-446655440006" },
-        };
-
-        builder.Entity<FinancialTransaction>().HasData(transactions);
+        builder.Entity<FinancialTransaction>().HasData(
+            // customer1
+            new
+            {
+                Id = 1,
+                Description = "Supermarket",
+                Amount = -80.00m,
+                OriginalAmount = -80.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-6).AddDays(-15),
+                Type = TransactionType.Expense,
+                CategoryId = 1,
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                Notes = "Compras básicas",
+                PaymentMethod = "Cartão",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-6).AddDays(-15),
+                UpdatedAt = now.AddMonths(-6).AddDays(-15)
+            },
+            new
+            {
+                Id = 2,
+                Description = "Bus",
+                Amount = -15.00m,
+                OriginalAmount = -15.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-6).AddDays(-10),
+                Type = TransactionType.Expense,
+                CategoryId = 2,
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                Notes = "Transporte público",
+                PaymentMethod = "Dinheiro",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-6).AddDays(-10),
+                UpdatedAt = now.AddMonths(-6).AddDays(-10)
+            },
+            new
+            {
+                Id = 3,
+                Description = "Salary",
+                Amount = 2000.00m,
+                OriginalAmount = 2000.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-6).AddDays(-1),
+                Type = TransactionType.Income,
+                CategoryId = 1,
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                Notes = "Salário mensal",
+                PaymentMethod = "Transferência",
+                IsRecurring = true,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-6).AddDays(-1),
+                UpdatedAt = now.AddMonths(-6).AddDays(-1)
+            },
+            new
+            {
+                Id = 4,
+                Description = "Pharmacy",
+                Amount = -50.00m,
+                OriginalAmount = -50.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-5).AddDays(-5),
+                Type = TransactionType.Expense,
+                CategoryId = 3,
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                Notes = "Remédios",
+                PaymentMethod = "Cartão",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-5).AddDays(-5),
+                UpdatedAt = now.AddMonths(-5).AddDays(-5)
+            },
+            new
+            {
+                Id = 5,
+                Description = "Rent",
+                Amount = -800.00m,
+                OriginalAmount = -800.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-5).AddDays(-3),
+                Type = TransactionType.Expense,
+                CategoryId = 4,
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                Notes = "Aluguel mensal",
+                PaymentMethod = "Transferência",
+                IsRecurring = true,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-5).AddDays(-3),
+                UpdatedAt = now.AddMonths(-5).AddDays(-3)
+            },
+            new
+            {
+                Id = 6,
+                Description = "Netflix Subscription",
+                Amount = -39.90m,
+                OriginalAmount = -39.90m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = new DateTime(2024, 12, 13),
+                Type = TransactionType.Expense,
+                CategoryId = 5,
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                Notes = "Entretenimento mensal",
+                PaymentMethod = "Cartão",
+                IsRecurring = true,
+                NextOccurrence = new DateTime(2025, 1, 12),
+                CreatedAt = new DateTime(2024, 12, 13),
+                UpdatedAt = new DateTime(2024, 12, 13)
+            },
+            new
+            {
+                Id = 7,
+                Description = "Uber Ride",
+                Amount = -22.50m,
+                OriginalAmount = -22.50m,
+                Fee = 1.50m,
+                Discount = (decimal?)null,
+                Date = new DateTime(2025, 2, 1),
+                Type = TransactionType.Expense,
+                CategoryId = 2,
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                Notes = "Corrida rápida",
+                PaymentMethod = "Pix",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = new DateTime(2025, 2, 1),
+                UpdatedAt = new DateTime(2025, 2, 1)
+            },
+            new
+            {
+                Id = 8,
+                Description = "Freelance Project",
+                Amount = 1800.00m,
+                OriginalAmount = 1800.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = new DateTime(2025, 3, 8),
+                Type = TransactionType.Income,
+                CategoryId = 1,
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                Notes = "Projeto de site",
+                PaymentMethod = "Transferência",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = new DateTime(2025, 3, 8),
+                UpdatedAt = new DateTime(2025, 3, 8)
+            },
+            // customer2
+            new
+            {
+                Id = 20,
+                Description = "Cinema",
+                Amount = -40.00m,
+                OriginalAmount = -40.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-6).AddDays(-7),
+                Type = TransactionType.Expense,
+                CategoryId = 5,
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                Notes = "Filme em cartaz",
+                PaymentMethod = "Cartão",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-6).AddDays(-7),
+                UpdatedAt = now.AddMonths(-6).AddDays(-7)
+            },
+            new
+            {
+                Id = 21,
+                Description = "Online Course",
+                Amount = -150.00m,
+                OriginalAmount = -150.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-6).AddDays(-3),
+                Type = TransactionType.Expense,
+                CategoryId = 6,
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                Notes = "Curso de investimento",
+                PaymentMethod = "Cartão",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-6).AddDays(-3),
+                UpdatedAt = now.AddMonths(-6).AddDays(-3)
+            },
+            new
+            {
+                Id = 22,
+                Description = "Freelance",
+                Amount = 1000.00m,
+                OriginalAmount = 1000.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-6).AddDays(-2),
+                Type = TransactionType.Income,
+                CategoryId = 6,
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                Notes = "Serviço de edição",
+                PaymentMethod = "Transferência",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-6).AddDays(-2),
+                UpdatedAt = now.AddMonths(-6).AddDays(-2)
+            },
+            new
+            {
+                Id = 23,
+                Description = "Spotify Premium",
+                Amount = -19.90m,
+                OriginalAmount = -19.90m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = new DateTime(2024, 12, 23),
+                Type = TransactionType.Expense,
+                CategoryId = 5,
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                Notes = "Assinatura mensal",
+                PaymentMethod = "Cartão",
+                IsRecurring = true,
+                NextOccurrence = new DateTime(2025, 1, 22),
+                CreatedAt = new DateTime(2024, 12, 23),
+                UpdatedAt = new DateTime(2024, 12, 23)
+            },
+            new
+            {
+                Id = 24,
+                Description = "Dentist appointment",
+                Amount = -250.00m,
+                OriginalAmount = -250.00m,
+                Fee = (decimal?)null,
+                Discount = 50.00m,
+                Date = new DateTime(2025, 2, 1),
+                Type = TransactionType.Expense,
+                CategoryId = 3,
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                Notes = "Consulta odontológica",
+                PaymentMethod = "Cartão",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = new DateTime(2025, 2, 1),
+                UpdatedAt = new DateTime(2025, 2, 1)
+            },
+            // customer3
+            new
+            {
+                Id = 35,
+                Description = "Restaurant",
+                Amount = -70.00m,
+                OriginalAmount = -70.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-6).AddDays(-12),
+                Type = TransactionType.Expense,
+                CategoryId = 8,
+                UserId = "550e8400-e29b-41d4-a716-446655440006",
+                Notes = "Jantar fora",
+                PaymentMethod = "Pix",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-6).AddDays(-12),
+                UpdatedAt = now.AddMonths(-6).AddDays(-12)
+            },
+            new
+            {
+                Id = 36,
+                Description = "Notebook",
+                Amount = -1500.00m,
+                OriginalAmount = -1500.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = now.AddMonths(-6).AddDays(-5),
+                Type = TransactionType.Expense,
+                CategoryId = 9,
+                UserId = "550e8400-e29b-41d4-a716-446655440006",
+                Notes = "Compra de notebook",
+                PaymentMethod = "Cartão",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = now.AddMonths(-6).AddDays(-5),
+                UpdatedAt = now.AddMonths(-6).AddDays(-5)
+            },
+            new
+            {
+                Id = 37,
+                Description = "Udemy Course: C# Clean Architecture",
+                Amount = -89.90m,
+                OriginalAmount = -89.90m,
+                Fee = (decimal?)null,
+                Discount = 40.00m,
+                Date = new DateTime(2025, 1, 12),
+                Type = TransactionType.Expense,
+                CategoryId = 6,
+                UserId = "550e8400-e29b-41d4-a716-446655440006",
+                Notes = "Curso avançado",
+                PaymentMethod = "Cartão",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = new DateTime(2025, 1, 12),
+                UpdatedAt = new DateTime(2025, 1, 12)
+            },
+            new
+            {
+                Id = 38,
+                Description = "Birthday Gift - Pix Received",
+                Amount = 150.00m,
+                OriginalAmount = 150.00m,
+                Fee = (decimal?)null,
+                Discount = (decimal?)null,
+                Date = new DateTime(2025, 4, 2),
+                Type = TransactionType.Income,
+                CategoryId = 10,
+                UserId = "550e8400-e29b-41d4-a716-446655440006",
+                Notes = "Presente de aniversário",
+                PaymentMethod = "Pix",
+                IsRecurring = false,
+                NextOccurrence = (DateTime?)null,
+                CreatedAt = new DateTime(2025, 4, 2),
+                UpdatedAt = new DateTime(2025, 4, 2)
+            }
+        );
     }
+
 
     private static void SeedBudgets(ModelBuilder builder)
     {
         var now = DateTime.UtcNow;
-        var budgets = new List<object>
-        {
-            new { Id = 1, CategoryId = 1, Amount = 400.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 2, CategoryId = 3, Amount = 250.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 3, CategoryId = 4, Amount = 1000.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
 
-            new { Id = 4, CategoryId = 5, Amount = 200.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 5, CategoryId = 6, Amount = 500.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 6, CategoryId = 7, Amount = 300.00m, StartDate = now.AddMonths(-3), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440005" },
+        builder.Entity<Budget>().HasData(
+            // customer1
+            new { Id = 10, CategoryId = 1, Amount = 500.00m, StartDate = now.AddMonths(-2), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 11, CategoryId = 2, Amount = 120.00m, StartDate = now.AddMonths(-2), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
+            new { Id = 12, CategoryId = 5, Amount = 100.00m, StartDate = now.AddMonths(-1), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440004" },
 
-            new { Id = 7, CategoryId = 8, Amount = 300.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 8, CategoryId = 9, Amount = 2000.00m, StartDate = now.AddMonths(-6), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 9, CategoryId = 10, Amount = 150.00m, StartDate = now.AddMonths(-3), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440006" }
-        };
+            // customer2
+            new { Id = 13, CategoryId = 6, Amount = 600.00m, StartDate = now.AddMonths(-2), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440005" },
+            new { Id = 14, CategoryId = 3, Amount = 200.00m, StartDate = now.AddMonths(-3), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440005" },
 
-        builder.Entity<Budget>().HasData(budgets);
+            // customer3
+            new { Id = 15, CategoryId = 9, Amount = 3000.00m, StartDate = now.AddMonths(-4), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440006" },
+            new { Id = 16, CategoryId = 10, Amount = 200.00m, StartDate = now.AddMonths(-1), EndDate = now.AddMonths(3), UserId = "550e8400-e29b-41d4-a716-446655440006" }
+        );
     }
+
 
     private static void SeedMessages(ModelBuilder builder)
     {
@@ -303,7 +618,11 @@ public static class DatabaseSeeder
             new { Id = 4, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440005", Content = "I recommend index funds.", SentAt = now.AddDays(-4), IsRead = true, ReadAt = now.AddDays(-3) },
             new { Id = 5, SenderId = "550e8400-e29b-41d4-a716-446655440006", ReceiverId = "550e8400-e29b-41d4-a716-446655440003", Content = "How can I reduce my expenses?", SentAt = now.AddDays(-3), IsRead = false, ReadAt = (DateTime?)null },
             new { Id = 6, SenderId = "550e8400-e29b-41d4-a716-446655440003", ReceiverId = "550e8400-e29b-41d4-a716-446655440006", Content = "Let's review your categories.", SentAt = now.AddDays(-2), IsRead = false, ReadAt = (DateTime?)null },
-            new { Id = 7, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Thank you for your help!", SentAt = now.AddDays(-1), IsRead = false, ReadAt = (DateTime?)null }
+            new { Id = 7, SenderId = "550e8400-e29b-41d4-a716-446655440004", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Thank you for your help!", SentAt = now.AddDays(-1), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 8, SenderId = "550e8400-e29b-41d4-a716-446655440002", ReceiverId = "550e8400-e29b-41d4-a716-446655440005", Content = "Lembre-se de registrar seus investimentos.", SentAt = now.AddDays(-14), IsRead = true, ReadAt = now.AddDays(-13) },
+            new { Id = 9, SenderId = "550e8400-e29b-41d4-a716-446655440005", ReceiverId = "550e8400-e29b-41d4-a716-446655440002", Content = "Obrigado, acabei de atualizar.", SentAt = now.AddDays(-13), IsRead = true, ReadAt = now.AddDays(-12) },
+            new { Id = 10, SenderId = "550e8400-e29b-41d4-a716-446655440006", ReceiverId = "550e8400-e29b-41d4-a716-446655440003", Content = "Quero aprender mais sobre reserva de emergência.", SentAt = now.AddDays(-5), IsRead = false, ReadAt = (DateTime?)null },
+            new { Id = 11, SenderId = "550e8400-e29b-41d4-a716-446655440003", ReceiverId = "550e8400-e29b-41d4-a716-446655440006", Content = "Vamos marcar uma call pra isso amanhã?", SentAt = now.AddDays(-4), IsRead = true, ReadAt = now.AddDays(-4) }
         );
     }
 

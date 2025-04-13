@@ -1,34 +1,47 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TransactionDTO, FinancialReport } from '../models/Transaction';
+import { FinancialReport, TransactionDTO } from '../models/Transaction';
 import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionService {
-  private apiUrl = `${environment.apiUrl}/transaction`;
+  private apiUrl = `${environment.apiUrl}/financialtransaction`;
 
   constructor(private http: HttpClient) {}
 
-  addTransaction(transactionDto: TransactionDTO): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, transactionDto);
+  getTransactionById(id: number): Observable<TransactionDTO> {
+    return this.http.get<TransactionDTO>(`${this.apiUrl}/${id}`);
   }
 
-  getTransactionsByUserId(userId: string): Observable<TransactionDTO[]> {
-    return this.http.get<TransactionDTO[]>(`${this.apiUrl}/user/${userId}`);
+  getAllTransactions(): Observable<TransactionDTO[]> {
+    return this.http.get<TransactionDTO[]>(`${this.apiUrl}`);
+  }
+
+  getUserTransactions(): Observable<TransactionDTO[]> {
+    return this.http.get<TransactionDTO[]>(`${this.apiUrl}/user`);
   }
 
   getFinancialReport(startDate: Date, endDate: Date): Observable<FinancialReport> {
-    const validStartDate = startDate instanceof Date && !isNaN(startDate.getTime()) ? startDate : new Date();
-    const validEndDate = endDate instanceof Date && !isNaN(endDate.getTime()) ? endDate : new Date();
-
-    return this.http.get<FinancialReport>(`${this.apiUrl}/report`, {
+    return this.http.get<FinancialReport>(`${this.apiUrl}/range`, {
       params: {
-        startDate: validStartDate.toISOString(),
-        endDate: validEndDate.toISOString()
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
       }
     });
+  }
+
+  createTransaction(transactionDto: TransactionDTO): Observable<TransactionDTO> {
+    return this.http.post<TransactionDTO>(`${this.apiUrl}`, transactionDto);
+  }
+
+  updateTransaction(id: number, transactionDto: TransactionDTO): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, transactionDto);
+  }
+
+  deleteTransaction(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

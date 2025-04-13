@@ -1,44 +1,44 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject, Injector } from '@angular/core';
-import { catchError, switchMap, throwError } from 'rxjs';
-import { AuthService } from './auth.service';
+import { HttpInterceptorFn, HttpHandlerFn, HttpRequest, HttpEvent } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const injector = inject(Injector);
-  const authService = injector.get(AuthService);
-  const accessToken = authService.getAccessToken();
-
+export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
+  const accessToken = localStorage.getItem('accessToken');
+  let authReq = req;
   if (accessToken) {
-    req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    });
+    authReq = req.clone({ setHeaders: { Authorization: `Bearer ${accessToken}` } });
   }
-
-  return next(req).pipe(
+  return next(authReq).pipe(
     catchError(error => {
       if (error.status === 401) {
-        const refreshToken = authService.getRefreshToken();
-        
+        const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-          return authService.refreshToken(refreshToken).pipe(
-            switchMap(() => {
-              const newAccessToken = authService.getAccessToken();
-              req = req.clone({
-                setHeaders: {
-                  Authorization: `Bearer ${newAccessToken}`
-                }
-              });
-              return next(req);
+          const http = inject(HttpClient);
+          return http.post<any>(`${environment.apiUrl}/user/refresh-token`, { refreshToken }).pipe(
+            switchMap(response => {
+              if (response.accessToken) {
+                localStorage.setItem('accessToken', response.accessToken);
+                localStorage.setItem('refreshToken', response.refreshToken);
+                const newAuthReq = req.clone({ setHeaders: { Authorization: `Bearer ${response.accessToken}` } });
+                return next(newAuthReq);
+              } else {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                return throwError(() => error);
+              }
             }),
             catchError(refreshError => {
-              authService.logout();
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('refreshToken');
               return throwError(() => refreshError);
             })
           );
         } else {
-          authService.logout();
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
           return throwError(() => error);
         }
       }

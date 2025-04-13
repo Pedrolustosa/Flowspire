@@ -1,4 +1,3 @@
-// src/app/services/auth.service.ts
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
@@ -9,8 +8,7 @@ import { environment } from '../../environments/environment';
 import { User } from '../models/User';
 import { LoginRequest } from '../models/LoginRequest';
 import { RegisterCustomerRequest } from '../models/RegisterCustomerRequest';
-import { RefreshTokenRequest } from '../models/RefreshTokenRequest';
-import { UpdateRequest, UpdateRequestWrapper } from '../models/UpdateRequest';
+import { UpdateRequest } from '../models/UpdateRequest';
 import { LoadingService } from './loading.service';
 
 @Injectable({
@@ -41,7 +39,6 @@ export class AuthService {
     if (this.isAuthenticatedSubject.value) {
       this.getCurrentUser().subscribe({
         next: (user) => {
-          console.log('User loaded on initialization:', user);
         },
         error: (err) => {
           console.error('Failed to fetch current user on initialization:', err);
@@ -66,10 +63,8 @@ export class AuthService {
             this.toastr.success('Login bem-sucedido!', 'Sucesso');
             this.getCurrentUser().subscribe({
               next: (user) => {
-                console.log('Current user after login:', user);
               },
               error: (err) => {
-                console.error('Failed to fetch current user after login:', err);
                 this.logout();
               }
             });
@@ -144,8 +139,7 @@ export class AuthService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.getAccessToken()}`
     });
-    const body: UpdateRequestWrapper = { request: request };
-    return this.http.put<User>(`${this.apiUrl}/user/update`, body, { headers }).pipe(
+    return this.http.put<User>(`${this.apiUrl}/user/update`, request, { headers }).pipe(
       tap({
         next: (response) => {
           this.currentUserSubject.next(response);
@@ -161,6 +155,7 @@ export class AuthService {
       })
     );
   }
+  
 
   getCurrentUser(): Observable<User> {
     this.loadingService.setLoading(true);

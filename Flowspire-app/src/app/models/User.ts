@@ -5,7 +5,7 @@ export interface User {
   lastName: string;
   phoneNumber: string;
   birthDate?: Date | string;
-  gender?: string;
+  gender?: Gender;
   addressLine1?: string;
   addressLine2?: string;
   city?: string;
@@ -13,4 +13,11 @@ export interface User {
   country?: string;
   postalCode?: string;
   roles: number[];
+}
+
+export enum Gender
+{
+    Male,
+    Female,
+    NotSpecified
 }

@@ -1,24 +1,17 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Flowspire.Application.Interfaces;
-using Flowspire.Application.DTOs;
 using Flowspire.Domain.Enums;
 using System.Security.Claims;
 using Flowspire.API.Models;
-using System.Threading.Tasks;
 
 namespace Flowspire.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController(IUserService userService) : ControllerBase
     {
-        private readonly IUserService _userService;
-
-        public UserController(IUserService userService)
-        {
-            _userService = userService;
-        }
+        private readonly IUserService _userService = userService;
 
         [HttpPost("register")]
         [Authorize(Roles = "Administrator")]
@@ -28,7 +21,6 @@ namespace Flowspire.API.Controllers
             {
                 var requestingUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                // Passing all new profile and address fields to the service
                 var userDto = await _userService.RegisterUserAsync(
                     request.Email,
                     request.FirstName,
@@ -125,7 +117,6 @@ namespace Flowspire.API.Controllers
                 if (string.IsNullOrEmpty(userId))
                     return Unauthorized();
 
-                // Pass profile and address fields from the update request
                 var updatedUserDto = await _userService.UpdateUserAsync(
                     userId,
                     requestWrapper.Request.FirstName,
@@ -179,7 +170,7 @@ namespace Flowspire.API.Controllers
             {
                 return NotFound(new { Error = ex.Message });
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(new { Error = ex.Message });
             }
