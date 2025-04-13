@@ -44,6 +44,7 @@ export class ProfileComponent implements OnInit {
 
   private initializeForm(): void {
     this.profileForm = this.fb.group({
+      email: [{ value: '', disabled: true }],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       birthDate: ['', Validators.required],
@@ -64,6 +65,7 @@ export class ProfileComponent implements OnInit {
       next: (user) => {
         this.user = user;
         this.profileForm.patchValue({
+          email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           birthDate: user.birthDate ? new Date(user.birthDate).toISOString().slice(0, 10) : '',
@@ -110,10 +112,10 @@ export class ProfileComponent implements OnInit {
     
     this.loadingService.setLoading(true);
     this.authService.updateUser(payload as any).subscribe({
-      next: (updatedUser) => {
-        this.user = updatedUser;
+      next: () => {
         this.toastr.success('Profile updated successfully!', 'Success');
         this.loadingService.setLoading(false);
+        this.loadUserProfile();
       },
       error: (err) => {
         this.toastr.error(err.error?.title || 'Error updating profile.', 'Error');
