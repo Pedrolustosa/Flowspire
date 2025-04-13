@@ -88,10 +88,10 @@
               <div class="col-md-6 mb-3">
                 <label for="gender" class="form-label">Gender</label>
                 <select id="gender" class="form-select" formControlName="gender">
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="NotSpecified">Not Specified</option>
+                  <option [ngValue]="null">Select Gender</option>
+                  <option *ngFor="let option of genderOptions" [ngValue]="option.id">
+                    {{ option.name }}
+                  </option>
                 </select>
                 <div *ngIf="profileForm.get('gender')?.touched && profileForm.get('gender')?.invalid" class="text-danger">
                   Gender is required.

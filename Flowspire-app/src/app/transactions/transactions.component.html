@@ -250,7 +250,7 @@
                   <td>{{ transaction.description }}</td>
                   <td>
                     <span class="badge rounded-pill bg-light text-dark">
-                      {{ transaction.category?.name }}
+                      {{ transaction.categoryName }}
                     </span>
                   </td>
                   <td [class.text-success]="transaction.amount >= 0" [class.text-danger]="transaction.amount < 0">

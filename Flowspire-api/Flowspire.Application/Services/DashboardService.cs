@@ -2,15 +2,14 @@
 using Flowspire.Application.DTOs;
 using System.Globalization;
 using Flowspire.Domain.Interfaces;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using Flowspire.Domain.Enums;
 
 namespace Flowspire.Application.Services;
 
-public class DashboardService(IFinancialTransactionRepository transactionRepository,
-                              IBudgetRepository budgetRepository) : IDashboardService
+public class DashboardService(
+    IFinancialTransactionRepository transactionRepository,
+    IBudgetRepository budgetRepository
+) : IDashboardService
 {
     private readonly IFinancialTransactionRepository _transactionRepository = transactionRepository;
     private readonly IBudgetRepository _budgetRepository = budgetRepository;
@@ -24,8 +23,12 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
                 .Where(t => t.Date >= startDate && t.Date <= endDate)
                 .ToList();
 
-            var totalIncome = filteredTransactions.Where(t => t.Amount > 0).Sum(t => t.Amount);
-            var totalExpenses = filteredTransactions.Where(t => t.Amount < 0).Sum(t => Math.Abs(t.Amount));
+            var totalIncome = filteredTransactions
+                .Where(t => t.Type == TransactionType.Income)
+                .Sum(t => t.Amount);
+            var totalExpenses = filteredTransactions
+                .Where(t => t.Type == TransactionType.Expense)
+                .Sum(t => t.Amount);
 
             var budgets = await _budgetRepository.GetByUserIdAsync(userId);
             var activeBudgets = budgets
@@ -34,17 +37,20 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
 
             var budgetStatuses = new List<BudgetStatusDTO>();
             var alerts = new List<string>();
+
             foreach (var budget in activeBudgets)
             {
                 var spentAmount = filteredTransactions
-                    .Where(t => t.CategoryId == budget.CategoryId && t.Date >= budget.StartDate && t.Date <= budget.EndDate)
-                    .Sum(t => Math.Abs(t.Amount));
+                    .Where(t => t.CategoryId == budget.CategoryId
+                                && t.Date >= budget.StartDate
+                                && t.Date <= budget.EndDate
+                                && t.Type == TransactionType.Expense)
+                    .Sum(t => t.Amount);
 
                 var percentageUsed = budget.Amount > 0 ? (double)(spentAmount / budget.Amount) * 100 : 0;
 
                 budgetStatuses.Add(new BudgetStatusDTO
                 {
-                    // Removido BudgetId, mantendo apenas dados analíticos
                     CategoryName = budget.Category.Name,
                     BudgetAmount = budget.Amount,
                     SpentAmount = spentAmount,
@@ -69,8 +75,8 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
                 monthlyHistory.Add(new MonthlySummaryDTO
                 {
                     Month = monthStart.ToString("MMMM yyyy", CultureInfo.CurrentCulture),
-                    Income = monthTransactions.Where(t => t.Amount > 0).Sum(t => t.Amount),
-                    Expenses = monthTransactions.Where(t => t.Amount < 0).Sum(t => Math.Abs(t.Amount))
+                    Income = monthTransactions.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount),
+                    Expenses = monthTransactions.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount)
                 });
             }
 
@@ -85,13 +91,13 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
                 .Select(g => new CategoryTrendDTO
                 {
                     CategoryName = g.Key,
-                    CurrentPeriodExpenses = g.Where(t => t.Amount < 0).Sum(t => Math.Abs(t.Amount)),
+                    CurrentPeriodExpenses = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount),
                     PreviousPeriodExpenses = previousTransactions
-                        .Where(t => t.Category.Name == g.Key && t.Amount < 0)
-                        .Sum(t => Math.Abs(t.Amount)),
+                        .Where(t => t.Category.Name == g.Key && t.Type == TransactionType.Expense)
+                        .Sum(t => t.Amount),
                     TrendPercentage = CalculateTrendPercentage(
-                        g.Where(t => t.Amount < 0).Sum(t => Math.Abs(t.Amount)),
-                        previousTransactions.Where(t => t.Category.Name == g.Key && t.Amount < 0).Sum(t => Math.Abs(t.Amount)))
+                        g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount),
+                        previousTransactions.Where(t => t.Category.Name == g.Key && t.Type == TransactionType.Expense).Sum(t => t.Amount))
                 })
                 .ToList();
 
@@ -100,8 +106,8 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
                 .Select(g => new CategorySummaryDTO
                 {
                     CategoryName = g.Key,
-                    Income = g.Where(t => t.Amount > 0).Sum(t => t.Amount),
-                    Expenses = g.Where(t => t.Amount < 0).Sum(t => Math.Abs(t.Amount))
+                    Income = g.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount),
+                    Expenses = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount)
                 })
                 .ToList();
 
@@ -137,13 +143,14 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
                 .ToList();
 
             var summary = filteredTransactions
-                .Where(t => (type == "Expense" && t.Amount < 0) || (type == "Revenue" && t.Amount > 0))
+                .Where(t => (type == "Expense" && t.Type == TransactionType.Expense) ||
+                            (type == "Revenue" && t.Type == TransactionType.Income))
                 .GroupBy(t => t.Category.Name)
                 .Select(g => new CategorySummaryDTO
                 {
                     CategoryName = g.Key,
                     Income = type == "Revenue" ? g.Sum(t => t.Amount) : 0,
-                    Expenses = type == "Expense" ? g.Sum(t => Math.Abs(t.Amount)) : 0
+                    Expenses = type == "Expense" ? g.Sum(t => t.Amount) : 0
                 })
                 .ToList();
 
@@ -172,8 +179,12 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
                 {
                     Description = t.Description,
                     Amount = t.Amount,
-                    Type = t.Amount > 0 ? "Revenue" : "Expense",
-                    Category = t.Category.Name,
+                    Type = t.Type == TransactionType.Income
+                            ? "Revenue"
+                            : t.Type == TransactionType.Expense
+                                ? "Expense"
+                                : t.Type.ToString(),
+                    Category = t.Category != null ? t.Category.Name : "Uncategorized",
                     Date = t.Date
                 })
                 .ToList();
@@ -194,8 +205,8 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
                 throw new ArgumentException("User ID is required.", nameof(userId));
 
             var transactions = await _transactionRepository.GetByUserIdAsync(userId);
-            var totalRevenue = transactions.Where(t => t.Amount > 0).Sum(t => t.Amount);
-            var totalExpense = transactions.Where(t => t.Amount < 0).Sum(t => Math.Abs(t.Amount));
+            var totalRevenue = transactions.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
+            var totalExpense = transactions.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
 
             return new BalanceDTO
             {
@@ -221,17 +232,21 @@ public class DashboardService(IFinancialTransactionRepository transactionReposit
             var transactions = await _transactionRepository.GetByUserIdAsync(userId);
 
             var financialGoals = budgets
-                .Select(b => new FinancialGoalDTO
-                {
-                    Name = b.Category.Name,
-                    TargetAmount = b.Amount,
-                    CurrentAmount = transactions
-                        .Where(t => t.CategoryId == b.CategoryId && t.Date >= b.StartDate && t.Date <= b.EndDate)
-                        .Sum(t => Math.Abs(t.Amount)),
-                    Deadline = b.EndDate,
-                    ProgressPercentage = b.Amount > 0 ? (double)(transactions
-                        .Where(t => t.CategoryId == b.CategoryId && t.Date >= b.StartDate && t.Date <= b.EndDate)
-                        .Sum(t => Math.Abs(t.Amount)) / b.Amount) * 100 : 0
+                .Select(b => {
+                    var currentSpent = transactions
+                        .Where(t => t.CategoryId == b.CategoryId
+                                    && t.Date >= b.StartDate
+                                    && t.Date <= b.EndDate
+                                    && t.Type == TransactionType.Expense)
+                        .Sum(t => t.Amount);
+                    return new FinancialGoalDTO
+                    {
+                        Name = b.Category.Name,
+                        TargetAmount = b.Amount,
+                        CurrentAmount = currentSpent,
+                        Deadline = b.EndDate,
+                        ProgressPercentage = b.Amount > 0 ? (double)(currentSpent / b.Amount) * 100 : 0
+                    };
                 })
                 .Where(g => g.CurrentAmount > 0)
                 .ToList();
