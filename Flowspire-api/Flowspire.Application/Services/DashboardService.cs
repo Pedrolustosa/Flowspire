@@ -48,10 +48,12 @@ public class DashboardService(
                     .Sum(t => t.Amount);
 
                 var percentageUsed = budget.Amount > 0 ? (double)(spentAmount / budget.Amount) * 100 : 0;
+                // Caso o budget.Category seja nulo, define um valor padrão
+                var categoryName = budget.Category != null ? budget.Category.Name : "Uncategorized";
 
                 budgetStatuses.Add(new BudgetStatusDTO
                 {
-                    CategoryName = budget.Category.Name,
+                    CategoryName = categoryName,
                     BudgetAmount = budget.Amount,
                     SpentAmount = spentAmount,
                     PercentageUsed = (decimal)percentageUsed
@@ -59,7 +61,7 @@ public class DashboardService(
 
                 if (percentageUsed >= 90)
                 {
-                    alerts.Add($"Atenção: O orçamento de {budget.Category.Name} atingiu {percentageUsed:F2}% do limite ({spentAmount}/{budget.Amount}).");
+                    alerts.Add($"Atenção: O orçamento de {categoryName} atingiu {percentageUsed:F2}% do limite ({spentAmount}/{budget.Amount}).");
                 }
             }
 
@@ -87,22 +89,23 @@ public class DashboardService(
                 .ToList();
 
             var categoryTrends = filteredTransactions
-                .GroupBy(t => t.Category.Name)
+                .GroupBy(t => t.Category != null ? t.Category.Name : "Uncategorized")
                 .Select(g => new CategoryTrendDTO
                 {
                     CategoryName = g.Key,
                     CurrentPeriodExpenses = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount),
                     PreviousPeriodExpenses = previousTransactions
-                        .Where(t => t.Category.Name == g.Key && t.Type == TransactionType.Expense)
+                        .Where(t => (t.Category != null ? t.Category.Name : "Uncategorized") == g.Key && t.Type == TransactionType.Expense)
                         .Sum(t => t.Amount),
                     TrendPercentage = CalculateTrendPercentage(
                         g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount),
-                        previousTransactions.Where(t => t.Category.Name == g.Key && t.Type == TransactionType.Expense).Sum(t => t.Amount))
+                        previousTransactions.Where(t => (t.Category != null ? t.Category.Name : "Uncategorized") == g.Key && t.Type == TransactionType.Expense)
+                            .Sum(t => t.Amount))
                 })
                 .ToList();
 
             var categorySummary = filteredTransactions
-                .GroupBy(t => t.Category.Name)
+                .GroupBy(t => t.Category != null ? t.Category.Name : "Uncategorized")
                 .Select(g => new CategorySummaryDTO
                 {
                     CategoryName = g.Key,
@@ -127,6 +130,7 @@ public class DashboardService(
             throw new Exception("Erro inesperado ao gerar o dashboard financeiro.", ex);
         }
     }
+
 
     public async Task<List<CategorySummaryDTO>> GetCategorySummaryAsync(string userId, DateTime startDate, DateTime endDate, string type)
     {
@@ -232,16 +236,18 @@ public class DashboardService(
             var transactions = await _transactionRepository.GetByUserIdAsync(userId);
 
             var financialGoals = budgets
-                .Select(b => {
+                .Select(b =>
+                {
                     var currentSpent = transactions
                         .Where(t => t.CategoryId == b.CategoryId
                                     && t.Date >= b.StartDate
                                     && t.Date <= b.EndDate
                                     && t.Type == TransactionType.Expense)
                         .Sum(t => t.Amount);
+
                     return new FinancialGoalDTO
                     {
-                        Name = b.Category.Name,
+                        Name = b.Category != null ? b.Category.Name : "Uncategorized",
                         TargetAmount = b.Amount,
                         CurrentAmount = currentSpent,
                         Deadline = b.EndDate,
@@ -258,6 +264,7 @@ public class DashboardService(
             throw new Exception("Erro ao obter metas financeiras.", ex);
         }
     }
+
 
     private decimal CalculateTrendPercentage(decimal current, decimal previous)
     {

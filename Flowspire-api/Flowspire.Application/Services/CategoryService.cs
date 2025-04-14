@@ -1,8 +1,7 @@
-﻿using Flowspire.Application.Interfaces;
-using Flowspire.Domain.Entities;
+﻿using Flowspire.Domain.Entities;
 using Flowspire.Application.DTOs;
-using Microsoft.EntityFrameworkCore;
 using Flowspire.Domain.Interfaces;
+using Flowspire.Application.Interfaces;
 
 namespace Flowspire.Application.Services;
 
@@ -10,75 +9,101 @@ public class CategoryService(ICategoryRepository categoryRepository) : ICategory
 {
     private readonly ICategoryRepository _categoryRepository = categoryRepository;
 
-    public async Task<CategoryDTO> AddCategoryAsync(CategoryDTO categoryDto)
+    public async Task<CategoryDTO> GetByIdAsync(int id)
     {
-        try
-        {
-            var category = Category.Create(categoryDto.Name, categoryDto.UserId);
-            var addedCategory = await _categoryRepository.AddAsync(category);
-            return new CategoryDTO
-            {
-                Id = addedCategory.Id,
-                Name = addedCategory.Name,
-                UserId = addedCategory.UserId
-            };
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao adicionar a categoria ao banco de dados.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao adicionar categoria.", ex);
-        }
+        var category = await _categoryRepository.GetByIdAsync(id);
+        return MapToDTO(category);
     }
 
-    public async Task<List<CategoryDTO>> GetCategoriesByUserIdAsync(string userId)
+    public async Task<IEnumerable<CategoryDTO>> GetAllAsync()
     {
-        try
-        {
-            var categories = await _categoryRepository.GetByUserIdAsync(userId);
-            return categories.Select(c => new CategoryDTO
-            {
-                Id = c.Id,
-                Name = c.Name,
-                UserId = c.UserId
-            }).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao recuperar categorias.", ex);
-        }
+        var categories = await _categoryRepository.GetAllAsync();
+        return categories.Select(MapToDTO).ToList();
     }
 
-    public async Task<CategoryDTO> UpdateCategoryAsync(CategoryDTO categoryDto)
+    public async Task<IEnumerable<CategoryDTO>> GetByUserIdAsync(string userId)
     {
-        try
-        {
-            var category = await _categoryRepository.GetByIdAsync(categoryDto.Id);
-            if (category == null)
-                throw new KeyNotFoundException("Categoria não encontrada.");
+        var categories = await _categoryRepository.GetByUserIdAsync(userId);
+        return categories.Select(MapToDTO).ToList();
+    }
 
-            category.UpdateName(categoryDto.Name);
-            await _categoryRepository.UpdateAsync(category);
-            return new CategoryDTO
-            {
-                Id = category.Id,
-                Name = category.Name,
-                UserId = category.UserId
-            };
-        }
-        catch (DbUpdateException ex)
+    public async Task CreateAsync(CategoryDTO categoryDTO)
+    {
+        var category = Category.Create(
+            categoryDTO.Name,
+            categoryDTO.UserId,
+            categoryDTO.Description,
+            categoryDTO.IsDefault,
+            categoryDTO.SortOrder);
+
+        await _categoryRepository.AddAsync(category);
+        categoryDTO.Id = category.Id;
+    }
+
+    public async Task UpdateAsync(CategoryDTO categoryDTO)
+    {
+        var category = await _categoryRepository.GetByIdAsync(categoryDTO.Id);
+        if (category == null)
+            throw new Exception("Category not found.");
+
+        category.UpdateName(categoryDTO.Name);
+        category.UpdateDescription(categoryDTO.Description);
+        category.UpdateSortOrder(categoryDTO.SortOrder);
+        if (category.IsDefault != categoryDTO.IsDefault)
+            category.ToggleDefault();
+
+        await _categoryRepository.UpdateAsync(category);
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var category = await _categoryRepository.GetByIdAsync(id);
+        if (category == null)
+            throw new Exception("Category not found.");
+        await _categoryRepository.DeleteAsync(category);
+    }
+
+    public async Task<bool> ExistsByNameAsync(string userId, string name)
+    {
+        return await _categoryRepository.ExistsByNameAsync(userId, name);
+    }
+
+    public async Task<CategoryDTO> GetByNameAsync(string userId, string name)
+    {
+        var category = await _categoryRepository.GetCategoryByNameAsync(userId, name);
+        return MapToDTO(category);
+    }
+
+    public async Task<IEnumerable<CategoryDTO>> GetDefaultCategoriesAsync(string userId)
+    {
+        var categories = await _categoryRepository.GetDefaultCategoriesAsync(userId);
+        return categories.Select(MapToDTO).ToList();
+    }
+
+    public async Task<IEnumerable<CategoryDTO>> GetCategoriesWithTransactionsAsync(string userId)
+    {
+        var categories = await _categoryRepository.GetCategoriesWithTransactionsAsync(userId);
+        return categories.Select(MapToDTO).ToList();
+    }
+
+    public async Task<int> CountByUserAsync(string userId)
+    {
+        return await _categoryRepository.CountByUserAsync(userId);
+    }
+
+    private CategoryDTO MapToDTO(Category category)
+    {
+        if (category == null)
+            return null;
+
+        return new CategoryDTO
         {
-            throw new Exception("Erro ao atualizar a categoria no banco de dados.", ex);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao atualizar categoria.", ex);
-        }
+            Id = category.Id,
+            Name = category.Name,
+            Description = category.Description,
+            UserId = category.UserId,
+            IsDefault = category.IsDefault,
+            SortOrder = category.SortOrder
+        };
     }
 }

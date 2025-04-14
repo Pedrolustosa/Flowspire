@@ -74,12 +74,9 @@ export class TransactionComponent implements OnInit {
 
   loadCategories(): void {
     this.spinner.show();
-    this.categoryService.getCategories().subscribe({
+    this.categoryService.getUserCategories().subscribe({
       next: (data: CategoryDTO[]) => {
         this.categories = data;
-        if (data.length > 0) {
-          this.newTransaction.categoryId = data[0].id;
-        }
         this.spinner.hide();
       },
       error: (err: any) => {
@@ -91,7 +88,6 @@ export class TransactionComponent implements OnInit {
 
   loadTransactions(): void {
     this.spinner.show();
-    // Call the service method that returns transactions for the current user.
     this.transactionService.getUserTransactions().subscribe({
       next: (data: TransactionDTO[]) => {
         this.transactions = data;
@@ -152,14 +148,14 @@ export class TransactionComponent implements OnInit {
     this.transactionService.createTransaction(this.newTransaction).subscribe({
       next: (response: TransactionDTO) => {
         this.toastr.success('Transação adicionada com sucesso!', 'Sucesso');
-        const selectedCategory = this.categories.find(c => c.id === this.newTransaction.categoryId);
+        const selectedCategory = this.categories.find(c => c.id === this.newTransaction.categoryId!);
         this.newTransaction = {
           description: '',
           amount: 0,
           originalAmount: 0,
           transactionType: TransactionType.Expense,
           date: new Date(),
-          categoryId: this.categories.length > 0 ? this.categories[0].id : 0,
+          categoryId: this.categories.length > 0 ? this.categories[0].id! : 0,
           userId: this.newTransaction.userId
         };
         this.loadTransactions();

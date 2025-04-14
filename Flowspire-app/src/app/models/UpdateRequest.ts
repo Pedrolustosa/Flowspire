@@ -7,6 +7,7 @@ export interface UpdateRequestWrapper {
 export interface UpdateRequest {
   firstName: string;
   lastName: string;
+  email: string;
   birthDate?: Date | string;
   gender: Gender;
   addressLine1?: string;

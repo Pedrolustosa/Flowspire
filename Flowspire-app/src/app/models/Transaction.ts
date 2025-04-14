@@ -27,10 +27,14 @@ export enum TransactionType {
 }
   
 export interface CategoryDTO {
-  id: number;
+  id?: number;
   name: string;
+  description?: string;
   userId: string;
+  isDefault?: boolean;
+  sortOrder?: number;
 }
+
   
 export interface FinancialReport {
   totalIncome: number;

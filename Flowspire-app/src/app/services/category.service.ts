@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import { CategoryDTO } from '../models/Transaction';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +12,23 @@ export class CategoryService {
 
   constructor(private http: HttpClient) {}
 
-  addCategory(categoryDto: CategoryDTO): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, categoryDto);
+  createCategory(category: CategoryDTO): Observable<CategoryDTO> {
+    return this.http.post<CategoryDTO>(`${this.apiUrl}`, category);
   }
 
-  getCategories(): Observable<CategoryDTO[]> {
+  getCategoryById(id: number): Observable<CategoryDTO> {
+    return this.http.get<CategoryDTO>(`${this.apiUrl}/${id}`);
+  }
+
+  getUserCategories(): Observable<CategoryDTO[]> {
     return this.http.get<CategoryDTO[]>(`${this.apiUrl}/user`);
   }
 
-  updateCategory(categoryDto: CategoryDTO): Observable<any> {
-    return this.http.put(`${this.apiUrl}`, categoryDto);
+  updateCategory(id: number, category: CategoryDTO): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, category);
+  }
+
+  deleteCategory(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

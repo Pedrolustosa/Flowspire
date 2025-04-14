@@ -1,51 +1,54 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Flowspire.Domain.Entities;
 using Flowspire.Infra.Data;
-using Microsoft.Data.Sqlite;
+using Flowspire.Domain.Interfaces;
 
 namespace Flowspire.Infra.Repositories;
+
 public class BudgetRepository(ApplicationDbContext context) : IBudgetRepository
 {
     private readonly ApplicationDbContext _context = context;
 
-    public async Task<Budget> AddAsync(Budget budget)
+    public async Task<Budget> GetByIdAsync(int id)
     {
-        try
-        {
-            _context.Budgets.Add(budget);
-            await _context.SaveChangesAsync();
-            return budget;
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao adicionar o orçamento ao banco de dados.", ex);
-        }
-        catch (SqliteException ex)
-        {
-            throw new Exception("Erro de conexão ou operação no SQLite ao adicionar orçamento.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao adicionar orçamento.", ex);
-        }
+        return await _context.Budgets.FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public async Task<List<Budget>> GetByUserIdAsync(string userId)
+    public async Task<IEnumerable<Budget>> GetAllAsync()
     {
-        try
-        {
-            return await _context.Budgets
-                .Where(b => b.UserId == userId)
-                .Include(b => b.Category)
-                .ToListAsync();
-        }
-        catch (SqliteException ex)
-        {
-            throw new Exception("Erro de conexão ou operação no SQLite ao recuperar orçamentos.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao recuperar orçamentos.", ex);
-        }
+        return await _context.Budgets.ToListAsync();
+    }
+
+    public async Task<IEnumerable<Budget>> GetByUserIdAsync(string userId)
+    {
+        return await _context.Budgets.Where(b => b.UserId == userId).ToListAsync();
+    }
+
+    public async Task AddAsync(Budget budget)
+    {
+        await _context.Budgets.AddAsync(budget);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Budget budget)
+    {
+        _context.Budgets.Update(budget);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Budget budget)
+    {
+        _context.Budgets.Remove(budget);
+        await _context.SaveChangesAsync();
+    }
+    public async Task<IEnumerable<Budget>> GetActiveBudgetsAsync(string userId, DateTime date)
+    {
+        return await _context.Budgets
+            .Where(b => b.UserId == userId && b.StartDate <= date && b.EndDate >= date)
+            .ToListAsync();
+    }
+    public async Task<Budget> GetBudgetByCategoryIdAsync(string userId, int categoryId)
+    {
+        return await _context.Budgets
+            .FirstOrDefaultAsync(b => b.UserId == userId && b.CategoryId == categoryId);
     }
 }
