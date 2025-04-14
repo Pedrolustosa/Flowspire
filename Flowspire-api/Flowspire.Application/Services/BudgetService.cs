@@ -1,80 +1,82 @@
-﻿using Flowspire.Application.Interfaces;
-using Flowspire.Domain.Entities;
-using Flowspire.Application.DTOs;
-using Microsoft.EntityFrameworkCore;
+﻿using Flowspire.Application.DTOs;
 using Flowspire.Domain.Interfaces;
+using Flowspire.Application.Interfaces;
 
 namespace Flowspire.Application.Services;
 
-public class BudgetService(IBudgetRepository budgetRepository, 
-                           IFinancialTransactionRepository transactionRepository) : IBudgetService
+public class BudgetService(IBudgetRepository budgetRepository) : IBudgetService
 {
     private readonly IBudgetRepository _budgetRepository = budgetRepository;
-    private readonly IFinancialTransactionRepository _transactionRepository = transactionRepository;
 
-    public async Task<BudgetDTO> AddBudgetAsync(BudgetDTO budgetDto)
+    public async Task<BudgetDTO> GetByIdAsync(int id)
     {
-        try
-        {
-            var budget = Budget.Create(budgetDto.CategoryId, budgetDto.Amount, budgetDto.StartDate, budgetDto.EndDate, budgetDto.UserId);
-            var addedBudget = await _budgetRepository.AddAsync(budget);
-            return new BudgetDTO
-            {
-                Id = addedBudget.Id,
-                CategoryId = addedBudget.CategoryId,
-                Amount = addedBudget.Amount,
-                StartDate = addedBudget.StartDate,
-                EndDate = addedBudget.EndDate,
-                UserId = addedBudget.UserId
-            };
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao adicionar o orçamento ao banco de dados.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao adicionar orçamento.", ex);
-        }
+        var budget = await _budgetRepository.GetByIdAsync(id);
+        return MapToDTO(budget);
     }
 
-    public async Task<List<BudgetDTO>> GetBudgetsByUserIdAsync(string userId)
+    public async Task<IEnumerable<BudgetDTO>> GetAllAsync()
     {
-        try
-        {
-            var budgets = await _budgetRepository.GetByUserIdAsync(userId);
-            return budgets.Select(b => new BudgetDTO
-            {
-                Id = b.Id,
-                CategoryId = b.CategoryId,
-                Amount = b.Amount,
-                StartDate = b.StartDate,
-                EndDate = b.EndDate,
-                UserId = b.UserId
-            }).ToList();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao recuperar orçamentos.", ex);
-        }
+        var budgets = await _budgetRepository.GetAllAsync();
+        return budgets.Select(b => MapToDTO(b)).ToList();
     }
 
-    public async Task CheckBudgetAndNotifyAsync(string userId, int categoryId, decimal transactionAmount)
+    public async Task<IEnumerable<BudgetDTO>> GetByUserIdAsync(string userId)
     {
-        try
-        {
-            var budgets = await _budgetRepository.GetByUserIdAsync(userId);
-            var budget = budgets.FirstOrDefault(b => b.CategoryId == categoryId && DateTime.UtcNow >= b.StartDate && DateTime.UtcNow <= b.EndDate);
-            if (budget == null) return;
+        var budgets = await _budgetRepository.GetByUserIdAsync(userId);
+        return budgets.Select(b => MapToDTO(b)).ToList();
+    }
 
-            var transactions = await _transactionRepository.GetByUserIdAsync(userId);
-            var totalSpent = transactions
-                .Where(t => t.CategoryId == categoryId && t.Date >= budget.StartDate && t.Date <= budget.EndDate)
-                .Sum(t => t.Amount) + transactionAmount;
-        }
-        catch (Exception ex)
+    public async Task CreateAsync(BudgetDTO budgetDTO)
+    {
+        var budget = Budget.Create(budgetDTO.Amount, budgetDTO.StartDate, budgetDTO.EndDate, budgetDTO.CategoryId, budgetDTO.UserId);
+        await _budgetRepository.AddAsync(budget);
+        budgetDTO.Id = budget.Id;
+    }
+
+    public async Task UpdateAsync(BudgetDTO budgetDTO)
+    {
+        var budget = await _budgetRepository.GetByIdAsync(budgetDTO.Id);
+        if (budget == null)
+            throw new Exception("Budget not found.");
+;
+        budget.Update(budgetDTO.Amount, budgetDTO.StartDate, budgetDTO.EndDate, budgetDTO.CategoryId);
+        await _budgetRepository.UpdateAsync(budget);
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var budget = await _budgetRepository.GetByIdAsync(id);
+        if (budget == null)
+            throw new Exception("Budget not found.");
+        await _budgetRepository.DeleteAsync(budget);
+    }
+
+    public async Task<IEnumerable<BudgetDTO>> GetActiveBudgetsAsync(string userId, DateTime date)
+    {
+        var budgets = await _budgetRepository.GetActiveBudgetsAsync(userId, date);
+        return budgets.Select(b => MapToDTO(b)).ToList();
+    }
+
+    public async Task<BudgetDTO> GetBudgetByCategoryIdAsync(string userId, int categoryId)
+    {
+        var budget = await _budgetRepository.GetBudgetByCategoryIdAsync(userId, categoryId);
+        return MapToDTO(budget);
+    }
+
+    private BudgetDTO MapToDTO(Budget budget)
+    {
+        if (budget == null)
+            return null;
+
+        return new BudgetDTO
         {
-            throw new Exception("Erro inesperado ao verificar orçamento e enviar notificação.", ex);
-        }
+            Id = budget.Id,
+            Amount = budget.Amount,
+            StartDate = budget.StartDate,
+            EndDate = budget.EndDate,
+            CategoryId = budget.CategoryId,
+            UserId = budget.UserId,
+            CategoryName = budget.Category != null ? budget.Category.Name : string.Empty
+        };
     }
 }

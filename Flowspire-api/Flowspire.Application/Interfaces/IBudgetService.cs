@@ -1,16 +1,15 @@
 ﻿using Flowspire.Application.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Flowspire.Application.Interfaces
+namespace Flowspire.Application.Interfaces;
+
+public interface IBudgetService
 {
-    public interface IBudgetService
-    {
-        Task<BudgetDTO> AddBudgetAsync(BudgetDTO budgetDto);
-        Task<List<BudgetDTO>> GetBudgetsByUserIdAsync(string userId);
-        Task CheckBudgetAndNotifyAsync(string userId, int categoryId, decimal transactionAmount);
-    }
+    Task<BudgetDTO> GetByIdAsync(int id);
+    Task<IEnumerable<BudgetDTO>> GetAllAsync();
+    Task<IEnumerable<BudgetDTO>> GetByUserIdAsync(string userId);
+    Task CreateAsync(BudgetDTO budgetDTO);
+    Task UpdateAsync(BudgetDTO budgetDTO);
+    Task DeleteAsync(int id);
+    Task<IEnumerable<BudgetDTO>> GetActiveBudgetsAsync(string userId, DateTime date);
+    Task<BudgetDTO> GetBudgetByCategoryIdAsync(string userId, int categoryId);
 }

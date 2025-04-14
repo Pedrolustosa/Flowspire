@@ -2,8 +2,6 @@
 using Flowspire.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 
 namespace Flowspire.Infra.Data;
 
@@ -29,7 +27,6 @@ public static class DatabaseSeeder
 
     private static void SeedUsersAndRoles(ModelBuilder builder, PasswordHasher<User> hasher)
     {
-        // Define fixed GUIDs for seeded users
         var adminId = "550e8400-e29b-41d4-a716-446655440001";
         var advisor1Id = "550e8400-e29b-41d4-a716-446655440002";
         var advisor2Id = "550e8400-e29b-41d4-a716-446655440003";
@@ -37,10 +34,8 @@ public static class DatabaseSeeder
         var customer2Id = "550e8400-e29b-41d4-a716-446655440005";
         var customer3Id = "550e8400-e29b-41d4-a716-446655440006";
 
-        // Choose a fixed DateTime (e.g., January 1, 2023 in UTC)
         var seedDate = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        // Seed Users with all required properties
         builder.Entity<User>().HasData(
             new
             {
@@ -212,7 +207,6 @@ public static class DatabaseSeeder
             }
         );
 
-        // Define Role IDs and seed them along with the user roles
         var adminRoleId = "660e8400-e29b-41d4-a716-446655440001";
         var advisorRoleId = "660e8400-e29b-41d4-a716-446655440002";
         var customerRoleId = "660e8400-e29b-41d4-a716-446655440003";
@@ -236,19 +230,141 @@ public static class DatabaseSeeder
 
     private static void SeedCategories(ModelBuilder builder)
     {
+        var seedDate = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         builder.Entity<Category>().HasData(
-            new { Id = 1, Name = "Food", UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 2, Name = "Transport", UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 3, Name = "Health", UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 4, Name = "Housing", UserId = "550e8400-e29b-41d4-a716-446655440004" },
-            new { Id = 5, Name = "Leisure", UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 6, Name = "Education", UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 7, Name = "Clothing", UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 8, Name = "Food", UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 9, Name = "Technology", UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 10, Name = "Leisure", UserId = "550e8400-e29b-41d4-a716-446655440006" },
-            new { Id = 11, Name = "Health", UserId = "550e8400-e29b-41d4-a716-446655440005" },
-            new { Id = 12, Name = "Education", UserId = "550e8400-e29b-41d4-a716-446655440006" }
+            new
+            {
+                Id = 1,
+                Name = "Food",
+                Description = "Despesas com alimentação e supermercado",
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                IsDefault = true,
+                SortOrder = 1,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 2,
+                Name = "Transport",
+                Description = "Despesas com transporte, combustível e ônibus",
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                IsDefault = true,
+                SortOrder = 2,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 3,
+                Name = "Health",
+                Description = "Despesas médicas e de saúde",
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                IsDefault = true,
+                SortOrder = 3,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 4,
+                Name = "Housing",
+                Description = "Despesas com moradia, aluguel e utilities",
+                UserId = "550e8400-e29b-41d4-a716-446655440004",
+                IsDefault = true,
+                SortOrder = 4,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 5,
+                Name = "Leisure",
+                Description = "Entretenimento, restaurantes e lazer",
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                IsDefault = false,
+                SortOrder = 1,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 6,
+                Name = "Education",
+                Description = "Cursos, livros e despesas educacionais",
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                IsDefault = false,
+                SortOrder = 2,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 7,
+                Name = "Clothing",
+                Description = "Roupas e acessórios",
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                IsDefault = false,
+                SortOrder = 3,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 8,
+                Name = "Food",
+                Description = "Despesas com alimentação para outros clientes",
+                UserId = "550e8400-e29b-41d4-a716-446655440006",
+                IsDefault = true,
+                SortOrder = 1,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 9,
+                Name = "Technology",
+                Description = "Gastos com gadgets, assinaturas e tecnologia",
+                UserId = "550e8400-e29b-41d4-a716-446655440006",
+                IsDefault = false,
+                SortOrder = 2,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 10,
+                Name = "Leisure",
+                Description = "Despesas com lazer, viagens e entretenimento",
+                UserId = "550e8400-e29b-41d4-a716-446655440006",
+                IsDefault = false,
+                SortOrder = 3,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 11,
+                Name = "Health",
+                Description = "Despesas com saúde, academia e consultas",
+                UserId = "550e8400-e29b-41d4-a716-446655440005",
+                IsDefault = true,
+                SortOrder = 4,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            },
+            new
+            {
+                Id = 12,
+                Name = "Education",
+                Description = "Investimentos em educação e cursos",
+                UserId = "550e8400-e29b-41d4-a716-446655440006",
+                IsDefault = true,
+                SortOrder = 4,
+                CreatedAt = seedDate,
+                UpdatedAt = seedDate
+            }
         );
     }
 
@@ -257,7 +373,6 @@ public static class DatabaseSeeder
         var now = DateTime.UtcNow;
 
         builder.Entity<FinancialTransaction>().HasData(
-            // customer1
             new
             {
                 Id = 1,
@@ -410,7 +525,6 @@ public static class DatabaseSeeder
                 CreatedAt = new DateTime(2025, 3, 8),
                 UpdatedAt = new DateTime(2025, 3, 8)
             },
-            // customer2
             new
             {
                 Id = 20,
@@ -506,7 +620,6 @@ public static class DatabaseSeeder
                 CreatedAt = new DateTime(2025, 2, 1),
                 UpdatedAt = new DateTime(2025, 2, 1)
             },
-            // customer3
             new
             {
                 Id = 35,
@@ -592,16 +705,13 @@ public static class DatabaseSeeder
         var now = DateTime.UtcNow;
 
         builder.Entity<Budget>().HasData(
-            // customer1
             new { Id = 10, CategoryId = 1, Amount = 500.00m, StartDate = now.AddMonths(-2), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
             new { Id = 11, CategoryId = 2, Amount = 120.00m, StartDate = now.AddMonths(-2), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440004" },
             new { Id = 12, CategoryId = 5, Amount = 100.00m, StartDate = now.AddMonths(-1), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440004" },
 
-            // customer2
             new { Id = 13, CategoryId = 6, Amount = 600.00m, StartDate = now.AddMonths(-2), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440005" },
             new { Id = 14, CategoryId = 3, Amount = 200.00m, StartDate = now.AddMonths(-3), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440005" },
 
-            // customer3
             new { Id = 15, CategoryId = 9, Amount = 3000.00m, StartDate = now.AddMonths(-4), EndDate = now.AddMonths(2), UserId = "550e8400-e29b-41d4-a716-446655440006" },
             new { Id = 16, CategoryId = 10, Amount = 200.00m, StartDate = now.AddMonths(-1), EndDate = now.AddMonths(3), UserId = "550e8400-e29b-41d4-a716-446655440006" }
         );

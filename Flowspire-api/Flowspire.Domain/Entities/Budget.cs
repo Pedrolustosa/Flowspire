@@ -13,26 +13,39 @@ public class Budget
 
     private Budget() { }
 
-    public static Budget Create(int categoryId, decimal amount, DateTime startDate, DateTime endDate, string userId)
+    public static Budget Create(decimal amount, DateTime startDate, DateTime endDate, int categoryId, string userId)
     {
-        if (categoryId <= 0) throw new ArgumentException("Categoria inválida.");
-        if (amount <= 0) throw new ArgumentException("O valor do orçamento deve ser positivo.");
-        if (startDate >= endDate) throw new ArgumentException("Data inicial deve ser anterior à final.");
-        if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("UserId é obrigatório.");
+        if (amount <= 0)
+            throw new ArgumentException("Amount must be positive.", nameof(amount));
+        if (startDate >= endDate)
+            throw new ArgumentException("Start date must be before end date.", nameof(startDate));
+        if (categoryId <= 0)
+            throw new ArgumentException("Invalid category.", nameof(categoryId));
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ArgumentException("UserId is required.", nameof(userId));
 
         return new Budget
         {
-            CategoryId = categoryId,
             Amount = amount,
             StartDate = startDate,
             EndDate = endDate,
+            CategoryId = categoryId,
             UserId = userId
         };
     }
 
-    public void Update(decimal amount)
+    public void Update(decimal amount, DateTime startDate, DateTime endDate, int categoryId)
     {
-        if (amount <= 0) throw new ArgumentException("O valor do orçamento deve ser positivo.");
+        if (amount <= 0)
+            throw new ArgumentException("Amount must be positive.", nameof(amount));
+        if (startDate >= endDate)
+            throw new ArgumentException("Start date must be before end date.", nameof(startDate));
+        if (categoryId <= 0)
+            throw new ArgumentException("Invalid category.", nameof(categoryId));
+
         Amount = amount;
+        StartDate = startDate;
+        EndDate = endDate;
+        CategoryId = categoryId;
     }
 }

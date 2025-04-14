@@ -12,6 +12,7 @@
   </div>
 
   <div class="row g-4">
+    <!-- Formulário de Categoria -->
     <div class="col-12 col-lg-4">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-white border-bottom border-light py-3">
@@ -21,7 +22,8 @@
           </h5>
         </div>
         <div class="card-body">
-          <form (ngSubmit)="addOrUpdateCategory()" #categoryForm="ngForm" class="needs-validation" novalidate>
+          <form [formGroup]="categoryForm" (ngSubmit)="addOrUpdateCategory()" novalidate class="needs-validation">
+            <!-- Nome da Categoria -->
             <div class="mb-4">
               <label for="name" class="form-label">Nome da Categoria</label>
               <div class="input-group">
@@ -30,37 +32,71 @@
                 </span>
                 <input
                   type="text"
-                  class="form-control border-start-0 ps-0"
                   id="name"
-                  name="name"
-                  [(ngModel)]="newCategory.name"
-                  required
-                  minlength="3"
-                  #nameInput="ngModel"
+                  class="form-control border-start-0 ps-0"
+                  formControlName="name"
                   placeholder="Digite o nome da categoria"
-                  [class.is-invalid]="nameInput.invalid && (nameInput.dirty || nameInput.touched)"
+                  [class.is-invalid]="categoryForm.get('name')?.invalid && (categoryForm.get('name')?.dirty || categoryForm.get('name')?.touched)"
                 />
-                <div class="invalid-feedback" *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
-                  <div *ngIf="nameInput.errors?.['required']">Nome da categoria é obrigatório</div>
-                  <div *ngIf="nameInput.errors?.['minlength']">Nome deve ter pelo menos 3 caracteres</div>
+                <div class="invalid-feedback" *ngIf="categoryForm.get('name')?.invalid && (categoryForm.get('name')?.dirty || categoryForm.get('name')?.touched)">
+                  <div *ngIf="categoryForm.get('name')?.errors?.['required']">Nome da categoria é obrigatório</div>
+                  <div *ngIf="categoryForm.get('name')?.errors?.['minlength']">Nome deve ter pelo menos 3 caracteres</div>
                 </div>
               </div>
             </div>
 
+            <!-- Descrição da Categoria -->
+            <div class="mb-4">
+              <label for="description" class="form-label">Descrição da Categoria</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fa-solid fa-info-circle"></i>
+                </span>
+                <input
+                  type="text"
+                  id="description"
+                  class="form-control border-start-0 ps-0"
+                  formControlName="description"
+                  placeholder="Digite a descrição da categoria"
+                />
+              </div>
+            </div>
+
+            <!-- Checkbox Categoria Padrão -->
+            <div class="form-check mb-4">
+              <input
+                type="checkbox"
+                id="isDefault"
+                class="form-check-input"
+                formControlName="isDefault"
+              />
+              <label for="isDefault" class="form-check-label">Categoria Padrão</label>
+            </div>
+
+            <!-- Ordem de Exibição -->
+            <div class="mb-4">
+              <label for="sortOrder" class="form-label">Ordem de Exibição</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                  <i class="fa-solid fa-sort-numeric-up"></i>
+                </span>
+                <input
+                  type="number"
+                  id="sortOrder"
+                  class="form-control border-start-0 ps-0"
+                  formControlName="sortOrder"
+                  placeholder="Digite a ordem de exibição"
+                />
+              </div>
+            </div>
+
+            <!-- Botões de Ação -->
             <div class="d-grid gap-2">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                [disabled]="!categoryForm.form.valid"
-              >
+              <button type="submit" class="btn btn-primary" [disabled]="!categoryForm.valid">
                 <i class="fa-solid" [class.fa-plus]="!isEditing" [class.fa-check]="isEditing"></i>
                 {{ isEditing ? 'Atualizar' : 'Adicionar' }}
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                (click)="resetForm()"
-              >
+              <button type="button" class="btn btn-outline-secondary" (click)="resetForm()">
                 <i class="fa-solid fa-xmark"></i> Cancelar
               </button>
             </div>
@@ -69,6 +105,7 @@
       </div>
     </div>
 
+    <!-- Lista de Categorias -->
     <div class="col-12 col-lg-8">
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom border-light py-3 d-flex justify-content-between align-items-center">
@@ -85,13 +122,12 @@
               <thead class="table-light">
                 <tr>
                   <th class="border-0 px-4">Nome</th>
+                  <th class="border-0 px-4">Descrição</th>
                   <th class="border-0 px-4 text-end">Ações</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let category of categories; let i = index" 
-                    class="category-row"
-                    [class.table-active]="isEditing && category.id === newCategory.id">
+                <tr *ngFor="let category of categories" [class.table-active]="isEditing && category.id === selectedCategoryId">
                   <td class="px-4">
                     <div class="d-flex align-items-center">
                       <span class="category-icon rounded-circle bg-light p-2 me-3">
@@ -100,19 +136,18 @@
                       {{ category.name }}
                     </div>
                   </td>
+                  <td class="px-4">
+                    {{ category.description }}
+                  </td>
                   <td class="px-4 text-end">
-                    <button
-                      (click)="editCategory(category)"
-                      class="btn btn-sm btn-outline-warning me-2"
-                      [class.active]="isEditing && category.id === newCategory.id"
-                    >
+                    <button (click)="editCategory(category)" class="btn btn-sm btn-outline-warning me-2">
                       <i class="fa-solid fa-pen"></i>
                       <span class="d-none d-sm-inline ms-1">Editar</span>
                     </button>
                   </td>
                 </tr>
                 <tr *ngIf="categories.length === 0">
-                  <td colspan="2" class="text-center py-5">
+                  <td colspan="3" class="text-center py-5">
                     <div class="text-muted">
                       <span class="display-4 d-block mb-3 text-info opacity-75">
                         <i class="fa-solid fa-folder-plus"></i>
