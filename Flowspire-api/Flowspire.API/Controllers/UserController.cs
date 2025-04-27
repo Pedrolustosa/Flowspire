@@ -2,25 +2,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Flowspire.Application.Interfaces;
 using Flowspire.Domain.Enums;
-using System.Security.Claims;
 using Flowspire.API.Models;
+using Flowspire.API.Common;
+using Flowspire.Application.Common;
 
 namespace Flowspire.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController(IUserService userService) : ControllerBase
+    public class UserController(IUserService userService, ILogger<UserController> logger) : ControllerBase
     {
         private readonly IUserService _userService = userService;
+        private readonly ILogger<UserController> _logger = logger;
 
         [HttpPost("register")]
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
-                var requestingUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
+                var requestingUserId = User.GetUserId();
                 var userDto = await _userService.RegisterUserAsync(
                     request.Email,
                     request.FirstName,
@@ -38,22 +38,12 @@ namespace Flowspire.API.Controllers
                     request.Role,
                     requestingUserId);
 
-                return Ok(new { Message = "User registered successfully", User = userDto });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Forbid(ex.Message);
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+                return userDto;
+            }, _logger, this, SuccessMessages.UserRegistered);
 
         [HttpPost("register-customer")]
         public async Task<IActionResult> RegisterCustomer([FromBody] RegisterCustomerRequest request)
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
                 var userDto = await _userService.RegisterUserAsync(
                     request.Email,
@@ -71,52 +61,53 @@ namespace Flowspire.API.Controllers
                     request.PostalCode,
                     UserRole.Customer);
 
-                return Ok(new { Message = "User registered successfully", User = userDto });
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+                return userDto;
+            }, _logger, this, SuccessMessages.CustomerRegistered);
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
                 var (accessToken, refreshToken) = await _userService.LoginUserAsync(request.Email, request.Password);
-                return Ok(new { Message = "Login successful", AccessToken = accessToken, RefreshToken = refreshToken });
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+
+                Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddHours(8)
+                });
+
+                var tokenResponse = new
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                };
+
+                return tokenResponse;
+            }, _logger, this, SuccessMessages.LoginSuccessful);
 
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
                 var (accessToken, refreshToken) = await _userService.RefreshTokenAsync(request.RefreshToken);
-                return Ok(new { AccessToken = accessToken, RefreshToken = refreshToken });
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+
+                var tokenResponse = new
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                };
+
+                return tokenResponse;
+            }, _logger, this, SuccessMessages.TokenRefreshed);
 
         [Authorize]
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] UpdateRequestWrapper requestWrapper)
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId))
-                    return Unauthorized();
-
+                var userId = User.GetUserId();
                 var updatedUserDto = await _userService.UpdateUserAsync(
                     userId,
                     requestWrapper.Request.FirstName,
@@ -131,84 +122,42 @@ namespace Flowspire.API.Controllers
                     requestWrapper.Request.PostalCode,
                     requestWrapper.Request.Roles);
 
-                return Ok(new { Message = "User updated successfully", User = updatedUserDto });
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+                return updatedUserDto;
+            }, _logger, this, SuccessMessages.UserUpdated);
 
         [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUser()
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId))
-                    return Unauthorized();
-
+                var userId = User.GetUserId();
                 var userDto = await _userService.GetCurrentUserAsync(userId);
-                return Ok(userDto);
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+                return userDto;
+            }, _logger, this, SuccessMessages.CurrentUserRetrieved);
 
         [HttpPost("assign")]
         public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest request)
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
                 await _userService.AssignRoleAsync(request.UserId, request.Role);
-                return Ok(new { Message = $"Role {request.Role} assigned to user {request.UserId} successfully." });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { Error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+            }, _logger, this, SuccessMessages.RoleAssigned);
 
         [HttpPost("remove")]
         public async Task<IActionResult> RemoveRole([FromBody] RemoveRoleRequest request)
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
                 await _userService.RemoveRoleAsync(request.UserId, request.Role);
-                return Ok(new { Message = $"Role {request.Role} removed from user {request.UserId} successfully." });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { Error = ex.Message });
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+            }, _logger, this, SuccessMessages.RoleRemoved);
 
         [HttpGet("users/{roleName}")]
         public async Task<IActionResult> GetUsersByRole(string roleName)
-        {
-            try
+            => await ControllerHelper.ExecuteAsync(async () =>
             {
-                if (!System.Enum.TryParse<UserRole>(roleName, true, out var role))
-                    return BadRequest(new { Error = "Invalid role." });
+                if (!Enum.TryParse<UserRole>(roleName, true, out var role))
+                    throw new ArgumentException(ErrorMessages.RoleNotFound);
 
                 var users = await _userService.GetUsersByRoleAsync(role);
-                return Ok(users);
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
+                return users;
+            }, _logger, this, SuccessMessages.UsersByRoleRetrieved);
     }
 }

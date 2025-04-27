@@ -49,6 +49,8 @@ public static class DependencyInjection
         services.AddScoped<IAdvisorCustomerService, AdvisorCustomerService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
         services.AddSignalR();
 

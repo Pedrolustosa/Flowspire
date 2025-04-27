@@ -20,7 +20,7 @@ public interface IUserService
         string? country,
         string? postalCode,
         UserRole role,
-        string requestingUserId = null);
+        string? requestingUserId = null);
 
     Task<(string AccessToken, string RefreshToken)> LoginUserAsync(string email, string password);
     Task<(string AccessToken, string RefreshToken)> RefreshTokenAsync(string refreshToken);
@@ -37,7 +37,7 @@ public interface IUserService
         string? state,
         string? country,
         string? postalCode,
-        List<UserRole> roles = null);
+        List<UserRole>? roles = null);
     Task AssignRoleAsync(string userId, UserRole role);
     Task RemoveRoleAsync(string userId, UserRole role);
     Task<List<UserDTO>> GetUsersByRoleAsync(UserRole role);

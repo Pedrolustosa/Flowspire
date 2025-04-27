@@ -4,8 +4,8 @@ namespace Flowspire.Domain.Interfaces;
 
 public interface IUserRepository
 {
-    Task<User> FindByIdAsync(string id);
-    Task<User> FindByEmailAsync(string email);
+    Task<User?> FindByIdAsync(string id);
+    Task<User?> FindByEmailAsync(string email);
     Task<IdentityResult> CreateAsync(User user, string password);
     Task<IdentityResult> UpdateAsync(User user);
     Task AddToRoleAsync(User user, string role);
