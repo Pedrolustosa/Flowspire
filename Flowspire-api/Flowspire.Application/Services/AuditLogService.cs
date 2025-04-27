@@ -5,57 +5,60 @@ using Flowspire.Application.Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
-namespace Flowspire.Application.Services
+namespace Flowspire.Application.Services;
+
+public class AuditLogService(IAuditLogRepository auditLogRepository, ILogger<AuditLogService> logger) : IAuditLogService
 {
-    public class AuditLogService(IAuditLogRepository auditLogRepository, ILogger<AuditLogService> logger) : IAuditLogService
+    private readonly IAuditLogRepository _auditLogRepository = auditLogRepository;
+    private readonly ILogger<AuditLogService> _logger = logger;
+
+    public async Task<PagedResult<AuditLogDTO>> GetAuditLogsAsync(PaginationQuery paginationQuery)
     {
-        private readonly IAuditLogRepository _auditLogRepository = auditLogRepository;
-        private readonly ILogger<AuditLogService> _logger = logger;
-
-        public async Task<PagedResult<AuditLogDTO>> GetAuditLogsAsync(PaginationQuery paginationQuery)
+        return await ServiceHelper.ExecuteAsync(async () =>
         {
-            return await ServiceHelper.ExecuteAsync(async () =>
-            {
-                var query = _auditLogRepository.Query();
+            var query = _auditLogRepository.Query();
 
-                var totalCount = await query.CountAsync();
+            var totalCount = await query.CountAsync();
 
-                var logs = await query
-                    .OrderByDescending(x => x.Timestamp)
-                    .Skip((paginationQuery.Page - 1) * paginationQuery.PageSize)
-                    .Take(paginationQuery.PageSize)
-                    .Select(log => new AuditLogDTO
-                    {
-                        Id = log.Id,
-                        UserId = log.UserId,
-                        IpAddress = log.IpAddress,
-                        Method = log.Method,
-                        Path = log.Path,
-                        StatusCode = log.StatusCode,
-                        ExecutionTimeMs = log.ExecutionTimeMs,
-                        Timestamp = log.Timestamp
-                    })
-                    .ToListAsync();
-
-                return new PagedResult<AuditLogDTO>
+            var logs = await query
+                .OrderByDescending(x => x.Timestamp)
+                .Skip((paginationQuery.Page - 1) * paginationQuery.PageSize)
+                .Take(paginationQuery.PageSize)
+                .Select(log => new AuditLogDTO
                 {
-                    Data = logs,
-                    TotalCount = totalCount
-                };
-            }, _logger, nameof(GetAuditLogsAsync));
-        }
+                    Id = log.Id,
+                    UserId = log.UserId,
+                    IpAddress = log.IpAddress,
+                    Method = log.Method,
+                    Path = log.Path,
+                    StatusCode = log.StatusCode,
+                    ExecutionTimeMs = log.ExecutionTimeMs,
+                    Timestamp = log.Timestamp
+                })
+                .ToListAsync();
 
-        public async Task CleanupOldLogsAsync()
-        {
-            await ServiceHelper.ExecuteAsync(async () =>
+            if (logs.Count == 0)
+                throw new Exception(ErrorMessages.NoAuditLogsFound);
+
+            _logger.LogInformation(SuccessMessages.AuditLogsRetrieved);
+
+            return new PagedResult<AuditLogDTO>
             {
-                var cutoffDate = DateTime.UtcNow.AddDays(-30);
+                Data = logs,
+                TotalCount = totalCount
+            };
+        }, _logger, nameof(GetAuditLogsAsync));
+    }
 
-                await _auditLogRepository.DeleteLogsOlderThanAsync(cutoffDate);
+    public async Task CleanupOldLogsAsync()
+    {
+        await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-30);
 
-                _logger.LogInformation("Audit logs older than {CutoffDate} have been deleted.", cutoffDate);
-            }, _logger, nameof(CleanupOldLogsAsync));
-        }
+            await _auditLogRepository.DeleteLogsOlderThanAsync(cutoffDate);
 
+            _logger.LogInformation(SuccessMessages.AuditLogsCleaned, cutoffDate);
+        }, _logger, nameof(CleanupOldLogsAsync));
     }
 }
