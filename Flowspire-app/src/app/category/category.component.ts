@@ -36,7 +36,7 @@ export class CategoryComponent implements OnInit {
       this.categoryForm.patchValue({ userId: user.id });
     } else {
       this.authService.getCurrentUser().subscribe({
-        next: (user) => this.categoryForm.patchValue({ userId: user.id }),
+        next: (user) => this.categoryForm.patchValue({ userId: user.data.id }),
         error: () => this.toastr.error('Erro ao buscar usuário atual.', 'Erro')
       });
     }

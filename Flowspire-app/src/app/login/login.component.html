@@ -14,7 +14,10 @@
           <button type="submit" class="btn btn-primary w-100">Entrar</button>
         </form>
         <p class="text-center mt-3">
-          Não tem uma conta? <a routerLink="['/register']" class="text-primary">Registre-se</a>
+          Don't have an account yet?
+          <button class="btn btn-link text-primary p-0 align-baseline" (click)="navigateToRegister()">
+            Register
+          </button>
         </p>
       </div>
     </div>

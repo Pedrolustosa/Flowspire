@@ -11,11 +11,13 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { RegisterCustomerRequest } from '../models/RegisterCustomerRequest';
 import { NgIf } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, NgIf],
+  imports: [ReactiveFormsModule, BsDatepickerModule, NgIf],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -25,8 +27,9 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private toastr: ToastrService
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
@@ -39,10 +42,10 @@ export class RegisterComponent implements OnInit {
         lastName: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         phoneNumber: ['', Validators.required],
-        birthDate: ['', Validators.required],
+        birthDate: [null, Validators.required],
         gender: ['', Validators.required],
         addressLine1: ['', Validators.required],
-        addressLine2: [''], // Optional
+        addressLine2: [''],
         city: ['', Validators.required],
         state: ['', Validators.required],
         country: ['', Validators.required],
@@ -54,7 +57,6 @@ export class RegisterComponent implements OnInit {
     );
   }
 
-  // Custom validator to ensure password and confirmPassword match
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
     const confirmPassword = control.get('confirmPassword')?.value;
@@ -62,7 +64,6 @@ export class RegisterComponent implements OnInit {
       control.get('confirmPassword')?.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     } else {
-      // Remove passwordMismatch error if passwords match
       const errors = control.get('confirmPassword')?.errors;
       if (errors) {
         delete errors['passwordMismatch'];
@@ -79,17 +80,56 @@ export class RegisterComponent implements OnInit {
     if (this.registerForm.invalid) {
       return;
     }
-    // Destructure form value to remove confirmPassword
+
     const { confirmPassword, ...payload } = this.registerForm.value;
-    // Now payload conforms to RegisterCustomerRequest interface
-    this.authService.register(payload as RegisterCustomerRequest).subscribe({
+    const birthDateFormatted = this.convertDateToIsoString(payload.birthDate);
+
+    const registerRequest: RegisterCustomerRequest = {
+      ...payload,
+      birthDate: birthDateFormatted,
+      gender: this.convertGender(payload.gender)
+    };
+
+    this.authService.register(registerRequest).subscribe({
       next: (response) => {
-        alert(response.Message);
-        this.router.navigate(['/login']);
+        if (response.success) {
+          this.toastr.success(response.message);
+          this.router.navigate(['/login']);
+        } else if (response.errors && Array.isArray(response.errors)) {
+          response.errors.forEach(error => this.toastr.error(error));
+        }
       },
       error: (err) => {
-        alert('Registration error: ' + (err.error?.Error || 'Please try again.'));
+        if (err.error?.errors && Array.isArray(err.error.errors)) {
+          err.error.errors.forEach((error: string) => this.toastr.error(error));
+        }
       }
     });
+  }
+  navigateToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  private convertGender(gender: string): number {
+    switch (gender) {
+      case 'Male':
+        return 0;
+      case 'Female':
+        return 1;
+      case 'NotSpecified':
+        return 2;
+      default:
+        return 2;
+    }
+  }
+
+  private convertDateToIsoString(date: Date): string {
+    if (!date) return '';
+
+    const year = date.getFullYear().toString().padStart(4, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 }

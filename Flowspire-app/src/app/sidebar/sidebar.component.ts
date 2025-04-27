@@ -20,6 +20,7 @@ export class SidebarComponent {
     { icon: 'fas fa-tags', route: '/category', label: 'Categorias' },
     { icon: 'fas fa-comment-dots', route: '/chat', label: 'Chat' },
     { icon: 'fas fa-user', route: '/profile', label: 'Perfil' },
+    { icon: 'fas fa-file-alt', route: '/audit-logs', label: 'Audit Logs' }
   ];
 
   private authService = inject(AuthService);

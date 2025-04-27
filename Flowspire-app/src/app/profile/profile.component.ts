@@ -63,21 +63,21 @@ export class ProfileComponent implements OnInit {
     this.loadingService.setLoading(true);
     this.authService.getCurrentUser().subscribe({
       next: (user) => {
-        this.user = user;
+        this.user = user.data;
         this.profileForm.patchValue({
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          birthDate: user.birthDate ? new Date(user.birthDate).toISOString().slice(0, 10) : '',
-          gender: user.gender !== undefined ? user.gender : null,
-          addressLine1: user.addressLine1,
-          addressLine2: user.addressLine2,
-          city: user.city,
-          state: user.state,
-          country: user.country,
-          postalCode: user.postalCode,
-          roles: Array.isArray(user.roles)
-            ? user.roles.filter(role => this.roleOptions.some(option => option.id === role))
+          email: user.data.email,
+          firstName: user.data.firstName,
+          lastName: user.data.lastName,
+          birthDate: user.data.birthDate ? new Date(user.data.birthDate).toISOString().slice(0, 10) : '',
+          gender: user.data.gender !== undefined ? user.data.gender : null,
+          addressLine1: user.data.addressLine1,
+          addressLine2: user.data.addressLine2,
+          city: user.data.city,
+          state: user.data.state,
+          country: user.data.country,
+          postalCode: user.data.postalCode,
+          roles: Array.isArray(user.data.roles)
+            ? user.data.roles.filter(role => this.roleOptions.some(option => option.id === role))
             : []
         });
         this.loadingService.setLoading(false);

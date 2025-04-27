@@ -1,0 +1,167 @@
+<div class="container-fluid py-4">
+    <!-- Header simples -->
+    <div class="bg-light rounded-3 p-3 mb-4 border-start border-5 border-primary shadow-sm">
+        <h2 class="fw-bold mb-0 d-flex align-items-center">
+            <i class="fa-solid fa-list-check text-primary fs-3 me-3"></i>
+            <span>Audit Logs</span>
+        </h2>
+        <p class="text-muted mb-0 mt-2">Monitor system activities and user actions</p>
+    </div>
+
+    <!-- Table with logs -->
+    <div *ngIf="!loading && auditLogs.length > 0" class="card border-0 shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="auditLogsTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="fw-semibold text-nowrap px-3" style="width: 15%">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-user text-muted me-2"></i>
+                                User
+                                <button class="btn btn-sm py-0 px-1 text-muted">
+                                    <i class="fa-solid fa-sort"></i>
+                                </button>
+                            </div>
+                        </th>
+                        <th class="fw-semibold text-nowrap px-3" style="width: 25%">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-link text-muted me-2"></i>
+                                Path
+                                <button class="btn btn-sm py-0 px-1 text-muted">
+                                    <i class="fa-solid fa-sort"></i>
+                                </button>
+                            </div>
+                        </th>
+                        <th class="fw-semibold text-nowrap px-3" style="width: 10%">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-code text-muted me-2"></i>
+                                Status
+                                <button class="btn btn-sm py-0 px-1 text-muted">
+                                    <i class="fa-solid fa-sort"></i>
+                                </button>
+                            </div>
+                        </th>
+                        <th class="fw-semibold text-nowrap px-3" style="width: 10%">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-arrow-right-arrow-left text-muted me-2"></i>
+                                Method
+                                <button class="btn btn-sm py-0 px-1 text-muted">
+                                    <i class="fa-solid fa-sort"></i>
+                                </button>
+                            </div>
+                        </th>
+                        <th class="fw-semibold text-nowrap px-3" style="width: 10%">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-stopwatch text-muted me-2"></i>
+                                Time
+                                <button class="btn btn-sm py-0 px-1 text-muted">
+                                    <i class="fa-solid fa-sort"></i>
+                                </button>
+                            </div>
+                        </th>
+                        <th class="fw-semibold text-nowrap px-3" style="width: 20%">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-calendar-days text-muted me-2"></i>
+                                Date
+                                <button class="btn btn-sm py-0 px-1 text-muted">
+                                    <i class="fa-solid fa-sort"></i>
+                                </button>
+                            </div>
+                        </th>
+                        <th class="fw-semibold text-nowrap px-3 text-end" style="width: 10%">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let log of auditLogs" class="hover-row">
+                        <td class="px-3">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                    <i class="fa-solid fa-user text-primary"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">{{ log.userId || 'Anonymous' }}</div>
+                                    <small class="text-muted">{{ log.ipAddress || '-' }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-3 text-truncate" style="max-width: 200px;">{{ log.path }}</td>
+                        <td class="px-3">
+                            <span [ngClass]="{
+                                'badge bg-success': log.statusCode >= 200 && log.statusCode < 300,
+                                'badge bg-warning': log.statusCode >= 400 && log.statusCode < 500,
+                                'badge bg-danger': log.statusCode >= 500
+                            }" class="px-2 py-1">
+                                <i class="fa-solid" [ngClass]="{
+                                'fa-circle-check': log.statusCode >= 200 && log.statusCode < 300,
+                                'fa-triangle-exclamation': log.statusCode >= 400 && log.statusCode < 500,
+                                'fa-circle-xmark': log.statusCode >= 500
+                                }"></i>
+                                {{ log.statusCode }}
+                            </span>
+                        </td>
+                        <td class="px-3">
+                            <span class="badge px-2 py-1" [ngClass]="{
+                                'bg-primary': log.method === 'GET',
+                                'bg-success': log.method === 'POST',
+                                'bg-info': log.method === 'PUT',
+                                'bg-danger': log.method === 'DELETE',
+                                'bg-secondary': !['GET', 'POST', 'PUT', 'DELETE'].includes(log.method)
+                            }">
+                                {{ log.method }}
+                            </span>
+                        </td>
+                        <td class="px-3 text-nowrap">{{ log.executionTimeMs }} ms</td>
+                        <td class="px-3 text-nowrap">{{ log.timestamp | date: 'MMM d, y, h:mm a' }}</td>
+                        <td class="px-3 text-end">
+                            <span class="text-muted">{{ log.ipAddress || '-' }}</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted" *ngIf="auditLogs.length > 0">
+                    Showing <span class="fw-semibold">{{ auditLogs.length }}</span> items of <span class="fw-semibold">{{ auditLogs.length * totalPages }}</span> total
+                </small>
+
+                <div class="d-flex align-items-center">
+                    
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" [class.disabled]="currentPage === 1">
+                            <button class="page-link border-0 rounded" (click)="goToPage(currentPage - 1)">
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                        </li>
+
+                        <li class="page-item" *ngFor="let page of getDisplayedPages()" [class.active]="currentPage === page">
+                            <button class="page-link border-0 rounded" (click)="goToPage(page)">
+                                {{ page }}
+                            </button>
+                        </li>
+
+                        <li class="page-item" [class.disabled]="currentPage === totalPages">
+                            <button class="page-link border-0 rounded" (click)="goToPage(currentPage + 1)">
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && auditLogs.length === 0" class="card border-0 shadow-sm my-5">
+        <div class="card-body text-center py-5">
+            <div class="mb-4">
+                <i class="fa-solid fa-clipboard-list text-muted" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="fw-semibold mb-2">No Audit Logs Found</h4>
+            <p class="text-muted mb-4">There are no system activity logs to display at this time.</p>
+            <button class="btn btn-primary btn-sm px-4 py-2">
+                <i class="fa-solid fa-rotate me-2"></i> Refresh
+            </button>
+        </div>
+    </div>
+</div>
