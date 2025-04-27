@@ -14,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Budget> Budgets { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<AdvisorCustomer> AdvisorCustomers { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
