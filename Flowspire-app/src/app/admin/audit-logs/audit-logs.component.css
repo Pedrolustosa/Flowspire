@@ -1,0 +1,85 @@
+/* Estilos para tabela de auditoria */
+.table-hover tbody tr.hover-row:hover {
+  background-color: rgba(13, 110, 253, 0.04);
+  cursor: pointer;
+}
+
+/* Estilos para avatar e ícones */
+.avatar {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cabeçalho de tabela com estilo moderno */
+#auditLogsTable thead th {
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-top: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Linhas da tabela com bordas suaves */
+#auditLogsTable tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background-color 0.15s ease;
+}
+
+#auditLogsTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Estilo para badges */
+.badge {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Botões de ação mais discretos */
+.btn-link {
+  color: #6c757d;
+  transition: color 0.15s ease;
+}
+
+.btn-link:hover {
+  color: #0d6efd;
+}
+
+/* Estilos para cabeçalho fixo durante rolagem */
+.table-responsive {
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  /* Ajustes para telas menores */
+  .table-responsive {
+    max-height: calc(100vh - 250px);
+  }
+  
+  /* Botões de filtro em telas menores */
+  .btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Estilo para paginação */
+.pagination .page-link {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 2px;
+  color: #495057;
+  background-color: transparent;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #0d6efd;
+  color: white;
+}

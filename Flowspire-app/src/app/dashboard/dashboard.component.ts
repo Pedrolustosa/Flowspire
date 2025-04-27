@@ -90,7 +90,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     this.authService.getCurrentUser().subscribe(user => {
-      this.userName = user && user.firstName ? user.firstName : 'Usuário Anônimo';
+      this.userName = user.data && user.data.firstName ? user.data.firstName : 'Usuário Anônimo';
       this.cdr.detectChanges();
     });
   }

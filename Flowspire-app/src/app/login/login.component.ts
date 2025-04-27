@@ -17,20 +17,9 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.authService.login(this.loginRequest).subscribe({
-      next: (response) => {
-        if (response && response.accessToken) {
-          this.router.navigate(['/dashboard']).then(success => {
-          }).catch(err => {
-            console.error('Erro ao navegar para /dashboard:', err);
-          });
-        } else {
-          console.error('AccessToken não encontrado na resposta:', response);
-        }
-      },
-      error: (err) => {
-        console.error('Erro no login:', err);
-      }
-    });
+    this.authService.login(this.loginRequest).subscribe();
+  }
+  navigateToRegister(): void {
+    this.router.navigate(['/register']);
   }
 }
