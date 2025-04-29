@@ -1,32 +1,30 @@
 ﻿using Flowspire.Application.DTOs;
 using Flowspire.Application.Interfaces;
+using Flowspire.Application.Common;
 using Flowspire.Domain.Entities;
 using Flowspire.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Flowspire.Application.Services;
 
-public class MessageService : IMessageService
+public class MessageService(
+    IMessageRepository messageRepository,
+    INotificationService notificationService,
+    ILogger<MessageService> logger) : IMessageService
 {
-    private readonly IMessageRepository _messageRepository;
-    private readonly INotificationService _notificationService;
-
-    public MessageService(IMessageRepository messageRepository, INotificationService notificationService)
-    {
-        _messageRepository = messageRepository ?? throw new ArgumentNullException(nameof(messageRepository));
-        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
-    }
+    private readonly IMessageRepository _messageRepository = messageRepository;
+    private readonly INotificationService _notificationService = notificationService;
+    private readonly ILogger<MessageService> _logger = logger;
 
     public async Task<MessageDTO> SendMessageAsync(MessageDTO messageDto)
     {
-        try
+        return await ServiceHelper.ExecuteAsync(async () =>
         {
-            if (string.IsNullOrWhiteSpace(messageDto.SenderId) || string.IsNullOrWhiteSpace(messageDto.ReceiverId) || string.IsNullOrWhiteSpace(messageDto.Content))
+            if (string.IsNullOrWhiteSpace(messageDto.SenderId) ||
+                string.IsNullOrWhiteSpace(messageDto.ReceiverId) ||
+                string.IsNullOrWhiteSpace(messageDto.Content))
             {
-                throw new ArgumentException("SenderId, ReceiverId, and Content are required.");
+                throw new ArgumentException(ErrorMessages.InvalidMessageData);
             }
 
             var message = Message.Create(messageDto.SenderId, messageDto.ReceiverId, messageDto.Content);
@@ -43,28 +41,24 @@ public class MessageService : IMessageService
                 ReadAt = addedMessage.ReadAt
             };
 
-            // Notificar os usuários em tempo real
             await _notificationService.SendMessageAsync(messageToSend.SenderId, messageToSend.ReceiverId, messageToSend);
 
             return messageToSend;
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Unexpected error while sending message.", ex);
-        }
+        }, _logger, nameof(SendMessageAsync));
     }
 
     public async Task<List<MessageDTO>> GetMessagesAsync(string userId, string otherUserId)
     {
-        try
+        return await ServiceHelper.ExecuteAsync(async () =>
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(otherUserId))
             {
-                throw new ArgumentException("userId and otherUserId are required.");
+                throw new ArgumentException(ErrorMessages.InvalidUserId);
             }
 
             var messages = await _messageRepository.GetMessagesBetweenUsersAsync(userId, otherUserId);
-            var messageDtos = messages.Select(m => new MessageDTO
+
+            return messages.Select(m => new MessageDTO
             {
                 Id = m.Id,
                 SenderId = m.SenderId,
@@ -74,12 +68,6 @@ public class MessageService : IMessageService
                 IsRead = m.IsRead,
                 ReadAt = m.ReadAt
             }).ToList();
-
-            return messageDtos;
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Unexpected error while retrieving messages.", ex);
-        }
+        }, _logger, nameof(GetMessagesAsync));
     }
 }

@@ -2,16 +2,45 @@
 
 public static class ErrorMessages
 {
-    public const string UserNotFound = "User not found.";
-    public const string InvalidCredentials = "Invalid credentials.";
-    public const string UnauthorizedAccess = "Unauthorized access.";
-    public const string RoleNotFound = "Role not found.";
-    public const string RoleAlreadyAssigned = "User already has the specified role.";
-    public const string RoleNotAssigned = "User does not have the specified role.";
-    public const string RefreshTokenInvalidOrExpired = "Invalid or expired refresh token.";
-    public const string ValidationFailed = "Validation failed.";
+    // General
     public const string UnexpectedError = "An unexpected error occurred.";
-    public const string DatabaseSaveError = "Error saving data to the database.";
-    public const string DatabaseUpdateError = "Error updating data in the database.";
-    public const string NoAuditLogsFound = "No audit logs were found.";
+
+    // Dashboard
+    public const string InvalidTransactionType = "Type must be 'Expense' or 'Revenue'.";
+    public const string InvalidTransactionLimit = "Limit must be between 1 and 50.";
+
+    // User
+    public const string UserNotFound = "User not found.";
+    public const string UserAlreadyExists = "A user with this email already exists.";
+    public const string UserNotIdentified = "User not identified.";
+    public const string RoleNotFound = "Role not found.";
+    public const string InvalidCredentials = "Invalid email or password.";
+    public const string UnauthorizedRoleAssignment = "Unauthorized to assign this role.";
+    public const string UnauthorizedAction = "You are not authorized to perform this action.";
+
+    // Advisor
+    public const string ForbiddenAccess = "You do not have permission to access this resource.";
+
+    // Budget
+    public const string BudgetNotFound = "Budget not found.";
+    public const string BudgetIdMismatch = "The provided IDs do not match.";
+    public const string InvalidModelState = "Invalid data submitted.";
+
+    // Audit Log
+    public const string AuditLogNotFound = "Audit log not found.";
+    public const string NoAuditLogsFound = "Nenhum log de auditoria encontrado.";
+    public const string AuditLogRetrievalFailed = "Failed to retrieve audit logs.";
+
+    // Category
+    public const string CategoryNotFound = "Category not found.";
+    public const string IdMismatch = "The provided ID does not match the entity ID.";
+
+    // Transaction
+    public const string TransactionNotFound = "Transaction not found.";
+    public const string TransactionIdMismatch = "Transaction ID mismatch.";
+
+    // Message (Chat)
+    public const string InvalidMessageData = "ReceiverId and Content are required.";
+    public const string InvalidUserId = "OtherUserId is required.";
+    public const string UserNotAuthenticated = "User not authenticated.";
 }

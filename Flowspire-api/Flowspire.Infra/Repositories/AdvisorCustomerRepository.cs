@@ -1,71 +1,46 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Flowspire.Domain.Entities;
-using Flowspire.Infra.Data;
 using Flowspire.Domain.Interfaces;
-using Microsoft.Data.Sqlite;
+using Flowspire.Infra.Data;
+using Flowspire.Infra.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Flowspire.Infra.Repositories;
-public class AdvisorCustomerRepository(ApplicationDbContext context) : IAdvisorCustomerRepository
+
+public class AdvisorCustomerRepository(ApplicationDbContext context, ILogger<AdvisorCustomerRepository> logger) : IAdvisorCustomerRepository
 {
     private readonly ApplicationDbContext _context = context;
+    private readonly ILogger<AdvisorCustomerRepository> _logger = logger;
 
     public async Task<AdvisorCustomer> AddAsync(AdvisorCustomer advisorCustomer)
     {
-        try
+        return await RepositoryHelper.ExecuteAsync(async () =>
         {
             _context.AdvisorCustomers.Add(advisorCustomer);
             await _context.SaveChangesAsync();
             return advisorCustomer;
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new Exception("Erro ao adicionar a associação advisor-customer ao banco de dados.", ex);
-        }
-        catch (SqliteException ex)
-        {
-            throw new Exception("Erro de conexão ou operação no SQLite ao adicionar associação.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao adicionar associação advisor-customer.", ex);
-        }
+        }, _logger, nameof(AddAsync));
     }
 
     public async Task<List<AdvisorCustomer>> GetCustomersByAdvisorIdAsync(string advisorId)
     {
-        try
+        return await RepositoryHelper.ExecuteAsync(async () =>
         {
             return await _context.AdvisorCustomers
                 .Where(ac => ac.AdvisorId == advisorId)
                 .Include(ac => ac.Customer)
                 .ToListAsync();
-        }
-        catch (SqliteException ex)
-        {
-            throw new Exception("Erro de conexão ou operação no SQLite ao recuperar clientes do advisor.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao recuperar clientes do advisor.", ex);
-        }
+        }, _logger, nameof(GetCustomersByAdvisorIdAsync));
     }
 
     public async Task<List<AdvisorCustomer>> GetAdvisorsByCustomerIdAsync(string customerId)
     {
-        try
+        return await RepositoryHelper.ExecuteAsync(async () =>
         {
             return await _context.AdvisorCustomers
                 .Where(ac => ac.CustomerId == customerId)
                 .Include(ac => ac.Advisor)
                 .ToListAsync();
-        }
-        catch (SqliteException ex)
-        {
-            throw new Exception("Erro de conexão ou operação no SQLite ao recuperar advisors do cliente.", ex);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Erro inesperado ao recuperar advisors do cliente.", ex);
-        }
+        }, _logger, nameof(GetAdvisorsByCustomerIdAsync));
     }
 }
