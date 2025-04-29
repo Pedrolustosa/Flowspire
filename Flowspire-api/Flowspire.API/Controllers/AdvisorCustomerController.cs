@@ -2,66 +2,52 @@
 using Microsoft.AspNetCore.Mvc;
 using Flowspire.Application.Interfaces;
 using Flowspire.API.Models;
+using Flowspire.API.Common;
+using Flowspire.Application.Common;
+using System.Security.Claims;
 
 namespace Flowspire.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class AdvisorCustomerController(IAdvisorCustomerService advisorCustomerService) : ControllerBase
+public class AdvisorCustomerController(IAdvisorCustomerService advisorCustomerService, ILogger<AdvisorCustomerController> logger) : ControllerBase
 {
     private readonly IAdvisorCustomerService _advisorCustomerService = advisorCustomerService;
+    private readonly ILogger<AdvisorCustomerController> _logger = logger;
 
     [HttpPost("assign")]
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> AssignAdvisor([FromBody] AssignAdvisorRequest request)
-    {
-        try
+        => await ControllerHelper.ExecuteAsync(async () =>
         {
             var result = await _advisorCustomerService.AssignAdvisorAsync(request.AdvisorId, request.CustomerId);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
+            return result;
+        }, _logger, this, SuccessMessages.AdvisorAssigned);
 
     [HttpGet("advisor/{advisorId}/customers")]
-    [Authorize(Roles = "FinancialAdvisor, Administrator")]
+    [Authorize(Roles = "FinancialAdvisor,Administrator")]
     public async Task<IActionResult> GetCustomers(string advisorId)
-    {
-        try
+        => await ControllerHelper.ExecuteAsync(async () =>
         {
-            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUserId != advisorId && !User.IsInRole("Administrator"))
-                return Forbid();
+                throw new UnauthorizedAccessException(ErrorMessages.ForbiddenAccess);
 
             var customers = await _advisorCustomerService.GetCustomersByAdvisorIdAsync(advisorId);
-            return Ok(customers);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
+            return customers;
+        }, _logger, this, SuccessMessages.CustomersRetrievedByAdvisor);
 
     [HttpGet("customer/{customerId}/advisors")]
-    [Authorize(Roles = "Customer, Administrator")]
+    [Authorize(Roles = "Customer,Administrator")]
     public async Task<IActionResult> GetAdvisors(string customerId)
-    {
-        try
+        => await ControllerHelper.ExecuteAsync(async () =>
         {
-            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUserId != customerId && !User.IsInRole("Administrator"))
-                return Forbid();
+                throw new UnauthorizedAccessException(ErrorMessages.ForbiddenAccess);
 
             var advisors = await _advisorCustomerService.GetAdvisorsByCustomerIdAsync(customerId);
-            return Ok(advisors);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Error = ex.Message });
-        }
-    }
+            return advisors;
+        }, _logger, this, SuccessMessages.AdvisorsRetrievedByCustomer);
 }

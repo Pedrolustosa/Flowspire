@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Flowspire.Application.DTOs;
 using Flowspire.Application.Interfaces;
+using Flowspire.API.Common;
+using Flowspire.Application.Common;
 using System.Security.Claims;
 
 namespace Flowspire.API.Controllers;
@@ -9,61 +11,66 @@ namespace Flowspire.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class BudgetController(IBudgetService budgetService) : ControllerBase
+public class BudgetController(IBudgetService budgetService, ILogger<BudgetController> logger) : ControllerBase
 {
     private readonly IBudgetService _budgetService = budgetService;
+    private readonly ILogger<BudgetController> _logger = logger;
 
     [HttpPost]
     [Authorize(Roles = "Customer,FinancialAdvisor")]
     public async Task<IActionResult> CreateBudget([FromBody] BudgetDTO budgetDTO)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        => await ControllerHelper.ExecuteAsync(async () =>
+        {
+            if (!ModelState.IsValid)
+                throw new ArgumentException(ErrorMessages.InvalidModelState);
 
-        await _budgetService.CreateAsync(budgetDTO);
-        return CreatedAtAction(nameof(GetBudgetById), new { id = budgetDTO.Id }, budgetDTO);
-    }
+            await _budgetService.CreateAsync(budgetDTO);
+        }, _logger, this, SuccessMessages.BudgetCreated);
 
     [HttpGet("{id}")]
     [Authorize(Roles = "Customer,FinancialAdvisor,Administrator")]
     public async Task<IActionResult> GetBudgetById(int id)
-    {
-        var budget = await _budgetService.GetByIdAsync(id);
-        if (budget == null)
-            return NotFound("Budget not found.");
-        return Ok(budget);
-    }
+        => await ControllerHelper.ExecuteAsync(async () =>
+        {
+            var budget = await _budgetService.GetByIdAsync(id);
+            if (budget == null)
+                throw new KeyNotFoundException(ErrorMessages.BudgetNotFound);
+
+            return budget;
+        }, _logger, this, SuccessMessages.BudgetRetrieved);
 
     [HttpGet("user")]
     [Authorize(Roles = "Customer,FinancialAdvisor,Administrator")]
     public async Task<IActionResult> GetBudgetsByUser()
-    {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized("User not identified.");
+        => await ControllerHelper.ExecuteAsync(async () =>
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException(ErrorMessages.UserNotFound);
 
-        var budgets = await _budgetService.GetByUserIdAsync(userId);
-        return Ok(budgets);
-    }
+            var budgets = await _budgetService.GetByUserIdAsync(userId);
+            return budgets;
+        }, _logger, this, SuccessMessages.BudgetsRetrievedByUser);
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Customer,FinancialAdvisor")]
     public async Task<IActionResult> UpdateBudget(int id, [FromBody] BudgetDTO budgetDTO)
-    {
-        if (id != budgetDTO.Id)
-            return BadRequest("ID mismatch.");
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        => await ControllerHelper.ExecuteAsync(async () =>
+        {
+            if (id != budgetDTO.Id)
+                throw new ArgumentException(ErrorMessages.BudgetIdMismatch);
 
-        await _budgetService.UpdateAsync(budgetDTO);
-        return NoContent();
-    }
+            if (!ModelState.IsValid)
+                throw new ArgumentException(ErrorMessages.InvalidModelState);
+
+            await _budgetService.UpdateAsync(budgetDTO);
+        }, _logger, this, SuccessMessages.BudgetUpdated);
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "Customer,FinancialAdvisor")]
     public async Task<IActionResult> DeleteBudget(int id)
-    {
-        await _budgetService.DeleteAsync(id);
-        return NoContent();
-    }
+        => await ControllerHelper.ExecuteAsync(async () =>
+        {
+            await _budgetService.DeleteAsync(id);
+        }, _logger, this, SuccessMessages.BudgetDeleted);
 }

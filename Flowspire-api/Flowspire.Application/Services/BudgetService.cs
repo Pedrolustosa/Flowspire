@@ -1,66 +1,107 @@
 ﻿using Flowspire.Application.DTOs;
-using Flowspire.Domain.Interfaces;
 using Flowspire.Application.Interfaces;
+using Flowspire.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
+using Flowspire.Application.Common;
 
 namespace Flowspire.Application.Services;
 
-public class BudgetService(IBudgetRepository budgetRepository) : IBudgetService
+public class BudgetService(IBudgetRepository budgetRepository, ILogger<BudgetService> logger) : IBudgetService
 {
     private readonly IBudgetRepository _budgetRepository = budgetRepository;
+    private readonly ILogger<BudgetService> _logger = logger;
 
     public async Task<BudgetDTO> GetByIdAsync(int id)
     {
-        var budget = await _budgetRepository.GetByIdAsync(id);
-        return MapToDTO(budget);
+        return await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var budget = await _budgetRepository.GetByIdAsync(id);
+            return MapToDTO(budget);
+        }, _logger, nameof(GetByIdAsync));
     }
 
     public async Task<IEnumerable<BudgetDTO>> GetAllAsync()
     {
-        var budgets = await _budgetRepository.GetAllAsync();
-        return budgets.Select(b => MapToDTO(b)).ToList();
+        return await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var budgets = await _budgetRepository.GetAllAsync();
+            return budgets.Select(MapToDTO).ToList();
+        }, _logger, nameof(GetAllAsync));
     }
 
     public async Task<IEnumerable<BudgetDTO>> GetByUserIdAsync(string userId)
     {
-        var budgets = await _budgetRepository.GetByUserIdAsync(userId);
-        return budgets.Select(b => MapToDTO(b)).ToList();
+        return await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var budgets = await _budgetRepository.GetByUserIdAsync(userId);
+            return budgets.Select(MapToDTO).ToList();
+        }, _logger, nameof(GetByUserIdAsync));
     }
 
     public async Task CreateAsync(BudgetDTO budgetDTO)
     {
-        var budget = Budget.Create(budgetDTO.Amount, budgetDTO.StartDate, budgetDTO.EndDate, budgetDTO.CategoryId, budgetDTO.UserId);
-        await _budgetRepository.AddAsync(budget);
-        budgetDTO.Id = budget.Id;
+        await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var budget = Budget.Create(
+                budgetDTO.Amount,
+                budgetDTO.StartDate,
+                budgetDTO.EndDate,
+                budgetDTO.CategoryId,
+                budgetDTO.UserId
+            );
+
+            await _budgetRepository.AddAsync(budget);
+            budgetDTO.Id = budget.Id;
+        }, _logger, nameof(CreateAsync));
     }
 
     public async Task UpdateAsync(BudgetDTO budgetDTO)
     {
-        var budget = await _budgetRepository.GetByIdAsync(budgetDTO.Id);
-        if (budget == null)
-            throw new Exception("Budget not found.");
-;
-        budget.Update(budgetDTO.Amount, budgetDTO.StartDate, budgetDTO.EndDate, budgetDTO.CategoryId);
-        await _budgetRepository.UpdateAsync(budget);
+        await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var budget = await _budgetRepository.GetByIdAsync(budgetDTO.Id);
+            if (budget == null)
+                throw new KeyNotFoundException("Budget not found.");
+
+            budget.Update(
+                budgetDTO.Amount,
+                budgetDTO.StartDate,
+                budgetDTO.EndDate,
+                budgetDTO.CategoryId
+            );
+
+            await _budgetRepository.UpdateAsync(budget);
+        }, _logger, nameof(UpdateAsync));
     }
 
     public async Task DeleteAsync(int id)
     {
-        var budget = await _budgetRepository.GetByIdAsync(id);
-        if (budget == null)
-            throw new Exception("Budget not found.");
-        await _budgetRepository.DeleteAsync(budget);
+        await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var budget = await _budgetRepository.GetByIdAsync(id);
+            if (budget == null)
+                throw new KeyNotFoundException("Budget not found.");
+
+            await _budgetRepository.DeleteAsync(budget);
+        }, _logger, nameof(DeleteAsync));
     }
 
     public async Task<IEnumerable<BudgetDTO>> GetActiveBudgetsAsync(string userId, DateTime date)
     {
-        var budgets = await _budgetRepository.GetActiveBudgetsAsync(userId, date);
-        return budgets.Select(b => MapToDTO(b)).ToList();
+        return await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var budgets = await _budgetRepository.GetActiveBudgetsAsync(userId, date);
+            return budgets.Select(MapToDTO).ToList();
+        }, _logger, nameof(GetActiveBudgetsAsync));
     }
 
     public async Task<BudgetDTO> GetBudgetByCategoryIdAsync(string userId, int categoryId)
     {
-        var budget = await _budgetRepository.GetBudgetByCategoryIdAsync(userId, categoryId);
-        return MapToDTO(budget);
+        return await ServiceHelper.ExecuteAsync(async () =>
+        {
+            var budget = await _budgetRepository.GetBudgetByCategoryIdAsync(userId, categoryId);
+            return MapToDTO(budget);
+        }, _logger, nameof(GetBudgetByCategoryIdAsync));
     }
 
     private BudgetDTO MapToDTO(Budget budget)
@@ -76,7 +117,7 @@ public class BudgetService(IBudgetRepository budgetRepository) : IBudgetService
             EndDate = budget.EndDate,
             CategoryId = budget.CategoryId,
             UserId = budget.UserId,
-            CategoryName = budget.Category != null ? budget.Category.Name : string.Empty
+            CategoryName = budget.Category?.Name ?? string.Empty
         };
     }
 }
