@@ -1,44 +1,49 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './services/auth.guard';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'login',
-    loadComponent: () => import('./login/login.component').then(m => m.LoginComponent)
+    loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
   },
   {
     path: 'register',
-    loadComponent: () => import('./register/register.component').then(m => m.RegisterComponent)
+    loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
   {
     path: 'transactions',
-    loadComponent: () => import('./transactions/transactions.component').then(m => m.TransactionComponent),
+    loadComponent: () => import('./features/transactions/transactions.component').then(m => m.TransactionComponent),
     canActivate: [authGuard]
   },
   {
     path: 'profile',
-    loadComponent: () => import('./profile/profile.component').then(m => m.ProfileComponent),
+    loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent),
     canActivate: [authGuard]
   },
   {
     path: 'category',
-    loadComponent: () => import('./category/category.component').then(m => m.CategoryComponent),
+    loadComponent: () => import('./features/category/category.component').then(m => m.CategoryComponent),
     canActivate: [authGuard]
   },
   {
     path: 'chat',
-    loadComponent: () => import('./chat/chat.component').then(m => m.ChatComponent),
+    loadComponent: () => import('./features/chat/chat.component').then(m => m.ChatComponent),
     canActivate: [authGuard]
   },
   {
     path: 'audit-logs',
-    loadComponent: () => import('./admin/audit-logs/audit-logs.component').then(m => m.AuditLogsComponent),
+    loadComponent: () => import('./features/admin/audit-logs/audit-logs.component').then(m => m.AuditLogsComponent),
     canActivate: [authGuard]
   },
+  {
+    path: 'budgets',
+    loadComponent: () => import('./features/budgets/budgets.component').then(m => m.BudgetsComponent),
+    canActivate: [authGuard]
+  }
 ];

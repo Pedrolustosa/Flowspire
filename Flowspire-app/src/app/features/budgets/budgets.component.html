@@ -1,0 +1,62 @@
+<div class="container mt-4">
+    <h2 class="mb-4">Gerenciar Orçamentos</h2>
+  
+    <form [formGroup]="form" (ngSubmit)="submit()" class="row g-3">
+      <div class="col-md-4">
+        <label for="categoryId" class="form-label">Categoria</label>
+        <select id="categoryId" formControlName="categoryId" class="form-select" required>
+          <option [ngValue]="null">-- Selecione --</option>
+          <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label for="amount" class="form-label">Valor</label>
+        <input type="number" id="amount" class="form-control" formControlName="amount" required min="1" />
+      </div>
+      <div class="col-md-3">
+        <label for="startDate" class="form-label">Início</label>
+        <input type="date" id="startDate" class="form-control" formControlName="startDate" required />
+      </div>
+      <div class="col-md-3">
+        <label for="endDate" class="form-label">Fim</label>
+        <input type="date" id="endDate" class="form-control" formControlName="endDate" required />
+      </div>
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </div>
+    </form>
+  
+    <hr class="my-4">
+  
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <div class="col" *ngFor="let b of budgets">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">{{ b.categoryName }}</h5>
+            <p class="card-text mb-2">
+              <strong>Valor:</strong> R$ {{ b.amount | number:'1.2-2' }}<br />
+              <strong>Período:</strong> {{ b.startDate | date:'shortDate' }} - {{ b.endDate | date:'shortDate' }}
+            </p>
+  
+            <div class="progress">
+              <div
+                class="progress-bar"
+                [ngClass]="{
+                  'bg-success': getUsagePercentage(b) <= 75,
+                  'bg-warning': getUsagePercentage(b) > 75 && getUsagePercentage(b) <= 90,
+                  'bg-danger': getUsagePercentage(b) > 90
+                }"
+                role="progressbar"
+                [style.width.%]="getUsagePercentage(b)">
+                {{ getUsagePercentage(b) }}%
+              </div>
+            </div>
+          </div>
+          <div class="card-footer bg-transparent text-end">
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteBudget(b.id)">Excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

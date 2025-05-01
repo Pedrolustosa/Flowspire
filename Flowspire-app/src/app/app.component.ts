@@ -2,9 +2,9 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, RouterOutlet } from '@angular/router';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
-import { SidebarComponent } from './sidebar/sidebar.component';
+import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { ToastrModule } from 'ngx-toastr';
-import { LoadingService } from './services/loading.service';
+import { LoadingService } from './core/services/loading.service';
 
 @Component({
   selector: 'app-root',
