@@ -11,7 +11,7 @@ namespace Flowspire.API.Models
 
     public class UpdateRequest
     {
-        public string FirstName { get; set; }
+        public string NameFirst { get; set; }
         public string LastName { get; set; }
         public DateTime? BirthDate { get; set; }
         public Gender Gender { get; set; } = Gender.NotSpecified;

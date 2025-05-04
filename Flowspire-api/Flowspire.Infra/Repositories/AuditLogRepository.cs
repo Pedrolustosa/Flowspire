@@ -12,14 +12,11 @@ public class AuditLogRepository(ApplicationDbContext context, ILogger<AuditLogRe
     private readonly ApplicationDbContext _context = context;
     private readonly ILogger<AuditLogRepository> _logger = logger;
 
-    public async Task AddAsync(AuditLog auditLog)
-    {
-        await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            await _context.AuditLogs.AddAsync(auditLog);
-            await _context.SaveChangesAsync();
-        }, _logger, nameof(AddAsync));
-    }
+    public Task AddAsync(AuditLog log)
+            => RepositoryHelper.ExecuteAsync(
+                async () => { await _context.AuditLogs.AddAsync(log); await _context.SaveChangesAsync(); },
+                _logger,
+                nameof(AddAsync));
 
     public async Task<List<AuditLog>> GetAllAsync()
     {
@@ -36,19 +33,14 @@ public class AuditLogRepository(ApplicationDbContext context, ILogger<AuditLogRe
         return _context.AuditLogs.AsQueryable();
     }
 
-    public async Task DeleteLogsOlderThanAsync(DateTime cutoffDate)
-    {
-        await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            var oldLogs = await _context.AuditLogs
-                .Where(log => log.Timestamp < cutoffDate)
-                .ToListAsync();
-
-            if (oldLogs.Any())
-            {
-                _context.AuditLogs.RemoveRange(oldLogs);
-                await _context.SaveChangesAsync();
-            }
-        }, _logger, nameof(DeleteLogsOlderThanAsync));
-    }
+    public Task DeleteLogsOlderThanAsync(DateTime threshold)
+            => RepositoryHelper.ExecuteAsync(
+                async () =>
+                {
+                    var old = _context.AuditLogs.Where(l => l.Timestamp < threshold);
+                    _context.AuditLogs.RemoveRange(old);
+                    await _context.SaveChangesAsync();
+                },
+                _logger,
+                nameof(DeleteLogsOlderThanAsync));
 }

@@ -2,6 +2,7 @@
 
 public class AdvisorCustomer
 {
+    public int Id { get; private set; }
     public string AdvisorId { get; private set; }
     public User Advisor { get; private set; }
     public string CustomerId { get; private set; }
@@ -12,8 +13,8 @@ public class AdvisorCustomer
 
     public static AdvisorCustomer Create(string advisorId, string customerId)
     {
-        if (string.IsNullOrWhiteSpace(advisorId)) throw new ArgumentException("AdvisorId é obrigatório.");
-        if (string.IsNullOrWhiteSpace(customerId)) throw new ArgumentException("CustomerId é obrigatório.");
+        if (string.IsNullOrWhiteSpace(advisorId)) throw new ArgumentException("AdvisorId is required.");
+        if (string.IsNullOrWhiteSpace(customerId)) throw new ArgumentException("CustomerId is required.");
 
         return new AdvisorCustomer
         {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Flowspire.Domain.Interfaces;
+using Flowspire.Infra.Data;
+using Flowspire.Infra.Common;
 using Microsoft.Extensions.Logging;
 using Flowspire.Domain.Entities;
-using Flowspire.Domain.Interfaces;
-using Flowspire.Infra.Common;
-using Flowspire.Infra.Data;
 
 namespace Flowspire.Infra.Repositories;
 
@@ -12,68 +12,57 @@ public class FinancialTransactionRepository(ApplicationDbContext context, ILogge
     private readonly ApplicationDbContext _context = context;
     private readonly ILogger<FinancialTransactionRepository> _logger = logger;
 
-    public async Task<FinancialTransaction> GetByIdAsync(int id)
-    {
-        return await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            return await _context.FinancialTransactions
-                .FirstOrDefaultAsync(t => t.Id == id);
-        }, _logger, nameof(GetByIdAsync));
-    }
+    public Task<FinancialTransaction?> GetByIdAsync(int id)
+        => RepositoryHelper.ExecuteAsync(
+            () => _context.Transactions.Include(t => t.Category).FirstOrDefaultAsync(t => t.Id == id),
+            _logger,
+            nameof(GetByIdAsync));
 
-    public async Task<IEnumerable<FinancialTransaction>> GetAllAsync()
-    {
-        return await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            return await _context.FinancialTransactions
-                .ToListAsync();
-        }, _logger, nameof(GetAllAsync));
-    }
+    public Task<List<FinancialTransaction>> GetAllAsync()
+        => RepositoryHelper.ExecuteAsync(
+            () => _context.Transactions.Include(t => t.Category).ToListAsync(),
+            _logger,
+            nameof(GetAllAsync));
 
-    public async Task<IEnumerable<FinancialTransaction>> GetByUserIdAsync(string userId)
-    {
-        return await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            return await _context.FinancialTransactions
-                .Where(t => t.UserId == userId)
-                .ToListAsync();
-        }, _logger, nameof(GetByUserIdAsync));
-    }
+    public Task<List<FinancialTransaction>> GetByUserIdAsync(string userId)
+        => RepositoryHelper.ExecuteAsync(
+            () => _context.Transactions.Where(t => t.UserId == userId).ToListAsync(),
+            _logger,
+            nameof(GetByUserIdAsync));
 
-    public async Task<IEnumerable<FinancialTransaction>> GetTransactionsByDateRangeAsync(DateTime startDate, DateTime endDate)
-    {
-        return await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            return await _context.FinancialTransactions
+    public Task<List<FinancialTransaction>> GetByUserIdAndDateRangeAsync(string userId, DateTime startDate, DateTime endDate)
+        => RepositoryHelper.ExecuteAsync(
+            () => _context.Transactions
+                .Where(t => t.UserId == userId && t.Date >= startDate && t.Date <= endDate)
+                .ToListAsync(),
+            _logger,
+            nameof(GetByUserIdAndDateRangeAsync));
+
+    public Task AddAsync(FinancialTransaction transaction)
+        => RepositoryHelper.ExecuteAsync(
+            async () => { await _context.Transactions.AddAsync(transaction); await _context.SaveChangesAsync(); },
+            _logger,
+            nameof(AddAsync));
+
+    public Task UpdateAsync(FinancialTransaction transaction)
+        => RepositoryHelper.ExecuteAsync(
+            async () => { _context.Transactions.Update(transaction); await _context.SaveChangesAsync(); },
+            _logger,
+            nameof(UpdateAsync));
+
+    public Task DeleteAsync(FinancialTransaction transaction)
+        => RepositoryHelper.ExecuteAsync(
+            async () => { _context.Transactions.Remove(transaction); await _context.SaveChangesAsync(); },
+            _logger,
+            nameof(DeleteAsync));
+
+    public Task<IEnumerable<FinancialTransaction>> GetTransactionsByDateRangeAsync(DateTime startDate, DateTime endDate)
+    => RepositoryHelper.ExecuteAsync(
+        async () =>
+            (IEnumerable<FinancialTransaction>)await _context.Transactions
                 .Where(t => t.Date >= startDate && t.Date <= endDate)
-                .ToListAsync();
-        }, _logger, nameof(GetTransactionsByDateRangeAsync));
-    }
-
-    public async Task AddAsync(FinancialTransaction transaction)
-    {
-        await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            await _context.FinancialTransactions.AddAsync(transaction);
-            await _context.SaveChangesAsync();
-        }, _logger, nameof(AddAsync));
-    }
-
-    public async Task UpdateAsync(FinancialTransaction transaction)
-    {
-        await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            _context.FinancialTransactions.Update(transaction);
-            await _context.SaveChangesAsync();
-        }, _logger, nameof(UpdateAsync));
-    }
-
-    public async Task DeleteAsync(FinancialTransaction transaction)
-    {
-        await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            _context.FinancialTransactions.Remove(transaction);
-            await _context.SaveChangesAsync();
-        }, _logger, nameof(DeleteAsync));
-    }
+                .ToListAsync(),
+        _logger,
+        nameof(GetTransactionsByDateRangeAsync)
+    );
 }

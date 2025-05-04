@@ -9,94 +9,109 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using FluentValidation.AspNetCore;
-using Flowspire.Application.Validators;
-using Flowspire.Domain.Entities;
 using Flowspire.Infra.Services;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Flowspire.Domain.Interfaces;
+using Flowspire.Domain.Entities;
 
 namespace Flowspire.Infra.IoC;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        string connectionString,
+        IConfiguration configuration)
     {
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new ArgumentException("Connection string must be provided.", nameof(connectionString));
+
+        // DbContext
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlite(connectionString));
 
+        // Identity
         services.AddIdentity<User, IdentityRole>(options =>
         {
             options.Password.RequireDigit = true;
             options.Password.RequiredLength = 6;
         })
         .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddSignInManager()
+        .AddDefaultTokenProviders()
         .AddRoles<IdentityRole>();
 
-        services.AddScoped<IFinancialTransactionService, FinancialTransactionService>();
-        services.AddScoped<IFinancialTransactionRepository, FinancialTransactionRepository>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<ICategoryService, CategoryService>();
-        services.AddScoped<IBudgetRepository, BudgetRepository>();
-        services.AddScoped<IBudgetService, BudgetService>();
-        services.AddScoped<IMessageRepository, MessageRepository>();
-        services.AddScoped<IMessageService, MessageService>();
-        services.AddScoped<IAdvisorCustomerRepository, AdvisorCustomerRepository>();
-        services.AddScoped<IAdvisorCustomerService, AdvisorCustomerService>();
-        services.AddScoped<IDashboardService, DashboardService>();
-        services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IAuditLogService, AuditLogService>();
-        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+        // JWT settings via Options pattern
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        var jwtSettings = configuration
+            .GetSection(JwtSettings.SectionName)
+            .Get<JwtSettings>()
+            ?? throw new InvalidOperationException("JWT settings are missing in configuration.");
 
-        services.AddSignalR();
-
+        // Authentication / JWT Bearer
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
         })
         .AddJwtBearer(options =>
         {
-            var jwtKey = configuration["Jwt:Key"];
-            if (string.IsNullOrEmpty(jwtKey))
-                throw new InvalidOperationException("A chave JWT não está configurada no appsettings.json.");
-
+            var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["Jwt:Issuer"],
-                ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(key)
             };
 
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
                 {
-                    var accessToken = context.Request.Query["access_token"];
-                    var path = context.HttpContext.Request.Path;
-
-                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub"))
+                    var token = context.Request.Query["access_token"];
+                    if (!string.IsNullOrEmpty(token) &&
+                        context.HttpContext.Request.Path.StartsWithSegments("/notificationHub"))
                     {
-                        context.Token = accessToken;
+                        context.Token = token;
                     }
                     return Task.CompletedTask;
                 }
             };
         });
 
+        // SignalR
+        services.AddSignalR();
+
+        // Swagger
         services.AddSwaggerConfiguration();
 
+        // FluentValidation
         services.AddFluentValidationAutoValidation();
         services.AddFluentValidationClientsideAdapters();
-        services.AddValidatorsFromAssemblyContaining<TransactionDTOValidator>();
+        services.AddValidatorsFromAssemblyContaining<Flowspire.Application.Validators.TransactionDTOValidator>();
+
+        // Repositories & Services
+        services.AddScoped<IFinancialTransactionService, FinancialTransactionService>();
+        services.AddScoped<IFinancialTransactionRepository, FinancialTransactionRepository>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IBudgetService, BudgetService>();
+        services.AddScoped<IBudgetRepository, BudgetRepository>();
+        services.AddScoped<IMessageService, MessageService>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IAdvisorCustomerService, AdvisorCustomerService>();
+        services.AddScoped<IAdvisorCustomerRepository, AdvisorCustomerRepository>();
+        services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IAuditLogService, AuditLogService>();
+        services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         return services;
     }

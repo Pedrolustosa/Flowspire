@@ -5,5 +5,9 @@ namespace Flowspire.Application.Interfaces;
 
 public interface INotificationService
 {
-    Task SendMessageAsync(string senderId, string receiverId, MessageDTO message);
+    Task SendMessageAsync(
+            string senderId,
+            string receiverId,
+            MessageDTO message,
+            CancellationToken cancellationToken = default);
 }

@@ -1,78 +1,33 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Flowspire.Domain.Entities;
-using Flowspire.Infra.Data;
 using Flowspire.Domain.Interfaces;
-using Microsoft.Data.Sqlite;
+using Flowspire.Infra.Data;
+using Flowspire.Infra.Common;
+using Microsoft.Extensions.Logging;
+using System;
 
-namespace Flowspire.Infra.Repositories
+namespace Flowspire.Infra.Repositories;
+
+public class RefreshTokenRepository(ApplicationDbContext context, ILogger<RefreshTokenRepository> logger) : IRefreshTokenRepository
 {
-    public class RefreshTokenRepository : IRefreshTokenRepository
-    {
-        private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context = context;
+    private readonly ILogger<RefreshTokenRepository> _logger = logger;
 
-        public RefreshTokenRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+    public Task<RefreshToken> AddAsync(RefreshToken token)
+        => RepositoryHelper.ExecuteAsync(
+            async () => { await _context.RefreshTokens.AddAsync(token); await _context.SaveChangesAsync(); return token; },
+            _logger,
+            nameof(AddAsync));
 
-        public async Task<RefreshToken> AddAsync(RefreshToken refreshToken)
-        {
-            try
-            {
-                _context.RefreshTokens.Add(refreshToken);
-                await _context.SaveChangesAsync();
-                return refreshToken;
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new Exception("Error adding refresh token to the database.", ex);
-            }
-            catch (SqliteException ex)
-            {
-                throw new Exception("SQLite connection or operation error while adding refresh token.", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Unexpected error while adding refresh token.", ex);
-            }
-        }
+    public Task<RefreshToken?> GetByTokenAsync(string token)
+        => RepositoryHelper.ExecuteAsync(
+            () => _context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == token),
+            _logger,
+            nameof(GetByTokenAsync));
 
-        public async Task<RefreshToken> GetByTokenAsync(string token)
-        {
-            try
-            {
-                return await _context.RefreshTokens
-                    .FirstOrDefaultAsync(rt => rt.Token == token);
-            }
-            catch (SqliteException ex)
-            {
-                throw new Exception("SQLite connection or operation error while retrieving refresh token.", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Unexpected error while retrieving refresh token.", ex);
-            }
-        }
-
-        public async Task UpdateAsync(RefreshToken refreshToken)
-        {
-            try
-            {
-                _context.RefreshTokens.Update(refreshToken);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new Exception("Error updating refresh token in the database.", ex);
-            }
-            catch (SqliteException ex)
-            {
-                throw new Exception("SQLite connection or operation error while updating refresh token.", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Unexpected error while updating refresh token.", ex);
-            }
-        }
-    }
+    public Task UpdateAsync(RefreshToken token)
+        => RepositoryHelper.ExecuteAsync(
+            async () => { _context.RefreshTokens.Update(token); await _context.SaveChangesAsync(); },
+            _logger,
+            nameof(UpdateAsync));
 }
