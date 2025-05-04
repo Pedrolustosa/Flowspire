@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Flowspire.Infra.Common;
+using Flowspire.Domain.Entities;
 
 namespace Flowspire.Infra.Repositories;
 

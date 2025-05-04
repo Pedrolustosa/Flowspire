@@ -67,8 +67,8 @@ app.MapHub<NotificationHub>("/notificationHub").RequireAuthorization();
 
 RecurringJob.AddOrUpdate<IAuditLogService>(
     "cleanup-old-audit-logs",
-    service => service.CleanupOldLogsAsync(),
-    Cron.Daily(3)
+    service => service.CleanupOldLogsAsync(CancellationToken.None),
+    Cron.Daily(1)
 );
 
 app.Run();

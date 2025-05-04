@@ -2,239 +2,198 @@
 using Flowspire.Application.Interfaces;
 using Flowspire.Application.Common;
 using Flowspire.Domain.Enums;
-using Flowspire.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 
 namespace Flowspire.Application.Services;
 
-public class DashboardService(
-    IFinancialTransactionRepository transactionRepository,
-    IBudgetRepository budgetRepository,
-    ILogger<DashboardService> logger) : IDashboardService
+public class DashboardService : IDashboardService
 {
-    private readonly IFinancialTransactionRepository _transactionRepository = transactionRepository;
-    private readonly IBudgetRepository _budgetRepository = budgetRepository;
-    private readonly ILogger<DashboardService> _logger = logger;
+    private readonly IFinancialTransactionService _transactionService;
+    private readonly IBudgetService _budgetService;
+    private readonly ILogger<DashboardService> _logger;
 
-    public async Task<DashboardDTO> GetDashboardAsync(string userId, DateTime startDate, DateTime endDate)
+    public DashboardService(
+        IFinancialTransactionService transactionService,
+        IBudgetService budgetService,
+        ILogger<DashboardService> logger)
+    {
+        _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
+        _budgetService = budgetService ?? throw new ArgumentNullException(nameof(budgetService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    public async Task<DashboardDTO> GetDashboardAsync(
+        string userId, DateTime startDate, DateTime endDate,
+        CancellationToken cancellationToken = default)
         => await ServiceHelper.ExecuteAsync(async () =>
         {
-            var transactions = await _transactionRepository.GetByUserIdAsync(userId);
-            var budgets = await _budgetRepository.GetByUserIdAsync(userId);
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("User ID must be provided.", nameof(userId));
+            if (startDate > endDate)
+                throw new ArgumentException("Start date must be before end date.", nameof(startDate));
 
-            var filteredTransactions = transactions
-                .Where(t => t.Date >= startDate && t.Date <= endDate)
-                .ToList();
+            _logger.LogInformation("Building dashboard for user {UserId} from {StartDate} to {EndDate}...", userId, startDate, endDate);
 
-            var totalIncome = filteredTransactions
-                .Where(t => t.Type == TransactionType.Income)
-                .Sum(t => t.Amount);
+            var transactions = await _transactionService.GetByUserIdAsync(userId);
+            var budgets = await _budgetService.GetByUserIdAsync(userId);
 
-            var totalExpenses = filteredTransactions
-                .Where(t => t.Type == TransactionType.Expense)
-                .Sum(t => t.Amount);
+            var filtered = transactions.Where(t => t.Date >= startDate && t.Date <= endDate).ToList();
 
-            var activeBudgets = budgets
-                .Where(b => b.StartDate <= endDate && b.EndDate >= startDate)
-                .ToList();
+            var totalIncome = filtered.Where(t => t.TransactionType == nameof(TransactionType.Income)).Sum(t => t.Amount);
+            var totalExpenses = filtered.Where(t => t.TransactionType == nameof(TransactionType.Expense)).Sum(t => t.Amount);
 
-            var budgetStatuses = new List<BudgetStatusDTO>();
-            var alerts = new List<string>();
+            var activeBudgets = budgets.Where(b => b.StartDate <= endDate && b.EndDate >= startDate).ToList();
 
-            foreach (var budget in activeBudgets)
-            {
-                var spentAmount = filteredTransactions
-                    .Where(t => t.CategoryId == budget.CategoryId && t.Type == TransactionType.Expense)
-                    .Sum(t => t.Amount);
+            var statuses = BuildBudgetStatuses(filtered, activeBudgets);
+            var alerts = statuses.Where(s => s.PercentageUsed >= 90)
+                                 .Select(s => $"Warning: Budget {s.CategoryName} reached {s.PercentageUsed:F2}% ({s.SpentAmount}/{s.BudgetAmount}).")
+                                 .ToList();
 
-                var percentageUsed = budget.Amount > 0 ? (double)(spentAmount / budget.Amount) * 100 : 0;
-                var categoryName = budget.Category?.Name ?? "Uncategorized";
+            var history = BuildMonthlyHistory(transactions, startDate);
+            var trends = BuildCategoryTrends(transactions, startDate);
+            var summary = BuildCategorySummary(filtered);
 
-                budgetStatuses.Add(new BudgetStatusDTO
-                {
-                    CategoryName = categoryName,
-                    BudgetAmount = budget.Amount,
-                    SpentAmount = spentAmount,
-                    PercentageUsed = (decimal)percentageUsed
-                });
-
-                if (percentageUsed >= 90)
-                    alerts.Add($"Warning: Budget {categoryName} reached {percentageUsed:F2}% ({spentAmount}/{budget.Amount}).");
-            }
-
-            var monthlyHistory = BuildMonthlyHistory(transactions, startDate);
-
-            var categoryTrends = BuildCategoryTrends(transactions, startDate);
-
-            var categorySummary = filteredTransactions
-                .GroupBy(t => t.Category?.Name ?? "Uncategorized")
-                .Select(g => new CategorySummaryDTO
-                {
-                    CategoryName = g.Key,
-                    Income = g.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount),
-                    Expenses = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount)
-                })
-                .ToList();
+            _logger.LogInformation("Dashboard built for user {UserId}.", userId);
 
             return new DashboardDTO
             {
                 TotalIncome = totalIncome,
                 TotalExpenses = totalExpenses,
-                Budgets = budgetStatuses,
+                Budgets = statuses,
                 Alerts = alerts,
-                MonthlyHistory = monthlyHistory,
-                CategoryTrends = categoryTrends,
-                CategorySummary = categorySummary
+                MonthlyHistory = history,
+                CategoryTrends = trends,
+                CategorySummary = summary
             };
         }, _logger, nameof(GetDashboardAsync));
 
-    public async Task<List<CategorySummaryDTO>> GetCategorySummaryAsync(string userId, DateTime startDate, DateTime endDate, string type)
-        => await ServiceHelper.ExecuteAsync(async () =>
-        {
-            if (type != "Expense" && type != "Revenue")
-                throw new ArgumentException("Invalid type. Use 'Expense' or 'Revenue'.");
+    #region Helpers
 
-            var transactions = await _transactionRepository.GetByUserIdAsync(userId);
-
-            var filteredTransactions = transactions
-                .Where(t => t.Date >= startDate && t.Date <= endDate)
-                .ToList();
-
-            return filteredTransactions
-                .Where(t => (type == "Expense" && t.Type == TransactionType.Expense) ||
-                            (type == "Revenue" && t.Type == TransactionType.Income))
-                .GroupBy(t => t.Category?.Name ?? "Uncategorized")
-                .Select(g => new CategorySummaryDTO
-                {
-                    CategoryName = g.Key,
-                    Income = type == "Revenue" ? g.Sum(t => t.Amount) : 0,
-                    Expenses = type == "Expense" ? g.Sum(t => t.Amount) : 0
-                })
-                .ToList();
-        }, _logger, nameof(GetCategorySummaryAsync));
-
-    public async Task<List<RecentTransactionDTO>> GetRecentTransactionsAsync(string userId, int limit)
-        => await ServiceHelper.ExecuteAsync(async () =>
-        {
-            if (limit <= 0)
-                throw new ArgumentException("Limit must be positive.");
-
-            var transactions = await _transactionRepository.GetByUserIdAsync(userId);
-
-            return transactions
-                .OrderByDescending(t => t.Date)
-                .Take(limit)
-                .Select(t => new RecentTransactionDTO
-                {
-                    Description = t.Description,
-                    Amount = t.Amount,
-                    Type = t.Type == TransactionType.Income ? "Revenue" : "Expense",
-                    Category = t.Category?.Name ?? "Uncategorized",
-                    Date = t.Date
-                })
-                .ToList();
-        }, _logger, nameof(GetRecentTransactionsAsync));
-
-    public async Task<BalanceDTO> GetCurrentBalanceAsync(string userId)
-        => await ServiceHelper.ExecuteAsync(async () =>
-        {
-            var transactions = await _transactionRepository.GetByUserIdAsync(userId);
-
-            var totalRevenue = transactions.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount);
-            var totalExpense = transactions.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
-
-            return new BalanceDTO
+    private List<BudgetStatusDTO> BuildBudgetStatuses(
+        List<FinancialTransactionDTO> txs,
+        List<BudgetDTO> budgets)
+    {
+        return budgets
+            .Select(b =>
             {
-                TotalRevenue = totalRevenue,
-                TotalExpense = totalExpense,
-                CurrentBalance = totalRevenue - totalExpense
-            };
-        }, _logger, nameof(GetCurrentBalanceAsync));
-
-    public async Task<List<FinancialGoalDTO>> GetFinancialGoalsAsync(string userId)
-        => await ServiceHelper.ExecuteAsync(async () =>
-        {
-            var budgets = await _budgetRepository.GetByUserIdAsync(userId);
-            var transactions = await _transactionRepository.GetByUserIdAsync(userId);
-
-            return budgets.Select(b =>
-            {
-                var spent = transactions
-                    .Where(t => t.CategoryId == b.CategoryId && t.Type == TransactionType.Expense)
+                var spent = txs
+                    .Where(t => t.CategoryId == b.CategoryId && t.TransactionType == nameof(TransactionType.Expense))
                     .Sum(t => t.Amount);
 
-                return new FinancialGoalDTO
+                // agora todo cálculo é em decimal
+                var pct = b.Amount > 0m
+                    ? spent / b.Amount * 100m
+                    : 0m;
+
+                return new BudgetStatusDTO
                 {
-                    Name = b.Category?.Name ?? "Uncategorized",
-                    TargetAmount = b.Amount,
-                    CurrentAmount = spent,
-                    Deadline = b.EndDate,
-                    ProgressPercentage = b.Amount > 0 ? (double)(spent / b.Amount) * 100 : 0
+                    CategoryName = b.CategoryName,
+                    BudgetAmount   = b.Amount,
+                    SpentAmount    = spent,
+                    PercentageUsed = pct
                 };
-            }).Where(g => g.CurrentAmount > 0).ToList();
-        }, _logger, nameof(GetFinancialGoalsAsync));
-
-    private List<MonthlySummaryDTO> BuildMonthlyHistory(IEnumerable<FinancialTransaction> transactions, DateTime startDate)
-    {
-        var monthlyHistory = new List<MonthlySummaryDTO>();
-
-        for (int i = 2; i >= 0; i--)
-        {
-            var monthStart = startDate.AddMonths(-i);
-            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
-
-            var monthTransactions = transactions
-                .Where(t => t.Date >= monthStart && t.Date <= monthEnd)
-                .ToList();
-
-            monthlyHistory.Add(new MonthlySummaryDTO
-            {
-                Month = monthStart.ToString("MMMM yyyy", CultureInfo.CurrentCulture),
-                Income = monthTransactions.Where(t => t.Type == TransactionType.Income).Sum(t => t.Amount),
-                Expenses = monthTransactions.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount)
-            });
-        }
-
-        return monthlyHistory;
+            })
+            .ToList();
     }
 
-    private List<CategoryTrendDTO> BuildCategoryTrends(IEnumerable<FinancialTransaction> transactions, DateTime startDate)
+    private List<MonthlySummaryDTO> BuildMonthlyHistory(
+    IEnumerable<FinancialTransactionDTO> txs,
+    DateTime startDate)
     {
-        var currentStart = startDate;
-        var previousStart = currentStart.AddMonths(-1);
-        var previousEnd = currentStart.AddDays(-1);
+        var list = new List<MonthlySummaryDTO>();
+        for (int i = 2; i >= 0; i--)
+        {
+            var mStart = startDate.AddMonths(-i);
+            var mEnd = mStart.AddMonths(1).AddDays(-1);
+            var mTx = txs.Where(t => t.Date >= mStart && t.Date <= mEnd);
 
-        var currentPeriod = transactions
-            .Where(t => t.Date >= currentStart)
-            .ToList();
+            list.Add(new MonthlySummaryDTO
+            {
+                Month    = mStart.ToString("MMMM yyyy", CultureInfo.CurrentCulture),
+                Income   = mTx.Where(t => t.TransactionType == nameof(TransactionType.Income)).Sum(t => t.Amount),
+                Expenses = mTx.Where(t => t.TransactionType == nameof(TransactionType.Expense)).Sum(t => t.Amount)
+            });
+        }
+        return list;
+    }
 
-        var previousPeriod = transactions
-            .Where(t => t.Date >= previousStart && t.Date <= previousEnd)
-            .ToList();
+    private List<CategoryTrendDTO> BuildCategoryTrends(
+        IEnumerable<FinancialTransactionDTO> txs,
+        DateTime startDate)
+    {
+        var currStart = startDate;
+        var prevStart = currStart.AddMonths(-1);
+        var prevEnd = currStart.AddDays(-1);
 
-        return currentPeriod
-            .GroupBy(t => t.Category?.Name ?? "Uncategorized")
+        var curr = txs.Where(t => t.Date >= currStart);
+        var prev = txs.Where(t => t.Date >= prevStart && t.Date <= prevEnd);
+
+        return curr
+            .GroupBy(t => t.CategoryName ?? "Uncategorized")
             .Select(g =>
             {
-                var currentExpense = g.Where(t => t.Type == TransactionType.Expense).Sum(t => t.Amount);
-                var previousExpense = previousPeriod
-                    .Where(t => (t.Category?.Name ?? "Uncategorized") == g.Key && t.Type == TransactionType.Expense)
+                var currExp = g
+                    .Where(t => t.TransactionType == nameof(TransactionType.Expense))
                     .Sum(t => t.Amount);
+
+                var prevExp = prev
+                    .Where(t => t.CategoryName == g.Key && t.TransactionType == nameof(TransactionType.Expense))
+                    .Sum(t => t.Amount);
+
+                // tudo em decimal também aqui
+                var trend = prevExp == 0m
+                    ? (currExp > 0m ? 100m : 0m)
+                    : (currExp - prevExp) / prevExp * 100m;
 
                 return new CategoryTrendDTO
                 {
-                    CategoryName = g.Key,
-                    CurrentPeriodExpenses = currentExpense,
-                    PreviousPeriodExpenses = previousExpense,
-                    TrendPercentage = CalculateTrendPercentage(currentExpense, previousExpense)
+                    CategoryName           = g.Key,
+                    CurrentPeriodExpenses  = currExp,
+                    PreviousPeriodExpenses = prevExp,
+                    TrendPercentage        = trend
                 };
-            }).ToList();
+            })
+            .ToList();
     }
 
-    private decimal CalculateTrendPercentage(decimal current, decimal previous)
+    private List<CategorySummaryDTO> BuildCategorySummary(
+        IEnumerable<FinancialTransactionDTO> txs)
     {
-        if (previous == 0) return current > 0 ? 100 : 0;
-        return ((current - previous) / previous) * 100;
+        return txs
+            .GroupBy(t => t.CategoryName ?? "Uncategorized")
+            .Select(g => new CategorySummaryDTO
+            {
+                CategoryName = g.Key,
+                Income       = g
+                    .Where(t => t.TransactionType == nameof(TransactionType.Income))
+                    .Sum(t => t.Amount),
+                Expenses     = g
+                    .Where(t => t.TransactionType == nameof(TransactionType.Expense))
+                    .Sum(t => t.Amount)
+            })
+            .ToList();
     }
+
+    public Task<List<CategorySummaryDTO>> GetCategorySummaryAsync(string userId, DateTime startDate, DateTime endDate, string type, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<RecentTransactionDTO>> GetRecentTransactionsAsync(string userId, int limit, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<BalanceDTO> GetCurrentBalanceAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<FinancialGoalDTO>> GetFinancialGoalsAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
 }

@@ -17,6 +17,13 @@ public static class ErrorMessages
     public const string InvalidCredentials = "Invalid email or password.";
     public const string UnauthorizedRoleAssignment = "Unauthorized to assign this role.";
     public const string UnauthorizedAction = "You are not authorized to perform this action.";
+    public const string OnlyAdminsCanAssignRoles = "Somente administradores podem atribuir funções.";
+    public const string EmailAlreadyRegistered = "Já existe um cadastro com este e-mail.";
+    public const string ErrorRegisteringUser = "Erro ao registrar usuário: ";
+    public const string InvalidRefreshToken = "Refresh token inválido.";
+    public const string ExpiredRefreshToken = "Refresh token expirado.";
+    public const string ErrorUpdatingUser = "Erro ao atualizar usuário: ";
+    public const string RoleNotAssigned = "Usuário não possui a função especificada.";
 
     // Advisor
     public const string ForbiddenAccess = "You do not have permission to access this resource.";

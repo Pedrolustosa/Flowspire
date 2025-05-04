@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Flowspire.Domain.Entities;
 using Flowspire.Domain.Interfaces;
 using Flowspire.Infra.Data;
 using Flowspire.Infra.Common;
 using Microsoft.Extensions.Logging;
+using Flowspire.Application.Interfaces;
 
 namespace Flowspire.Infra.Repositories;
 
@@ -13,34 +13,41 @@ public class AdvisorCustomerRepository(ApplicationDbContext context, ILogger<Adv
     private readonly ILogger<AdvisorCustomerRepository> _logger = logger;
 
     public async Task<AdvisorCustomer> AddAsync(AdvisorCustomer advisorCustomer)
+    => await RepositoryHelper.ExecuteAsync(async () =>
     {
-        return await RepositoryHelper.ExecuteAsync(async () =>
+        await _context.AdvisorCustomers.AddAsync(advisorCustomer);
+        await _context.SaveChangesAsync();
+        return advisorCustomer;
+    }, _logger, nameof(AddAsync));
+
+    public async Task<AdvisorCustomer?> GetByAdvisorAndCustomerAsync(string advisorId, string customerId)
+        => await RepositoryHelper.ExecuteAsync(
+            () => _context.AdvisorCustomers
+                          .FirstOrDefaultAsync(ac => ac.AdvisorId == advisorId
+                                                  && ac.CustomerId == customerId),
+            _logger,
+            nameof(GetByAdvisorAndCustomerAsync));
+
+    public async Task DeleteAsync(AdvisorCustomer advisorCustomer)
+        => await RepositoryHelper.ExecuteAsync(async () =>
         {
-            _context.AdvisorCustomers.Add(advisorCustomer);
+            _context.AdvisorCustomers.Remove(advisorCustomer);
             await _context.SaveChangesAsync();
-            return advisorCustomer;
-        }, _logger, nameof(AddAsync));
-    }
+        }, _logger, nameof(DeleteAsync));
 
     public async Task<List<AdvisorCustomer>> GetCustomersByAdvisorIdAsync(string advisorId)
-    {
-        return await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            return await _context.AdvisorCustomers
-                .Where(ac => ac.AdvisorId == advisorId)
-                .Include(ac => ac.Customer)
-                .ToListAsync();
-        }, _logger, nameof(GetCustomersByAdvisorIdAsync));
-    }
+        => await RepositoryHelper.ExecuteAsync(
+            () => _context.AdvisorCustomers
+                          .Where(ac => ac.AdvisorId == advisorId)
+                          .ToListAsync(),
+            _logger,
+            nameof(GetCustomersByAdvisorIdAsync));
 
     public async Task<List<AdvisorCustomer>> GetAdvisorsByCustomerIdAsync(string customerId)
-    {
-        return await RepositoryHelper.ExecuteAsync(async () =>
-        {
-            return await _context.AdvisorCustomers
-                .Where(ac => ac.CustomerId == customerId)
-                .Include(ac => ac.Advisor)
-                .ToListAsync();
-        }, _logger, nameof(GetAdvisorsByCustomerIdAsync));
-    }
+        => await RepositoryHelper.ExecuteAsync(
+            () => _context.AdvisorCustomers
+                          .Where(ac => ac.CustomerId == customerId)
+                          .ToListAsync(),
+            _logger,
+            nameof(GetAdvisorsByCustomerIdAsync));
 }

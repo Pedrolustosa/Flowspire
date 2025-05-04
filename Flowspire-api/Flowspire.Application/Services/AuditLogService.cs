@@ -7,18 +7,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Flowspire.Application.Services;
 
-public class AuditLogService(IAuditLogRepository auditLogRepository, ILogger<AuditLogService> logger) : IAuditLogService
+public class AuditLogService(
+    IAuditLogRepository auditLogRepository,
+    ILogger<AuditLogService> logger) : IAuditLogService
 {
-    private readonly IAuditLogRepository _auditLogRepository = auditLogRepository;
-    private readonly ILogger<AuditLogService> _logger = logger;
+    private readonly IAuditLogRepository _auditLogRepository = auditLogRepository
+            ?? throw new ArgumentNullException(nameof(auditLogRepository));
+    private readonly ILogger<AuditLogService> _logger = logger
+            ?? throw new ArgumentNullException(nameof(logger));
 
-    public async Task<PagedResult<AuditLogDTO>> GetAuditLogsAsync(PaginationQuery paginationQuery)
+    public async Task<PagedResult<AuditLogDTO>> GetAuditLogsAsync(
+        PaginationQuery paginationQuery,
+        CancellationToken cancellationToken = default)
     {
+        if (paginationQuery == null)
+            throw new ArgumentNullException(nameof(paginationQuery));
+
         return await ServiceHelper.ExecuteAsync(async () =>
         {
-            var query = _auditLogRepository.Query();
+            cancellationToken.ThrowIfCancellationRequested();
+            _logger.LogInformation("Retrieving audit logs: Page={Page}, Size={Size}",
+                paginationQuery.Page, paginationQuery.PageSize);
 
-            var totalCount = await query.CountAsync();
+            var query = _auditLogRepository.Query();
+            var totalCount = await query.CountAsync(cancellationToken);
 
             var logs = await query
                 .OrderByDescending(x => x.Timestamp)
@@ -35,12 +47,12 @@ public class AuditLogService(IAuditLogRepository auditLogRepository, ILogger<Aud
                     ExecutionTimeMs = log.ExecutionTimeMs,
                     Timestamp = log.Timestamp
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
-            if (logs.Count == 0)
-                throw new Exception(ErrorMessages.NoAuditLogsFound);
+            if (!logs.Any())
+                throw new KeyNotFoundException(ErrorMessages.NoAuditLogsFound);
 
-            _logger.LogInformation(SuccessMessages.AuditLogsRetrieved);
+            _logger.LogInformation("Retrieved {Count} logs out of {Total}.", logs.Count, totalCount);
 
             return new PagedResult<AuditLogDTO>
             {
@@ -50,15 +62,17 @@ public class AuditLogService(IAuditLogRepository auditLogRepository, ILogger<Aud
         }, _logger, nameof(GetAuditLogsAsync));
     }
 
-    public async Task CleanupOldLogsAsync()
+    public async Task CleanupOldLogsAsync(
+        CancellationToken cancellationToken = default)
     {
         await ServiceHelper.ExecuteAsync(async () =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var cutoffDate = DateTime.UtcNow.AddDays(-30);
 
+            _logger.LogInformation("Deleting audit logs older than {Cutoff}.", cutoffDate);
             await _auditLogRepository.DeleteLogsOlderThanAsync(cutoffDate);
-
-            _logger.LogInformation(SuccessMessages.AuditLogsCleaned, cutoffDate);
+            _logger.LogInformation("Audit logs cleanup completed.");
         }, _logger, nameof(CleanupOldLogsAsync));
     }
 }

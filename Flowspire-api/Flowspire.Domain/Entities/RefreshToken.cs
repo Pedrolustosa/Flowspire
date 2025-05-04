@@ -4,6 +4,7 @@ public class RefreshToken
     public int Id { get; private set; }
     public string Token { get; private set; }
     public string UserId { get; private set; }
+    public User User { get; private set; }
     public DateTime Created { get; private set; }
     public DateTime Expires { get; private set; }
     public bool IsRevoked { get; private set; }
@@ -12,8 +13,7 @@ public class RefreshToken
 
     public static RefreshToken Create(string userId)
     {
-        if (string.IsNullOrWhiteSpace(userId))
-            throw new ArgumentException("UserId é obrigatório.");
+        if (string.IsNullOrWhiteSpace(userId)) throw new ArgumentException("UserId is required.");
 
         return new RefreshToken
         {
@@ -27,8 +27,7 @@ public class RefreshToken
 
     public void Revoke()
     {
-        if (IsRevoked)
-            throw new InvalidOperationException("Token já foi revogado.");
+        if (IsRevoked) throw new InvalidOperationException("Token has already been revoked.");
         IsRevoked = true;
     }
 

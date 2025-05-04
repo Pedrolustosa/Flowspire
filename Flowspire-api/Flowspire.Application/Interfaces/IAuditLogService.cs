@@ -5,6 +5,10 @@ namespace Flowspire.Application.Interfaces;
 
 public interface IAuditLogService
 {
-    Task<PagedResult<AuditLogDTO>> GetAuditLogsAsync(PaginationQuery paginationQuery);
-    Task CleanupOldLogsAsync();
+    Task<PagedResult<AuditLogDTO>> GetAuditLogsAsync(
+        PaginationQuery paginationQuery,
+        CancellationToken cancellationToken = default);
+
+    Task CleanupOldLogsAsync(
+        CancellationToken cancellationToken = default);
 }
