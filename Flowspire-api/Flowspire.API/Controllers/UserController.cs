@@ -2,28 +2,32 @@
 using Microsoft.AspNetCore.Mvc;
 using Flowspire.Application.Interfaces;
 using Flowspire.Domain.Enums;
-using Flowspire.API.Models;
 using Flowspire.API.Common;
 using Flowspire.Application.Common;
+using Flowspire.API.Models.Users;
 
 namespace Flowspire.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserController(IUserService userService, ILogger<UserController> logger) : ControllerBase
+public class UserController(
+    IUserProfileService userProfileService,
+    IAuthenticationService authenticationService,
+    ILogger<UserController> logger) : ControllerBase
 {
-    private readonly IUserService _userService = userService;
+    private readonly IUserProfileService _userProfileService = userProfileService;
+    private readonly IAuthenticationService _authenticationService = authenticationService;
     private readonly ILogger<UserController> _logger = logger;
 
     [HttpPost("register")]
     [Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] UserRegistrationRequest request)
         => await ControllerHelper.ExecuteAsync(async () =>
         {
             var requestingUserId = User.GetUserId();
-            var userDto = await _userService.RegisterUserAsync(
+            var userDto = await _userProfileService.RegisterUserAsync(
                 request.Email,
-                request.NameFirst,
+                request.FirstName,
                 request.LastName,
                 request.Password,
                 request.PhoneNumber,
@@ -42,10 +46,10 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         }, _logger, this, SuccessMessages.UserRegistered);
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
         => await ControllerHelper.ExecuteAsync(async () =>
         {
-            var (accessToken, refreshToken) = await _userService.LoginUserAsync(request.Email, request.Password);
+            var (accessToken, refreshToken) = await _authenticationService.LoginUserAsync(request.Email, request.Password);
 
             Response.Cookies.Append("X-Access-Token", accessToken, new CookieOptions
             {
@@ -63,10 +67,10 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         }, _logger, this, SuccessMessages.LoginSuccessful);
 
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    public async Task<IActionResult> RefreshToken([FromBody] TokenRefreshRequest request)
         => await ControllerHelper.ExecuteAsync(async () =>
         {
-            var (accessToken, refreshToken) = await _userService.RefreshTokenAsync(request.RefreshToken);
+            var (accessToken, refreshToken) = await _authenticationService.RefreshTokenAsync(request.RefreshToken);
 
             return new
             {
@@ -77,23 +81,23 @@ public class UserController(IUserService userService, ILogger<UserController> lo
 
     [Authorize]
     [HttpPut("update")]
-    public async Task<IActionResult> Update([FromBody] UpdateRequestWrapper requestWrapper)
+    public async Task<IActionResult> Update([FromBody] UserUpdateRequest requestWrapper)
         => await ControllerHelper.ExecuteAsync(async () =>
         {
             var userId = User.GetUserId();
-            var updatedUserDto = await _userService.UpdateUserAsync(
+            var updatedUserDto = await _userProfileService.UpdateUserAsync(
                 userId,
-                requestWrapper.Request.NameFirst,
-                requestWrapper.Request.LastName,
-                requestWrapper.Request.BirthDate,
-                requestWrapper.Request.Gender,
-                requestWrapper.Request.AddressLine1,
-                requestWrapper.Request.AddressLine2,
-                requestWrapper.Request.City,
-                requestWrapper.Request.State,
-                requestWrapper.Request.Country,
-                requestWrapper.Request.PostalCode,
-                requestWrapper.Request.Roles);
+                requestWrapper.FirstName,
+                requestWrapper.LastName,
+                requestWrapper.BirthDate,
+                requestWrapper.Gender,
+                requestWrapper.AddressLine1,
+                requestWrapper.AddressLine2,
+                requestWrapper.City,
+                requestWrapper.State,
+                requestWrapper.Country,
+                requestWrapper.PostalCode,
+                requestWrapper.Roles);
 
             return updatedUserDto;
         }, _logger, this, SuccessMessages.UserUpdated);
@@ -104,7 +108,7 @@ public class UserController(IUserService userService, ILogger<UserController> lo
         => await ControllerHelper.ExecuteAsync(async () =>
         {
             var userId = User.GetUserId();
-            var userDto = await _userService.GetCurrentUserAsync(userId);
+            var userDto = await _userProfileService.GetCurrentUserAsync(userId);
             return userDto;
         }, _logger, this, SuccessMessages.CurrentUserRetrieved);
 
@@ -115,7 +119,7 @@ public class UserController(IUserService userService, ILogger<UserController> lo
             if (!Enum.TryParse<UserRole>(roleName, true, out var role))
                 throw new ArgumentException(ErrorMessages.RoleNotFound);
 
-            var users = await _userService.GetUsersByRoleAsync(role);
+            var users = await _userProfileService.GetUsersByRoleAsync(role);
             return users;
         }, _logger, this, SuccessMessages.UsersByRoleRetrieved);
 }

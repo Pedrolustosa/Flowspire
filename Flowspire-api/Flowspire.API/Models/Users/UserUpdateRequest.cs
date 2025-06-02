@@ -1,14 +1,11 @@
 ﻿using Flowspire.Domain.Enums;
 
-namespace Flowspire.API.Models;
+namespace Flowspire.API.Models.Users;
 
-public class RegisterCustomerRequest
+public class UserUpdateRequest
 {
-    public string Email { get; set; }
-    public string NameFirst { get; set; }
+    public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string Password { get; set; }
-    public string PhoneNumber { get; set; }
     public DateTime? BirthDate { get; set; }
     public Gender Gender { get; set; } = Gender.NotSpecified;
     public string? AddressLine1 { get; set; }
@@ -17,4 +14,5 @@ public class RegisterCustomerRequest
     public string? State { get; set; }
     public string? Country { get; set; }
     public string? PostalCode { get; set; }
+    public List<UserRole> Roles { get; set; } = new();
 }

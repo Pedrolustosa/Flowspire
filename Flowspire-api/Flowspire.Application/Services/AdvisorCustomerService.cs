@@ -8,12 +8,12 @@ namespace Flowspire.Application.Services;
 
 public class AdvisorCustomerService(
     IAdvisorCustomerRepository advisorCustomerRepository,
-    IUserService userService,
+    IUserProfileService userService,
     ILogger<AdvisorCustomerService> logger) : IAdvisorCustomerService
 {
     private readonly IAdvisorCustomerRepository _advisorCustomerRepository = advisorCustomerRepository
             ?? throw new ArgumentNullException(nameof(advisorCustomerRepository));
-    private readonly IUserService _userService = userService
+    private readonly IUserProfileService _userService = userService
             ?? throw new ArgumentNullException(nameof(userService));
     private readonly ILogger<AdvisorCustomerService> _logger = logger
             ?? throw new ArgumentNullException(nameof(logger));

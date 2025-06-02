@@ -10,16 +10,13 @@ namespace Flowspire.Application.Services;
 public class DashboardService : IDashboardService
 {
     private readonly IFinancialTransactionService _transactionService;
-    private readonly IBudgetService _budgetService;
     private readonly ILogger<DashboardService> _logger;
 
     public DashboardService(
         IFinancialTransactionService transactionService,
-        IBudgetService budgetService,
         ILogger<DashboardService> logger)
     {
         _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
-        _budgetService = budgetService ?? throw new ArgumentNullException(nameof(budgetService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -36,19 +33,11 @@ public class DashboardService : IDashboardService
             _logger.LogInformation("Building dashboard for user {UserId} from {StartDate} to {EndDate}...", userId, startDate, endDate);
 
             var transactions = await _transactionService.GetByUserIdAsync(userId);
-            var budgets = await _budgetService.GetByUserIdAsync(userId);
 
             var filtered = transactions.Where(t => t.Date >= startDate && t.Date <= endDate).ToList();
 
             var totalIncome = filtered.Where(t => t.TransactionType == nameof(TransactionType.Income)).Sum(t => t.Amount);
             var totalExpenses = filtered.Where(t => t.TransactionType == nameof(TransactionType.Expense)).Sum(t => t.Amount);
-
-            var activeBudgets = budgets.Where(b => b.StartDate <= endDate && b.EndDate >= startDate).ToList();
-
-            var statuses = BuildBudgetStatuses(filtered, activeBudgets);
-            var alerts = statuses.Where(s => s.PercentageUsed >= 90)
-                                 .Select(s => $"Warning: Budget {s.CategoryName} reached {s.PercentageUsed:F2}% ({s.SpentAmount}/{s.BudgetAmount}).")
-                                 .ToList();
 
             var history = BuildMonthlyHistory(transactions, startDate);
             var trends = BuildCategoryTrends(transactions, startDate);
@@ -60,8 +49,6 @@ public class DashboardService : IDashboardService
             {
                 TotalIncome = totalIncome,
                 TotalExpenses = totalExpenses,
-                Budgets = statuses,
-                Alerts = alerts,
                 MonthlyHistory = history,
                 CategoryTrends = trends,
                 CategorySummary = summary
@@ -69,33 +56,6 @@ public class DashboardService : IDashboardService
         }, _logger, nameof(GetDashboardAsync));
 
     #region Helpers
-
-    private List<BudgetStatusDTO> BuildBudgetStatuses(
-        List<FinancialTransactionDTO> txs,
-        List<BudgetDTO> budgets)
-    {
-        return budgets
-            .Select(b =>
-            {
-                var spent = txs
-                    .Where(t => t.CategoryId == b.CategoryId && t.TransactionType == nameof(TransactionType.Expense))
-                    .Sum(t => t.Amount);
-
-                // agora todo cálculo é em decimal
-                var pct = b.Amount > 0m
-                    ? spent / b.Amount * 100m
-                    : 0m;
-
-                return new BudgetStatusDTO
-                {
-                    CategoryName = b.CategoryName,
-                    BudgetAmount   = b.Amount,
-                    SpentAmount    = spent,
-                    PercentageUsed = pct
-                };
-            })
-            .ToList();
-    }
 
     private List<MonthlySummaryDTO> BuildMonthlyHistory(
     IEnumerable<FinancialTransactionDTO> txs,

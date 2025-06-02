@@ -4,8 +4,8 @@ using System.Security.Claims;
 using Flowspire.Application.DTOs;
 using Flowspire.Application.Interfaces;
 using Flowspire.API.Common;
-using Flowspire.API.Models;
 using Flowspire.Application.Common;
+using Flowspire.API.Models.Messaging;
 
 namespace Flowspire.API.Controllers;
 
@@ -19,7 +19,7 @@ public class MessageController(IMessageService messageService, ILogger<MessageCo
 
     [HttpPost("send")]
     [Authorize(Roles = "Customer,FinancialAdvisor")]
-    public async Task<IActionResult> SendMessage([FromBody] SendMessageRequest request)
+    public async Task<IActionResult> SendMessage([FromBody] MessageSendRequest request)
         => await ControllerHelper.ExecuteAsync(async () =>
         {
             if (string.IsNullOrWhiteSpace(request.ReceiverId) || string.IsNullOrWhiteSpace(request.Content))

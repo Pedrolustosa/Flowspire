@@ -15,8 +15,6 @@ public static class DatabaseSeeder
         SeedUsersAndRoles(builder, hasher);
         SeedCategories(builder);
         SeedTransactions(builder);
-        SeedBudgets(builder);
-        SeedBudgetAmounts(builder);
         SeedMessages(builder);
         SeedAdvisorCustomer(builder);
     }
@@ -178,22 +176,6 @@ public static class DatabaseSeeder
                 CreatedAt = now,
                 UpdatedAt = now
             }
-        );
-    }
-
-    private static void SeedBudgets(ModelBuilder builder)
-    {
-        var now = DateTime.UtcNow;
-
-        builder.Entity<Budget>().HasData(
-            new { Id = 1, CategoryId = 1, StartDate = now.AddMonths(-1), EndDate = now.AddMonths(1), UserId = "550e8400-e29b-41d4-a716-446655440002", CreatedAt = now, UpdatedAt = now }
-        );
-    }
-
-    private static void SeedBudgetAmounts(ModelBuilder builder)
-    {
-        builder.Entity<Budget>().OwnsOne(b => b.Amount).HasData(
-            new { BudgetId = 1, Value = 500.00m }
         );
     }
 
