@@ -20,19 +20,20 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=flowspire.db";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddInfrastructure(connectionString, builder.Configuration);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins", policy =>
+    options.AddPolicy("AllowLocalhost", policy =>
     {
         policy.AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials()
               .WithOrigins(
                   "http://localhost:4200",
-                  "https://localhost:4200"
+                  "https://localhost:4200",
+                  "http://localhost:8080"
               );
     });
 });
@@ -49,7 +50,7 @@ builder.Services.AddHangfireServer();
 var app = builder.Build();
 
 app.UseAuditLogging();
-app.UseCors("AllowSpecificOrigins");
+app.UseCors("AllowLocalhost");
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseExceptionMiddleware();

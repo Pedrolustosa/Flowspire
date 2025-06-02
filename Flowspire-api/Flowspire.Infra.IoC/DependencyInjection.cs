@@ -14,6 +14,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Flowspire.Domain.Interfaces;
 using Flowspire.Domain.Entities;
+using Flowspire.Application.Factories;
 
 namespace Flowspire.Infra.IoC;
 
@@ -99,8 +100,6 @@ public static class DependencyInjection
         services.AddScoped<IFinancialTransactionRepository, FinancialTransactionRepository>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<IBudgetService, BudgetService>();
-        services.AddScoped<IBudgetRepository, BudgetRepository>();
         services.AddScoped<IMessageService, MessageService>();
         services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddScoped<IAdvisorCustomerService, AdvisorCustomerService>();
@@ -109,8 +108,10 @@ public static class DependencyInjection
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IAuditLogService, AuditLogService>();
         services.AddScoped<IAuditLogRepository, AuditLogRepository>();
-        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserDtoFactory, UserDtoFactory>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         return services;

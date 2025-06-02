@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Flowspire.Application.Interfaces;
-using Flowspire.API.Models;
 using Flowspire.API.Common;
 using Flowspire.Application.Common;
 using System.Security.Claims;
+using Flowspire.API.Models.Users;
 
 namespace Flowspire.API.Controllers;
 
@@ -18,7 +18,7 @@ public class AdvisorCustomerController(IAdvisorCustomerService advisorCustomerSe
 
     [HttpPost("assign")]
     [Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> AssignAdvisor([FromBody] AssignAdvisorRequest request)
+    public async Task<IActionResult> AssignAdvisor([FromBody] UserAdvisorAssignmentRequest request)
         => await ControllerHelper.ExecuteAsync(async () =>
         {
             var result = await _advisorCustomerService.AssignAdvisorAsync(request.AdvisorId, request.CustomerId);

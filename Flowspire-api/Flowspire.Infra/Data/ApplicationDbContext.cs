@@ -13,7 +13,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<FinancialTransaction> Transactions { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Category> Categories { get; set; }
-    public DbSet<Budget> Budgets { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<AdvisorCustomer> AdvisorCustomers { get; set; }
     public DbSet<AuditLog> AuditLogs { get; set; }
@@ -33,7 +32,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.ApplyConfiguration(new UserConfiguration());
         builder.ApplyConfiguration(new RefreshTokenConfiguration());
         builder.ApplyConfiguration(new CategoryConfiguration());
-        builder.ApplyConfiguration(new BudgetConfiguration());
         builder.ApplyConfiguration(new MessageConfiguration());
         builder.ApplyConfiguration(new AdvisorCustomerConfiguration());
         DatabaseSeeder.Seed(builder);

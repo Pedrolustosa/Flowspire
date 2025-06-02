@@ -1,6 +1,6 @@
-﻿namespace Flowspire.API.Models;
+﻿namespace Flowspire.API.Models.Messaging;
 
-public class SendMessageRequest
+public class MessageSendRequest
 {
     public string ReceiverId { get; set; }
     public string Content { get; set; }
