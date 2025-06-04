@@ -26,13 +26,17 @@ public class FinancialTransactionRepository(ApplicationDbContext context, ILogge
 
     public Task<List<FinancialTransaction>> GetByUserIdAsync(string userId)
         => RepositoryHelper.ExecuteAsync(
-            () => _context.Transactions.Where(t => t.UserId == userId).ToListAsync(),
+            () => _context.Transactions
+                .Include(t => t.Category)
+                .Where(t => t.UserId == userId)
+                .ToListAsync(),
             _logger,
             nameof(GetByUserIdAsync));
 
     public Task<List<FinancialTransaction>> GetByUserIdAndDateRangeAsync(string userId, DateTime startDate, DateTime endDate)
         => RepositoryHelper.ExecuteAsync(
             () => _context.Transactions
+                .Include(t => t.Category)
                 .Where(t => t.UserId == userId && t.Date >= startDate && t.Date <= endDate)
                 .ToListAsync(),
             _logger,
@@ -57,12 +61,13 @@ public class FinancialTransactionRepository(ApplicationDbContext context, ILogge
             nameof(DeleteAsync));
 
     public Task<IEnumerable<FinancialTransaction>> GetTransactionsByDateRangeAsync(DateTime startDate, DateTime endDate)
-    => RepositoryHelper.ExecuteAsync(
-        async () =>
-            (IEnumerable<FinancialTransaction>)await _context.Transactions
-                .Where(t => t.Date >= startDate && t.Date <= endDate)
-                .ToListAsync(),
-        _logger,
-        nameof(GetTransactionsByDateRangeAsync)
-    );
+        => RepositoryHelper.ExecuteAsync(
+            async () =>
+                (IEnumerable<FinancialTransaction>)await _context.Transactions
+                    .Include(t => t.Category)
+                    .Where(t => t.Date >= startDate && t.Date <= endDate)
+                    .ToListAsync(),
+            _logger,
+            nameof(GetTransactionsByDateRangeAsync)
+        );
 }
